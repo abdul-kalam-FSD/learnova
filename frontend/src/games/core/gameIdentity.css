@@ -1,0 +1,126 @@
+/* =========================================================
+   Phase 1C — per-game visual identity layer.
+   Purely additive/CSS-only: everything here is keyed off the
+   optional [data-game-identity] attribute GamePage/GameResults
+   set on the page root (see GameShell.jsx). Games that don't
+   pass an `identity` prop get no attribute and are completely
+   unaffected by this file.
+
+   Each identity gets:
+     - a subtle background texture (page root)
+     - a topbar accent tint
+     - a panel entrance motion
+     - one small identity-specific touch, only where the
+       existing mechanic already supports it (timer glow for
+       "speed", hit-shake for "boss" on a wrong answer)
+
+   All motion respects the global
+   @media (prefers-reduced-motion: reduce) override already
+   defined in index.css (it zeroes every animation/transition
+   duration), so nothing extra is needed here for that.
+   ========================================================= */
+
+@keyframes identity-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-game-identity] .practice-panel {
+  animation: identity-panel-in 220ms ease-out;
+}
+
+/* ---------- Investigation (Diagnosis) ---------- */
+[data-game-identity="investigation"] {
+  background-image:
+    radial-gradient(circle at 15% 8%, color-mix(in srgb, var(--accent-color) 6%, transparent), transparent 45%);
+}
+[data-game-identity="investigation"] .practice-topbar {
+  border-bottom-color: color-mix(in srgb, var(--accent-color) 30%, var(--border-color));
+}
+
+/* ---------- Engineering (CircuitBuilder) ---------- */
+[data-game-identity="engineering"] {
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--primary-color) 5%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 24px 100%;
+}
+[data-game-identity="engineering"] .practice-topbar {
+  border-bottom-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+}
+
+/* ---------- History (TimelineBuilder) ---------- */
+[data-game-identity="history"] {
+  background-image:
+    linear-gradient(180deg, color-mix(in srgb, var(--xp-color) 5%, transparent), transparent 30%);
+}
+[data-game-identity="history"] .practice-topbar {
+  border-bottom-color: color-mix(in srgb, var(--xp-color) 35%, var(--border-color));
+}
+
+/* ---------- Speed (FractionSpeedChallenge) ---------- */
+[data-game-identity="speed"] .practice-topbar {
+  border-bottom-color: color-mix(in srgb, var(--danger-color) 30%, var(--border-color));
+}
+@keyframes identity-speed-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(0, 0, 0, 0); }
+  50% { box-shadow: 0 0 10px color-mix(in srgb, var(--danger-color) 45%, transparent); }
+}
+/* Only touches the existing timer bar fill — no new element, no new
+   mechanic, just a glow while time is genuinely running low, using
+   the same --danger-color state that already flags the last seconds. */
+[data-game-identity="speed"] .dragdrop-item--wrong.h-full {
+  animation: identity-speed-pulse 1s ease-in-out infinite;
+}
+
+/* ---------- Boss (FractionBossChallenge) ---------- */
+[data-game-identity="boss"] {
+  background-image:
+    radial-gradient(circle at 85% 0%, color-mix(in srgb, var(--danger-color) 8%, transparent), transparent 50%);
+}
+[data-game-identity="boss"] .practice-topbar {
+  border-bottom-color: color-mix(in srgb, var(--danger-color) 35%, var(--border-color));
+}
+@keyframes identity-hit-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+/* Fires on the existing wrong-answer state only — reinforces the
+   already-real life loss, doesn't add a new one. */
+[data-game-identity="boss"] .dragdrop-item--wrong {
+  animation: identity-hit-shake 320ms ease-in-out;
+}
+
+/* ---------- Strategy (EquationBalanceStrategy) ---------- */
+[data-game-identity="strategy"] {
+  background-image:
+    linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 4%, transparent) 25%, transparent 25%),
+    linear-gradient(225deg, color-mix(in srgb, var(--primary-color) 4%, transparent) 25%, transparent 25%);
+  background-size: 32px 32px;
+}
+[data-game-identity="strategy"] .practice-topbar {
+  border-bottom-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+}
+
+/* ---------- Identity badge (small icon + eyebrow label pairing) ---------- */
+.game-identity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.game-identity-mark {
+  opacity: 0.85;
+}

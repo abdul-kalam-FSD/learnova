@@ -1,0 +1,822 @@
+/* =========================================================
+   Practice / Bio Detective mode.
+   IMPORTANT: Practice.jsx logic is untouched — this file only
+   supplies the classNames it already renders with. (Previously
+   this file accidentally contained a duplicate of LeaderBoard.css,
+   so the whole Practice screen was rendering unstyled.)
+   ========================================================= */
+
+.practice-page {
+  background-color: var(--bg-color);
+  font-family: var(--font-body);
+}
+
+.practice-message {
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.practice-message--error {
+  color: var(--danger-color);
+}
+
+/* ---------- Top bar ---------- */
+.practice-topbar {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.practice-topbar__back {
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  /* Visible icon glyph stays the same size (line-height/font-size
+     unchanged); the clickable box grows to the 44x44px minimum touch
+     target (Phase 1B §9A) via a negative margin that pulls the larger
+     box back around the same visual center, so surrounding layout
+     (label position, topbar height) is unaffected. */
+  width: 44px;
+  height: 44px;
+  margin: -8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+
+.practice-topbar__back:hover {
+  color: var(--primary-color);
+  background-color: var(--tint-primary-soft);
+}
+
+.practice-topbar__label {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: var(--fs-base);
+  color: var(--text-color);
+}
+
+/* Phase 5C-B: optional real chapter/mission context line, shown above
+   the game title only when the session was launched from a chapter
+   (see missionContext.jsx). Visually subordinate to __label, matching
+   the existing small-caps eyebrow pattern already used elsewhere
+   (e.g. .mission-hero__label / .game-objective__label). */
+.practice-topbar__mission {
+  display: block;
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.practice-pill {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+}
+
+.practice-pill--xp {
+  background-color: color-mix(in srgb, var(--xp-color) 18%, var(--card-bg));
+  color: var(--xp-color);
+}
+
+/* ---------- Panel ---------- */
+.practice-panel {
+  background-color: var(--bg-color);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Eyebrow / evidence label ---------- */
+.clue-card__label {
+  display: inline-block;
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  background-color: color-mix(in srgb, var(--accent-color) 14%, var(--card-bg));
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+}
+
+.clue-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-color);
+  box-shadow: var(--shadow-card);
+  color: var(--text-color);
+}
+
+.hint-text {
+  color: var(--text-secondary);
+}
+
+.stat-label {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ---------- Buttons (page-scoped extensions of the global .btn-*
+   family in index.css — btn-secondary/btn-investigation are only
+   used here, so their color rules live in this file) ---------- */
+.btn-primary-disabled {
+  background-color: var(--disabled-bg);
+  color: var(--disabled-text);
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1.5px solid var(--secondary-border);
+}
+
+.btn-investigation {
+  background-color: var(--accent-color);
+  color: var(--on-accent);
+}
+
+.btn-investigation-disabled {
+  background-color: var(--disabled-accent-bg);
+  color: var(--disabled-text);
+  cursor: not-allowed;
+}
+
+/* ---------- MCQ / Theory answer options ---------- */
+.option {
+  background-color: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-color);
+  transition: border-color var(--motion-fast), background-color var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.option:hover {
+  border-color: var(--primary-color);
+}
+
+.option:active {
+  transform: scale(0.99);
+}
+
+.option--picked {
+  background-color: var(--tint-primary-soft);
+  border: 1.5px solid var(--primary-color);
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.option--correct {
+  background-color: var(--success-color);
+  border: 1.5px solid var(--success-color);
+  color: var(--on-success);
+  font-weight: 700;
+}
+
+.option--incorrect {
+  background-color: var(--danger-color);
+  border: 1.5px solid var(--danger-color);
+  color: var(--on-danger);
+  font-weight: 700;
+}
+
+/* Correct/incorrect variants were pixel-identical (color set inline via
+   the ✓/✕ glyph, not CSS) — one shared element class instead of two.
+   No color of its own: inherits var(--on-success)/var(--on-danger) from
+   whichever parent (.option--correct / .option--incorrect) it's in, since
+   those two tokens aren't always the same color across themes. */
+.option__icon {
+  font-weight: 800;
+  font-size: var(--fs-md);
+  flex-shrink: 0;
+}
+
+/* ---------- Feedback card (explanation after answering) ---------- */
+.feedback-card {
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+
+.feedback-card--correct {
+  background-color: var(--success-bg);
+  border: 1px solid var(--success-color);
+}
+
+.feedback-card--incorrect {
+  background-color: var(--error-bg);
+  border: 1px solid var(--danger-color);
+}
+
+.feedback-card__verdict {
+  font-weight: 800;
+  font-size: var(--fs-base);
+  margin-bottom: 2px;
+}
+
+.feedback-card--correct .feedback-card__verdict {
+  color: var(--success-color);
+}
+
+.feedback-card--incorrect .feedback-card__verdict {
+  color: var(--danger-color);
+}
+
+.feedback-card__explanation {
+  color: var(--text-color);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+
+/* ---------- Fun fact block (inside feedback card) ---------- */
+.fun-fact {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.fun-fact__label {
+  display: block;
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--accent-color);
+  margin-bottom: 3px;
+}
+
+.fun-fact__text {
+  color: var(--text-color);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  font-style: italic;
+}
+
+/* Plain inline feedback text (dragdrop / matching completion lines) */
+.feedback-text--correct {
+  color: var(--success-color);
+}
+
+.feedback-text--incorrect {
+  color: var(--danger-color);
+}
+
+/* ---------- Drag & drop / matching chips ---------- */
+.dragdrop-item {
+  border: 1.5px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  transition: border-color var(--motion-fast), background-color var(--motion-fast),
+    transform var(--motion-fast);
+  /* Phase 1B §9B: existing per-instance px/py padding utility classes
+     varied from ~32-36px tall. min-height alone (not a fixed height,
+     and deliberately not forcing display/align-items here) preserves
+     each instance's own padding, sizing, and flex/justify utility
+     classes exactly as they were, while guaranteeing at least the
+     44px touch-target minimum — most call sites are already flex
+     containers themselves (verified against every game's actual
+     className usage) so text stays centered as before; box-sizing
+     ensures the min-height plays correctly with existing padding. */
+  box-sizing: border-box;
+  min-height: 44px;
+}
+
+.dragdrop-item:active {
+  transform: scale(0.97);
+}
+
+.dragdrop-item[draggable="true"] {
+  cursor: grab;
+}
+
+.dragdrop-item--default {
+  border-color: var(--border-color);
+}
+
+.dragdrop-item--selected {
+  background-color: var(--tint-primary-soft);
+  border-color: var(--primary-color);
+  font-weight: 600;
+}
+
+.dragdrop-item--matched {
+  border-style: dashed;
+  border-color: var(--primary-color);
+  opacity: 0.85;
+}
+
+.dragdrop-item--correct {
+  background-color: var(--success-color);
+  border-color: var(--success-color);
+  color: var(--on-success);
+  font-weight: 700;
+}
+
+.dragdrop-item--wrong {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+  color: var(--on-danger);
+  font-weight: 700;
+}
+
+.dragdrop-item__handle {
+  opacity: 0.5;
+  font-size: var(--fs-xs);
+  cursor: grab;
+}
+
+/* .dragdrop-slot itself carries no styles — each state below is
+   visually distinct with nothing shared, so it's kept only as the
+   BEM base hook applied in JSX alongside the modifier. */
+.dragdrop-slot--empty {
+  border: 1.5px dashed var(--border-color);
+  background-color: transparent;
+  color: var(--text-secondary);
+}
+
+.dragdrop-slot--filled {
+  border: 1.5px solid var(--primary-color);
+  background-color: var(--tint-primary-soft);
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.dragdrop-slot--correct {
+  border: 1.5px solid var(--success-color);
+  background-color: var(--success-color);
+  color: var(--on-success);
+  font-weight: 700;
+}
+
+.dragdrop-slot--wrong {
+  border: 1.5px solid var(--danger-color);
+  background-color: var(--danger-color);
+  color: var(--on-danger);
+  font-weight: 700;
+}
+
+/* ---------- Investigation Hub list items ---------- */
+.hub-item {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  color: var(--text-color);
+  transition: border-color var(--motion-fast), transform var(--motion-fast);
+}
+
+.hub-item:hover {
+  border-color: var(--primary-color);
+}
+
+.hub-item:active {
+  transform: scale(0.99);
+}
+
+.hub-item--done {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.hub-item--next {
+  border: 1.5px solid var(--primary-color);
+  box-shadow: 0 0 0 3px var(--tint-primary-soft);
+}
+
+/* ---------- Investigation Hub: progress bar ---------- */
+.hub-progress__top {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.hub-progress__pct {
+  color: var(--primary-color);
+}
+
+.hub-progress__track {
+  height: 8px;
+  background-color: var(--surface-color);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.hub-progress__fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: var(--radius-pill);
+  transition: width var(--motion-base);
+}
+
+/* ---------- Investigation Hub: tool cards ---------- */
+.hub-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.hub-tools__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  text-align: left;
+  transition: border-color var(--motion-fast), transform var(--motion-fast);
+}
+
+.hub-tools__card:hover {
+  border-color: var(--primary-color);
+}
+
+.hub-tools__card:active {
+  transform: scale(0.98);
+}
+
+.hub-tools__icon {
+  font-size: var(--fs-xl);
+  margin-bottom: 4px;
+}
+
+.hub-tools__label {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.hub-tools__sub {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* ---------- Investigation Hub: step path ---------- */
+.hub-steps__title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.hub-steps__path {
+  display: flex;
+  flex-direction: column;
+}
+
+.hub-steps__row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  padding-bottom: 10px;
+}
+
+.hub-steps__track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.hub-steps__node {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  background-color: var(--surface-color);
+  color: var(--text-secondary);
+  border: 1.5px solid var(--border-color);
+}
+
+.hub-steps__node--done {
+  background-color: var(--success-color);
+  color: var(--on-success);
+  border-color: var(--success-color);
+}
+
+.hub-steps__node--next {
+  background-color: var(--primary-color);
+  color: var(--on-primary);
+  border-color: var(--primary-color);
+}
+
+.hub-steps__connector {
+  width: 2px;
+  flex: 1;
+  min-height: 14px;
+  background-color: var(--border-color);
+  margin: 2px 0;
+}
+
+.hub-steps__connector--done {
+  background-color: var(--success-color);
+}
+
+/* ---------- Shared SVG overlay (used by both the Detective Board
+   and the Matching canvas — not exclusive to either, so it isn't
+   namespaced under board- or matching-) ---------- */
+.canvas-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Detective Board canvas ---------- */
+.board-canvas {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+}
+
+.board-canvas__line {
+  stroke: var(--primary-color);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.board-canvas__pick-ring {
+  fill: none;
+  stroke: var(--accent-color);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.board-node {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 84px;
+  padding: 8px 4px;
+  border-radius: var(--radius-md);
+  background-color: var(--card-bg);
+  border: 1.5px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  text-align: center;
+}
+
+.board-node__icon {
+  font-size: var(--fs-md);
+}
+
+.board-node__label {
+  font-size: var(--fs-2xs);
+  font-weight: 600;
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
+.board-node--selected {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-color) 20%, transparent);
+}
+
+.board-node--linked {
+  border-color: var(--primary-color);
+}
+
+/* ---------- Matching canvas ---------- */
+.matching-canvas {
+  position: relative;
+}
+
+.matching-canvas__line {
+  stroke: var(--text-secondary);
+  stroke-width: 1;
+  stroke-dasharray: 3 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.matching-canvas__line--correct {
+  stroke: var(--success-color);
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  vector-effect: non-scaling-stroke;
+}
+
+.matching-canvas__line--wrong {
+  stroke: var(--danger-color);
+  stroke-width: 1.5;
+  stroke-dasharray: none;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---------- Case closed / result screen ---------- */
+.case-closed__badge {
+  background-color: var(--accent-color);
+  color: var(--on-accent);
+  letter-spacing: 0.12em;
+}
+
+.case-closed__stat {
+  background-color: var(--surface-color);
+  color: var(--text-color);
+}
+
+/* ---------- Game Shell additions (Part 8: progress / objective / hint / feedback) ---------- */
+.practice-topbar-wrap {
+  background-color: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Section 14: age-appropriate sizing. No modifier class = original
+   fixed size for every game that hasn't opted a gradeBand in yet. */
+.practice-topbar-wrap--primary .practice-topbar__label {
+  font-size: var(--fs-lg);
+}
+
+.practice-topbar-wrap--primary .practice-topbar__back {
+  font-size: var(--fs-xl);
+}
+
+.practice-topbar-wrap--senior .practice-topbar__label {
+  font-size: var(--fs-sm);
+}
+
+.practice-topbar-wrap--senior .practice-topbar {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.game-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.game-progress__track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background-color: var(--surface-color);
+  overflow: hidden;
+}
+
+.game-progress__fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background-color: var(--primary-color);
+  transition: width var(--motion-fast, 0.2s ease);
+}
+
+.game-progress__label {
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.game-objective {
+  background-color: var(--tint-primary-soft, var(--surface-color));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.game-objective__label {
+  display: block;
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  margin-bottom: 2px;
+}
+
+.game-objective__text {
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+.game-hint__toggle {
+  background: none;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--primary-color);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.game-hint__panel {
+  margin-top: 6px;
+  background-color: var(--surface-color);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+.game-hint__cost {
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Positive/negative pop-in so feedback reads as an *event*, not just
+   text that appeared — Part 8 explicitly calls for a "positive
+   animation" on a correct action, which the plain feedback-card had
+   never had. Kept subtle and short (180ms) so it doesn't feel gamey
+   or delay the student from moving on. Respects reduced-motion. */
+@keyframes game-feedback-pop {
+  0% {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.game-feedback {
+  animation: game-feedback-pop 180ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-feedback {
+    animation: none;
+  }
+}
+
+.game-feedback__xp {
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--success-color);
+  white-space: nowrap;
+}
+
+/* Floating "+N" over the top-bar XP pill, plus a brief pulse on the
+   pill itself, when xp increases (Part 22: "show XP earned
+   immediately... with a subtle animation"). Purely visual — the
+   aria-live announcement above already covers screen readers — and
+   self-clears via GameShell's xpBump timeout, so it never lingers or
+   blocks the number underneath from updating instantly. */
+@keyframes xp-bump-float {
+  0% { transform: translate(-50%, 0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate(-50%, -14px); opacity: 0; }
+}
+.xp-bump {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  margin-bottom: 2px;
+  transform: translate(-50%, 0);
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  color: var(--success-color);
+  pointer-events: none;
+  animation: xp-bump-float 900ms ease-out forwards;
+}
+@keyframes xp-pill-pulse {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+.practice-pill--xp-bump {
+  animation: xp-pill-pulse 300ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .xp-bump {
+    animation: none;
+    opacity: 1;
+  }
+  .practice-pill--xp-bump {
+    animation: none;
+  }
+}
+
+.game-feedback__learned {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid color-mix(in srgb, var(--success-color) 30%, transparent);
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  line-height: 1.4;
+}

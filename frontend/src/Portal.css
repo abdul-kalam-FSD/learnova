@@ -1,0 +1,133 @@
+.portal-entry {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: var(--bg-color);
+}
+
+.portal-entry__card {
+  width: 100%;
+  max-width: 440px;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  box-shadow: var(--shadow-card);
+  padding: 32px 28px;
+  text-align: center;
+}
+
+.portal-entry__icon {
+  font-size: var(--fs-hero);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.portal-entry__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
+}
+
+.portal-entry__title {
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--text-color);
+  margin: 0 0 8px;
+  line-height: 1.25;
+}
+
+.portal-entry__tagline {
+  font-size: var(--fs-base);
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.portal-entry__capabilities {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--surface-color);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.portal-entry__capabilities li {
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  padding-left: 22px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.portal-entry__capabilities li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.portal-entry__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.portal-entry__signin {
+  width: 100%;
+  padding: 13px;
+  font-weight: 700;
+  font-size: var(--fs-base);
+  border-radius: 12px;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.portal-entry__back {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.portal-entry__back:hover {
+  color: var(--text-color);
+}
+
+.portal-entry__note {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.portal-entry__card--denied .portal-entry__eyebrow {
+  color: var(--error-color);
+}
+
+.portal-context-banner {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.portal-context-banner strong {
+  color: var(--primary-color);
+}

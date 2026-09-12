@@ -1,0 +1,632 @@
+.chapters-page {
+  background-color: var(--bg-color);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+.chapters-page__error {
+  color: var(--danger-color);
+}
+
+.chapters-page__title {
+  font-family: var(--font-heading);
+  color: var(--text-color);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+}
+
+.chapters-page__subtitle {
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.chapters-page__unit-count {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  background-color: var(--surface-color);
+  border-radius: var(--radius-pill);
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+
+/* ---------- Subject grouping (only rendered when a grade spans more
+   than one subject, e.g. Grade 11-12 streams) ---------- */
+.chapters-page__subject-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.chapters-page__subject-icon {
+  font-size: var(--fs-lg);
+  line-height: 1;
+}
+
+.chapters-page__subject-title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--text-color);
+  flex: 1;
+  min-width: 0;
+}
+
+/* ---------- Chapter card ---------- */
+.chapter-card__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+/* Desktop: two-across instead of one long single-column list, once
+   the page container itself widens (see .chapters-page's lg:max-w-3xl
+   in Chapters.jsx). Each card keeps its own horizontal row layout —
+   only the number of rows-per-line changes. */
+@media (min-width: 1024px) {
+  .chapter-card__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 16px;
+  }
+}
+
+.chapter-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 12px 14px;
+  text-decoration: none;
+  transition: border-color var(--motion-fast), transform var(--motion-fast);
+}
+
+.chapter-card:hover {
+  border-color: var(--primary-color);
+}
+
+.chapter-card:active {
+  transform: scale(0.99);
+}
+
+.chapter-card__icon {
+  font-size: var(--fs-2xl);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    var(--tint-primary-soft),
+    color-mix(in srgb, var(--accent-color) 18%, var(--tint-primary-soft))
+  );
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.chapter-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.chapter-card__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 6px;
+}
+
+.chapter-card__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin-top: 5px;
+}
+
+.chapter-card__breakdown {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.chapter-card__breakdown-chip {
+  font-size: var(--fs-2xs);
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.chapter-card__arrow {
+  color: var(--text-secondary);
+  font-size: var(--fs-lg);
+  flex-shrink: 0;
+}
+
+/* ---------- Chapter Detail page ---------- */
+.chapter-detail__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 12px;
+}
+
+.chapter-detail__back:hover {
+  color: var(--primary-color);
+}
+
+.chapter-detail__title {
+  color: var(--text-color);
+}
+
+.chapter-detail__unit {
+  color: var(--text-secondary);
+}
+
+.chapter-detail__progress {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 14px;
+}
+
+.chapter-detail__progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.chapter-detail__progress-label {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.chapter-detail__progress-value {
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--primary-color);
+}
+
+/* ---------- Concept list ---------- */
+.concept-list {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.concept-list__row {
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+/* ==========================================================
+   Phase 0B — Subject World / Chapter World (game-world layer)
+   ========================================================== */
+
+/* ---------- Player header (Level/XP/Streak strip) ---------- */
+.world-player-header__identity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.world-player-header__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  color: var(--on-primary-accent-gradient);
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  flex-shrink: 0;
+}
+
+.world-player-header__name {
+  font-family: var(--font-heading);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.world-player-header__chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.world-player-header__track {
+  width: 100%;
+  height: 6px;
+  background-color: var(--surface-color);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.world-player-header__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: var(--radius-pill);
+  transition: width var(--motion-fast);
+}
+
+/* ---------- Subject category accents ----------
+   Reuse existing theme-aware tokens (never invent new hex colors per
+   theme) so every theme (light/dark/forest/etc.) gets a correct,
+   already-contrast-checked accent automatically. */
+.world-card--math { --world-accent: var(--primary-color); }
+.world-card--physical { --world-accent: var(--accent-color); }
+.world-card--life { --world-accent: var(--success-color); }
+.world-card--language { --world-accent: color-mix(in srgb, var(--primary-color) 50%, var(--accent-color)); }
+.world-card--computing { --world-accent: color-mix(in srgb, var(--accent-color) 40%, var(--primary-color)); }
+.world-card--humanities { --world-accent: var(--xp-color); }
+
+/* ---------- World card (Subject World) ---------- */
+.world-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-top: 3px solid var(--world-accent, var(--primary-color));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 14px;
+  text-align: left;
+  transition: border-color var(--motion-fast), transform var(--motion-fast);
+}
+
+.world-card:hover {
+  border-color: var(--world-accent, var(--primary-color));
+}
+
+.world-card:active {
+  transform: scale(0.99);
+}
+
+.world-card__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.world-card__icon {
+  font-size: var(--fs-2xl);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--world-accent, var(--primary-color)) 16%, var(--card-bg));
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.world-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.world-card__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.world-card__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin-top: 3px;
+}
+
+.world-card__arrow {
+  color: var(--text-secondary);
+  font-size: var(--fs-lg);
+  flex-shrink: 0;
+}
+
+.world-card__mission {
+  background-color: var(--surface-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 8px 10px;
+}
+
+.world-card__mission-label {
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}
+
+.world-card__mission-title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-color);
+  margin-top: 2px;
+}
+
+.world-card__recommended {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.world-card__recommended-action {
+  font-weight: 700;
+  color: var(--world-accent, var(--primary-color));
+}
+
+.world-card__complete-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--success-color);
+}
+
+/* ---------- Phase 3B: world-hub heading + grade context ----------
+   Additive only — title/subtitle text and classes are unchanged, this
+   just wraps them for a clearer identity block and adds a read-only
+   grade chip next to the title. The badge is a plain <span>: no
+   role, no tabIndex, no click handler, so it never becomes a
+   focusable/interactive element by accident. */
+.world-hub-heading__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.world-hub-heading__title {
+  margin: 0;
+}
+
+.world-hub-heading__subtitle {
+  margin-top: 4px;
+}
+
+.subject-world__grade-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: var(--fs-2xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  padding: 4px 11px;
+  white-space: nowrap;
+}
+
+/* ---------- Phase 3B: world-card visual polish ----------
+   Property-level refinements only — no classes renamed, no markup
+   restructured, no new game/progress logic. Elevation and the
+   mission/recommended dividers reuse the card's own --world-accent
+   token via color-mix, matching the technique already used by
+   .world-card__icon, so every subject category and every theme still
+   gets a correct, already-contrast-checked look for free. */
+.world-card__title {
+  letter-spacing: 0.01em;
+}
+
+.world-card__meta {
+  margin-bottom: 2px;
+}
+
+.world-card:hover {
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--world-accent, var(--primary-color)) 20%, transparent);
+}
+
+.world-card__mission {
+  border-left: 3px solid var(--world-accent, var(--primary-color));
+}
+
+.world-card__recommended {
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color);
+}
+
+.world-empty-games {
+  padding-top: 6px;
+  border-top: 1px solid var(--border-color);
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+/* ---------- Chapter journey (Subject Chapters "world map") ---------- */
+.chapter-journey {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.chapter-journey__stage {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 4px 22px 4px;
+  text-decoration: none;
+}
+
+/* Connecting trail line between stage nodes, stopping before the
+   last stage so nothing dangles below it. */
+.chapter-journey__stage:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 21px;
+  top: 44px;
+  bottom: -4px;
+  width: 2px;
+  background-color: var(--border-color);
+}
+
+.chapter-journey__node {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-xl);
+  background-color: var(--card-bg);
+  border: 2px solid var(--border-color);
+}
+
+.chapter-journey__stage--completed .chapter-journey__node {
+  border-color: var(--success-color);
+  background: color-mix(in srgb, var(--success-color) 14%, var(--card-bg));
+}
+
+.chapter-journey__stage--current .chapter-journey__node {
+  border-color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 16%, var(--card-bg));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+
+.chapter-journey__body {
+  flex: 1;
+  min-width: 0;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 10px 12px;
+}
+
+.chapter-journey__stage--current .chapter-journey__body {
+  border-color: var(--primary-color);
+}
+
+.chapter-journey__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.chapter-journey__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.chapter-journey__arrow {
+  align-self: center;
+  color: var(--text-secondary);
+  font-size: var(--fs-md);
+  flex-shrink: 0;
+}
+
+/* ---------- Mission hero (current chapter, dominant panel) ---------- */
+.mission-hero {
+  background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 10%, var(--card-bg)), var(--card-bg));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 16px;
+  text-align: left;
+  width: 100%;
+}
+
+.mission-hero__label {
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: var(--primary-color);
+  text-transform: uppercase;
+}
+
+.mission-hero__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-xl);
+  font-weight: 800;
+  color: var(--text-color);
+  margin: 3px 0 6px 0;
+}
+
+.mission-hero__sub {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.mission-hero__track {
+  width: 100%;
+  height: 8px;
+  background-color: var(--surface-color);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.mission-hero__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+  border-radius: var(--radius-pill);
+}
+
+.mission-hero__recommended {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--surface-color);
+  border-radius: var(--radius-md, 10px);
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  font-size: var(--fs-sm);
+}
+
+.mission-hero__recommended-icon {
+  font-size: var(--fs-lg);
+}
+
+.mission-hero__recommended-action {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.mission-hero__recommended-label {
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+}
+
+.world-empty-games {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  font-style: italic;
+}

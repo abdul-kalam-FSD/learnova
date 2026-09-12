@@ -1,0 +1,118 @@
+.progress-page {
+  background-color: var(--bg-color);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+.progress-page__error {
+  color: var(--error-color);
+}
+
+.progress-page__title {
+  color: var(--text-color);
+  font-family: var(--font-heading);
+}
+
+/* ---------- Overall mastery track/fill — shared with Home.jsx's
+   "Quick progress peek", which imports this file directly. Not
+   namespaced under progress-page since it's used on two pages. ---------- */
+.progress-overall__track {
+  width: 100%;
+  height: 10px;
+  background-color: var(--surface-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-overall__fill {
+  height: 100%;
+  background-color: var(--primary-color);
+  border-radius: 6px;
+  transition: width 0.4s ease;
+}
+
+.progress-overall__label {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+
+.progress-page__empty {
+  color: var(--text-secondary);
+}
+
+.progress-page__practice-link {
+  display: inline-block;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--accent-color);
+  text-decoration: none;
+}
+
+.progress-page__practice-link:hover {
+  text-decoration: underline;
+}
+
+.progress-page__filter {
+  color: var(--text-secondary);
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.progress-page__filter--active {
+  color: var(--on-danger);
+  background-color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+}
+
+/* ---------- Chapter card ---------- */
+.progress-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.progress-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress-card__icon {
+  font-size: var(--fs-lg);
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--tint-primary-soft);
+  border-radius: 8px;
+}
+
+.progress-card__chapter-title {
+  color: var(--text-color);
+}
+
+/* ---------- Desktop: two-column card grid ----------
+   Below 1024px this stays a single column (progress-card's own
+   margin-bottom handles vertical spacing, same as before). At 1024px+
+   — where the page container itself widens to lg:max-w-3xl in
+   Progress.jsx — lay chapters out two-across instead of one long
+   scrolling list. */
+.progress-card__grid {
+  display: flex;
+  flex-direction: column;
+}
+@media (min-width: 1024px) {
+  .progress-card__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0 16px;
+    align-items: start;
+  }
+}

@@ -1,0 +1,67 @@
+.nav {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 20;
+}
+
+.nav__link {
+  color: var(--text-secondary);
+  font-weight: 500;
+  background-color: transparent;
+  border-radius: 12px;
+  min-height: 44px;
+  position: relative;
+  transition: color var(--motion-fast), background-color var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.nav__link span:first-child {
+  font-size: var(--fs-lg);
+  line-height: 1;
+  transition: transform var(--motion-fast);
+}
+
+.nav__link:active span:first-child {
+  transform: scale(0.9);
+}
+
+.nav__link--active {
+  color: var(--primary-color);
+  font-weight: 700;
+  background-color: var(--tint-primary-soft);
+}
+
+.nav__link--active span:first-child {
+  transform: scale(1.08);
+}
+
+/* Small active indicator dot above the icon on mobile */
+.nav__link--active::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+}
+
+@media (min-width: 768px) {
+  .nav__link--active::before {
+    display: none;
+  }
+}
+
+/* Very small phones (iPhone SE / older Android) — trim padding further so
+   six tabs never wrap or clip. */
+@media (max-width: 360px) {
+  .nav__link {
+    font-size: var(--fs-2xs);
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  .nav__link span:first-child {
+    font-size: var(--fs-md);
+  }
+}

@@ -1,0 +1,248 @@
+.leaderboard {
+  font-family: var(--font-body);
+}
+
+.leaderboard__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-xl);
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 14px;
+}
+
+.leaderboard__tabs {
+  display: flex;
+  gap: 6px;
+  background-color: var(--surface-color);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 16px;
+}
+
+.leaderboard__tab {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.leaderboard__tab--active {
+  background-color: var(--accent-color);
+  color: var(--on-accent);
+}
+
+.leaderboard__loading,
+.leaderboard__empty {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 24px 0;
+  font-size: var(--fs-base);
+}
+
+.leaderboard__error {
+  color: var(--danger-color);
+  text-align: center;
+  padding: 16px 0;
+  font-size: var(--fs-base);
+}
+
+.leaderboard__card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.leaderboard__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.leaderboard__row:last-child {
+  border-bottom: none;
+}
+
+.leaderboard__row--you {
+  background-color: var(--tint-primary-soft);
+}
+
+.leaderboard__rank {
+  width: 28px;
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.leaderboard__name {
+  flex: 1;
+  font-size: var(--fs-base);
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.leaderboard__you-tag {
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.leaderboard__xp {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--xp-color);
+}
+
+.leaderboard__you-outside {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  border: 1px dashed var(--primary-color);
+  border-radius: 14px;
+  background-color: var(--surface-color);
+}
+
+/* ---------- Podium (top 3) ---------- */
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.podium__block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 92px;
+}
+
+.podium__avatar {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
+  /* Meets WCAG large-text (>=3:1) against both gradient stops at the
+     default 18px/800 size below. At the <=360px breakpoint further down
+     this shrinks to 16px, which falls just under the formal large-text
+     cutoff (~18.66px bold) - contrast there is ~3.3-3.7:1 in the light/
+     forest themes, short of the 4.5:1 normal-text bar. Known gap; fixing
+     it cleanly needs a bigger change (drop the gradient for a flat,
+     contrast-checked background, or add a text-shadow) rather than a
+     token swap. */
+  color: var(--on-primary-accent-gradient);
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+  box-shadow: var(--shadow-card);
+}
+
+.podium__block--first .podium__avatar {
+  width: 58px;
+  height: 58px;
+  font-size: var(--fs-xl);
+}
+
+.podium__medal {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  font-size: var(--fs-md);
+}
+
+.podium__name {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--text-color);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 90px;
+}
+
+.podium__xp {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--xp-color);
+  margin-bottom: 6px;
+}
+
+/* Narrow phones (iPhone SE / older Android, ~320px): the three fixed
+   92px podium blocks + gaps (296px) overflow the 288px available
+   inside .leaderboard's p-4 padding, clipping the 3rd-place block.
+   Shrink blocks/avatars/gap so all three always fit. */
+@media (max-width: 360px) {
+  .podium {
+    gap: 6px;
+  }
+
+  .podium__block {
+    width: 84px;
+  }
+
+  .podium__avatar {
+    width: 42px;
+    height: 42px;
+    font-size: var(--fs-md);
+  }
+
+  .podium__block--first .podium__avatar {
+    width: 50px;
+    height: 50px;
+    font-size: var(--fs-lg);
+  }
+
+  .podium__name {
+    max-width: 82px;
+    font-size: var(--fs-xs);
+  }
+}
+
+.podium__stand {
+  width: 100%;
+  border-radius: 10px 10px 0 0;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  text-align: center;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  color: var(--text-secondary);
+  padding-top: 6px;
+}
+
+.podium__block--first .podium__stand {
+  height: 64px;
+  background-color: var(--tint-primary-soft);
+  color: var(--primary-color);
+  font-size: var(--fs-lg);
+}
+
+.podium__block--second .podium__stand {
+  height: 46px;
+  font-size: var(--fs-md);
+}
+
+.podium__block--third .podium__stand {
+  height: 34px;
+  font-size: var(--fs-md);
+}

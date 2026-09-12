@@ -1,0 +1,196 @@
+.auth-page {
+  background-color: var(--bg-color);
+  font-family: var(--font-body);
+}
+
+.auth-page__card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.auth-page__title {
+  color: var(--text-color);
+  font-family: var(--font-heading);
+}
+
+/* ---------- Brand row (logo badge + wordmark) ---------- */
+.auth-page__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.auth-page__brand-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: var(--fs-sm);
+  border-radius: 7px;
+  background-color: var(--tint-primary-soft);
+  flex-shrink: 0;
+}
+
+.auth-page__brand-wordmark {
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent-color);
+}
+
+.auth-page__subtitle {
+  color: var(--text-secondary);
+}
+
+.auth-page__error {
+  background-color: var(--error-bg);
+  border: 1px solid var(--error-color);
+  color: var(--error-color);
+  border-radius: 8px;
+}
+
+.auth-page__label {
+  color: var(--text-secondary);
+}
+
+.auth-page__input {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  transition: border-color var(--motion-fast);
+}
+
+.auth-page__input:focus {
+  border-color: var(--primary-color);
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
+.auth-page__submit {
+  border-radius: 10px;
+}
+
+.auth-page__footer {
+  color: var(--text-secondary);
+}
+
+.auth-page__footer a {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* ---------- Password field with visibility toggle ---------- */
+.auth-page__password-row {
+  position: relative;
+}
+
+.auth-page__password-row .auth-page__input {
+  padding-right: 44px;
+}
+
+.auth-page__password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.auth-page__password-toggle:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+  border-radius: 6px;
+}
+
+/* ---------- Forgot password link / row above submit ---------- */
+.auth-page__forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -10px 0 16px;
+}
+
+.auth-page__forgot-row a {
+  color: var(--primary-color);
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+/* ---------- Divider + guest CTA ---------- */
+.auth-page__divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+}
+
+.auth-page__divider::before,
+.auth-page__divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--border-color);
+}
+
+.auth-page__guest-link {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+  background-color: var(--surface-color);
+}
+
+/* ---------- Role selector (Student / Teacher) ---------- */
+.auth-page__role-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.auth-page__role-option {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.auth-page__role-option--active {
+  border-color: var(--primary-color);
+  background-color: var(--tint-primary-soft);
+  color: var(--primary-color);
+}
+
+/* ---------- Success / info banners ---------- */
+.auth-page__success {
+  background-color: var(--success-bg, var(--tint-primary-soft));
+  border: 1px solid var(--success-color, var(--primary-color));
+  color: var(--success-color, var(--primary-color));
+  border-radius: 8px;
+}
+
+.auth-page__hint {
+  color: var(--text-secondary);
+}
