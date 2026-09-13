@@ -411,15 +411,63 @@ export function GamePanel({ children }) {
   return <div className="practice-panel p-5 flex-1">{children}</div>;
 }
 
+// BUGFIX (production bug 1 - duplicate game-completion requests):
+// this is the single shared button every one of the 54 games' "Check
+// X", "Claim Reward", "Start Mission", etc. actions render through.
+// None of them previously guarded against a fast double-click/double-
+// tap firing the same onClick handler twice in the same gesture —
+// most visibly on "Claim Reward", where that meant two near-
+// simultaneous POST /games/:id/complete requests for one click. The
+// backend is now idempotent either way (see gameControllers.js), but
+// stopping the duplicate request at the source is the more direct
+// fix. A short, self-resetting lock here — independent of the
+// caller's own `disabled` prop, which most callers of this button
+// don't set at all — blocks a second invocation without changing any
+// button's visible label, styling, or the caller's own click handler.
 export function GamePrimaryButton({ children, onClick, disabled, secondary }) {
+  const clickLockRef = useRef(false);
+  const lockTimeoutRef = useRef(null);
+
+  // The button at a given JSX slot (e.g. "Check Bridge" flipping to
+  // "Claim Reward" once the attempt is correct) is the same rendered
+  // component instance across that transition, not a remount — so a
+  // lock left over from clicking "Check Bridge" would otherwise still
+  // be active when "Claim Reward" first appears and block its very
+  // first, legitimate click. Resetting whenever the handler itself
+  // changes (a new logical action, always a new function reference
+  // every one of the 54 games passes) means the lock only ever blocks
+  // a second click on the *same* action, never a first click on the
+  // next one. This runs as an effect (not during render, which
+  // react-hooks/refs correctly disallows) — it still commits before
+  // the user can physically fire a next click, so a real same-render
+  // double-click (no re-render in between, same handler reference)
+  // stays correctly blocked.
+  useEffect(() => {
+    clickLockRef.current = false;
+    return () => clearTimeout(lockTimeoutRef.current);
+  }, [onClick]);
+
   const variant = secondary
     ? "btn-secondary"
     : disabled
       ? "btn-primary-disabled"
       : "btn-primary";
+
+  const handleClick = (event) => {
+    if (disabled || clickLockRef.current) return;
+    clickLockRef.current = true;
+    // 800ms is long enough to absorb a double-click/double-tap on the
+    // same gesture, short enough it never feels stuck for an action
+    // that doesn't itself trigger a re-render.
+    lockTimeoutRef.current = setTimeout(() => {
+      clickLockRef.current = false;
+    }, 800);
+    onClick?.(event);
+  };
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
       className={`${variant} w-full py-3 rounded-lg font-semibold text-sm`}
     >

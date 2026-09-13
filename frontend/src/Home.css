@@ -236,17 +236,7 @@
   flex-shrink: 0;
 }
 
-/* ---------- Phase 7C-4: Tier-3 (exploration/achievement) de-emphasis ----------
-   Small, additive-only weight reduction for New Games / All Games /
-   Achievements / Leaderboard so the Tier 1/2 learning actions above them
-   (hero, Level Progress, Overall Mastery, Assigned to You, Weak
-   Concepts) read as the primary path. Existing tokens only (--shadow-sm
-   already exists in index.css, theme-independent like the --shadow-lg
-   .home-hero already uses) -- no new design system, no hardcoded
-   colors. GameCard, GameUI.css, and global index.css are untouched: this
-   follows the same
-   additive-modifier pattern GameUI.css's own `.game-card--recommended`
-   already established, just scoped to this page's stylesheet instead. */
+/* ---------- Tier-3 de-emphasis (New Games/Achievements/Leaderboard, so the learning actions above read as primary) ---------- */
 .home-tier3-section .section-header__title {
   opacity: 0.85;
 }

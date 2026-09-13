@@ -391,10 +391,8 @@
 }
 
 .role-badge--pending {
-  /* Was hardcoded (#f59e0b) - didn't adapt across themes. Reuses the
-     existing --xp-color token (already the app's amber/warning hue,
-     see .badge-learning in index.css) instead of introducing a new
-     color, matching the project's established color-mix pattern. */
+  /* Was hardcoded #f59e0b, didn't adapt across themes — reuses
+     --xp-color (same amber as .badge-learning in index.css). */
   background-color: color-mix(in srgb, var(--xp-color) 18%, var(--card-bg));
   color: var(--xp-color);
 }

@@ -1,10 +1,6 @@
-/* =========================================================
-   Practice / Bio Detective mode.
-   IMPORTANT: Practice.jsx logic is untouched — this file only
-   supplies the classNames it already renders with. (Previously
-   this file accidentally contained a duplicate of LeaderBoard.css,
-   so the whole Practice screen was rendering unstyled.)
-   ========================================================= */
+/* Practice / Bio Detective mode.
+   (This used to be a duplicate of LeaderBoard.css by accident —
+   whole screen was rendering unstyled until that got fixed.) */
 
 .practice-page {
   background-color: var(--bg-color);
@@ -30,11 +26,8 @@
   color: var(--text-secondary);
   background: none;
   border: none;
-  /* Visible icon glyph stays the same size (line-height/font-size
-     unchanged); the clickable box grows to the 44x44px minimum touch
-     target (Phase 1B §9A) via a negative margin that pulls the larger
-     box back around the same visual center, so surrounding layout
-     (label position, topbar height) is unaffected. */
+  /* Negative margin bumps the tap target to 44x44 without growing the
+     visible glyph or shifting surrounding layout. */
   width: 44px;
   height: 44px;
   margin: -8px;
@@ -57,11 +50,9 @@
   color: var(--text-color);
 }
 
-/* Phase 5C-B: optional real chapter/mission context line, shown above
-   the game title only when the session was launched from a chapter
-   (see missionContext.jsx). Visually subordinate to __label, matching
-   the existing small-caps eyebrow pattern already used elsewhere
-   (e.g. .mission-hero__label / .game-objective__label). */
+/* Chapter/mission context line, only shown when launched from a
+   chapter (see missionContext.jsx). Same eyebrow style as
+   .mission-hero__label / .game-objective__label. */
 .practice-topbar__mission {
   display: block;
   font-size: var(--fs-2xs);
@@ -121,9 +112,8 @@
   letter-spacing: 0.04em;
 }
 
-/* ---------- Buttons (page-scoped extensions of the global .btn-*
-   family in index.css — btn-secondary/btn-investigation are only
-   used here, so their color rules live in this file) ---------- */
+/* ---------- Buttons (btn-secondary/btn-investigation only get
+   used on this page, so their colors live here not in index.css) ---------- */
 .btn-primary-disabled {
   background-color: var(--disabled-bg);
   color: var(--disabled-text);
@@ -185,11 +175,8 @@
   font-weight: 700;
 }
 
-/* Correct/incorrect variants were pixel-identical (color set inline via
-   the ✓/✕ glyph, not CSS) — one shared element class instead of two.
-   No color of its own: inherits var(--on-success)/var(--on-danger) from
-   whichever parent (.option--correct / .option--incorrect) it's in, since
-   those two tokens aren't always the same color across themes. */
+/* Shared class for the ✓/✕ glyph — color comes from the parent
+   (.option--correct / .option--incorrect), not set here. */
 .option__icon {
   font-weight: 800;
   font-size: var(--fs-md);
@@ -271,15 +258,9 @@
   color: var(--text-color);
   transition: border-color var(--motion-fast), background-color var(--motion-fast),
     transform var(--motion-fast);
-  /* Phase 1B §9B: existing per-instance px/py padding utility classes
-     varied from ~32-36px tall. min-height alone (not a fixed height,
-     and deliberately not forcing display/align-items here) preserves
-     each instance's own padding, sizing, and flex/justify utility
-     classes exactly as they were, while guaranteeing at least the
-     44px touch-target minimum — most call sites are already flex
-     containers themselves (verified against every game's actual
-     className usage) so text stays centered as before; box-sizing
-     ensures the min-height plays correctly with existing padding. */
+  /* min-height (not a fixed height) bumps short instances up to the
+     44px touch target without disturbing each call site's own
+     padding/flex classes. */
   box-sizing: border-box;
   min-height: 44px;
 }
@@ -738,11 +719,8 @@
   font-style: italic;
 }
 
-/* Positive/negative pop-in so feedback reads as an *event*, not just
-   text that appeared — Part 8 explicitly calls for a "positive
-   animation" on a correct action, which the plain feedback-card had
-   never had. Kept subtle and short (180ms) so it doesn't feel gamey
-   or delay the student from moving on. Respects reduced-motion. */
+/* Pop-in so feedback reads as an event, not just text appearing.
+   Short and subtle on purpose — respects reduced-motion below. */
 @keyframes game-feedback-pop {
   0% {
     transform: scale(0.96);
@@ -771,12 +749,9 @@
   white-space: nowrap;
 }
 
-/* Floating "+N" over the top-bar XP pill, plus a brief pulse on the
-   pill itself, when xp increases (Part 22: "show XP earned
-   immediately... with a subtle animation"). Purely visual — the
-   aria-live announcement above already covers screen readers — and
-   self-clears via GameShell's xpBump timeout, so it never lingers or
-   blocks the number underneath from updating instantly. */
+/* Floating "+N" over the XP pill plus a brief pulse when XP increases.
+   Purely visual — aria-live above covers screen readers — and
+   self-clears via GameShell's xpBump timeout. */
 @keyframes xp-bump-float {
   0% { transform: translate(-50%, 0); opacity: 0; }
   15% { opacity: 1; }

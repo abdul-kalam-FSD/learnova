@@ -310,14 +310,7 @@
   white-space: nowrap;
 }
 
-/* ---------- ZONES (Phase 2) ----------
-   Groups multiple existing .ph-section blocks into one visual band
-   so the page reads as 4 distinct zones (Start / Discover / Why
-   Learnova / CTA) instead of a long flat stack of same-weight
-   sections. Alternates the existing --surface-color token (same
-   token .ph-howitworks already used) with the default page
-   background — no new colors, no change to any section's own
-   internal layout or spacing. */
+/* ---------- ZONES: groups sections into 4 visual bands (Start/Discover/Why Learnova/CTA), alternating --surface-color with the page background ---------- */
 .ph-zone {
   padding: 1.5rem 0;
 }
@@ -402,12 +395,7 @@
   color: var(--primary-color);
 }
 
-/* ---------- WIZARD TRAIL CHIP (Phase 2 Batch B) ----------
-   Replaces a step's full grid with a compact "you picked this,
-   tap to change" chip once that step is chosen, so the page reads
-   as a sequence rather than every step's grid staying visible at
-   once. Same tokens as the rest of this file — no new colors,
-   no animation beyond the existing border transition idiom. */
+/* ---------- WIZARD TRAIL CHIP: replaces a step's grid with a compact "you picked this" chip once chosen ---------- */
 .ph-trail-chip {
   display: flex;
   align-items: center;
@@ -944,10 +932,8 @@
 }
 
 /* Scroll-reveal for below-the-fold sections (see useScrollReveal.js).
-   Deliberately understated: a short fade + small upward drift, not a
-   bounce or slide-from-offscreen — matches Part 29's "meaningful, not
-   distracting" animation rule. Hero is intentionally excluded since it
-   should be visible immediately on load, not faded in. */
+   Kept subtle — just fade + slight upward drift. Hero is excluded,
+   should be visible immediately. */
 .ph-reveal {
   opacity: 0;
   transform: translateY(18px);

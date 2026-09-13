@@ -133,11 +133,8 @@
   color: var(--accent-color);
 }
 
-/* Phase 4E: additive modifier only -- no change to the base
-   .game-card rules above, and no new GameCard prop. Applied via
-   GameCard's existing `className` passthrough to visually set the
-   chapter-scoped, cross-checked recommendation apart from the
-   plain Chapter Missions list underneath it. */
+/* Modifier applied via GameCard's className passthrough, to set the
+   recommended game apart from the plain missions list below it. */
 .game-card--recommended {
   border-color: var(--primary-color);
   box-shadow: 0 0 0 1px var(--primary-color);

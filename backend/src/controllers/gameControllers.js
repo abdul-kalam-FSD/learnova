@@ -611,6 +611,57 @@ const submitGameAttempt = async (req, res) => {
   }
 };
 
+// BUGFIX (production bug 1 - "This session is already completed" shown
+// as a fatal error): a session's *first* completeGame call already
+// wrote everything a caller needs onto the session itself
+// (xp_awarded, streak_counted, sync_status) plus the mastery doc it
+// updated. A second/duplicate completion request for the same
+// session (fast double-click on "Claim Reward", a client retry after
+// a slow-but-successful first response, etc.) reuses that stored
+// result instead of recomputing or re-awarding anything — XP and
+// mastery are only ever written once, on the request that actually
+// wins the atomic claim in completeGame below.
+const buildAlreadyCompletedResponse = async (session, userId) => {
+  const content = session.content_id
+    ? await GameContent.findById(session.content_id).select("concept_id")
+    : null;
+  const mastery = content
+    ? await UserConceptMastery.findOne({
+        user_id: userId,
+        concept_id: content.concept_id,
+      }).select("concept_id state")
+    : null;
+  const user = await User.findById(userId).select("streak_count");
+  const isCorrect = Boolean(session.game_payload?.is_correct);
+  const correctCount = session.game_payload?.correct_count ?? (isCorrect ? 1 : 0);
+  const totalCount = session.game_payload?.total_count ?? 1;
+
+  return {
+    isCorrect,
+    xpAwarded: session.xp_awarded || 0,
+    // The daily cap was already correctly applied (or not) on the
+    // request that actually completed the session; a duplicate never
+    // re-checks it and never re-awards XP either way.
+    xpCapped: false,
+    isPerfectQuiz: totalCount > 0 && correctCount === totalCount,
+    streakMultiplier: 1,
+    newStreak: user?.streak_count ?? 0,
+    masteryUpdate: mastery
+      ? {
+          concept_id: mastery.concept_id,
+          new_state: mastery.state,
+          previous_state: mastery.state,
+          changed: false,
+        }
+      : null,
+    performanceSync: session.sync_status,
+    // Additive-only: existing callers only read the fields above and
+    // keep working unchanged; a caller that wants to know this wasn't
+    // a fresh completion can check this flag.
+    alreadyCompleted: true,
+  };
+};
+
 // Mirrors quizControllers.completeQuiz's XP + mastery flow, but for a
 // single-concept game session instead of a multi-question quiz.
 const completeGame = async (req, res) => {
@@ -637,15 +688,53 @@ const completeGame = async (req, res) => {
       return res.status(403).json({ message: "Not your session" });
     }
     if (session.completed_at) {
+      // Plain duplicate request arriving after the session was
+      // genuinely already completed (e.g. a client retry, or a
+      // student re-opening an already-finished session) — reuse the
+      // stored result instead of a fatal error. See
+      // buildAlreadyCompletedResponse above; this never re-awards
+      // XP/mastery. Built before aborting the transaction so a read
+      // error here still lands in the catch block below with a
+      // transaction that's still in a normal abortable state.
+      const alreadyCompleted = await buildAlreadyCompletedResponse(session, userId);
       await dbSession.abortTransaction();
-      return res
-        .status(400)
-        .json({ message: "This session is already completed" });
+      return res.status(200).json(alreadyCompleted);
     }
     if (!session.game_payload || session.game_payload.is_correct === undefined) {
       await dbSession.abortTransaction();
       return res.status(400).json({ message: "No attempt submitted yet" });
     }
+
+    // BUGFIX (production bug 1 - duplicate completion race): two
+    // near-simultaneous completion requests for the same session
+    // (fast double-click on "Claim Reward", a slow first response
+    // that the client retries, etc.) can both pass the plain
+    // `if (session.completed_at)` check above if they read the
+    // session at nearly the same instant, before either has written
+    // completed_at back. This atomic conditional update — flipping
+    // completed_at from null to now in the same operation that
+    // requires it still be null — closes that window: MongoDB
+    // guarantees at most one such update can succeed for a given
+    // document, so at most one request can ever proceed past this
+    // point for a given session, regardless of timing.
+    const completionTimestamp = new Date();
+    const claim = await QuizSession.updateOne(
+      { _id: sessionId, completed_at: null },
+      { $set: { completed_at: completionTimestamp } },
+      { session: dbSession },
+    );
+    if (claim.modifiedCount === 0) {
+      // Lost the race — another request completed this session
+      // between our read above and this claim. Fetch it fresh
+      // (outside this transaction) and reuse its stored result
+      // exactly like the plain duplicate path above. Built before
+      // aborting, for the same reason as above.
+      const winningSession = await QuizSession.findById(sessionId);
+      const alreadyCompleted = await buildAlreadyCompletedResponse(winningSession, userId);
+      await dbSession.abortTransaction();
+      return res.status(200).json(alreadyCompleted);
+    }
+    session.completed_at = completionTimestamp;
 
     const content = await GameContent.findById(session.content_id).session(dbSession);
     const isCorrect = session.game_payload.is_correct;
@@ -735,7 +824,9 @@ const completeGame = async (req, res) => {
     user.xp_total += finalXP;
     await user.save({ session: dbSession });
 
-    session.completed_at = new Date();
+    // completed_at was already set atomically by the claim above —
+    // not reassigned here, so the timestamp reflects the moment this
+    // request won the race, not whenever this later save happens to run.
     session.xp_awarded = finalXP;
     session.streak_counted = streakCounted;
     await session.save({ session: dbSession });

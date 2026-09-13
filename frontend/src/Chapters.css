@@ -270,10 +270,7 @@
   transition: width var(--motion-fast);
 }
 
-/* ---------- Subject category accents ----------
-   Reuse existing theme-aware tokens (never invent new hex colors per
-   theme) so every theme (light/dark/forest/etc.) gets a correct,
-   already-contrast-checked accent automatically. */
+/* ---------- Subject category accents (theme-aware tokens only, no hardcoded hex) ---------- */
 .world-card--math { --world-accent: var(--primary-color); }
 .world-card--physical { --world-accent: var(--accent-color); }
 .world-card--life { --world-accent: var(--success-color); }
@@ -390,12 +387,7 @@
   color: var(--success-color);
 }
 
-/* ---------- Phase 3B: world-hub heading + grade context ----------
-   Additive only — title/subtitle text and classes are unchanged, this
-   just wraps them for a clearer identity block and adds a read-only
-   grade chip next to the title. The badge is a plain <span>: no
-   role, no tabIndex, no click handler, so it never becomes a
-   focusable/interactive element by accident. */
+/* ---------- World-hub heading + grade context (grade badge is a plain span, non-interactive) ---------- */
 .world-hub-heading__row {
   display: flex;
   align-items: center;
@@ -428,13 +420,7 @@
   white-space: nowrap;
 }
 
-/* ---------- Phase 3B: world-card visual polish ----------
-   Property-level refinements only — no classes renamed, no markup
-   restructured, no new game/progress logic. Elevation and the
-   mission/recommended dividers reuse the card's own --world-accent
-   token via color-mix, matching the technique already used by
-   .world-card__icon, so every subject category and every theme still
-   gets a correct, already-contrast-checked look for free. */
+/* ---------- World-card visual polish (dividers reuse --world-accent via color-mix, same as .world-card__icon) ---------- */
 .world-card__title {
   letter-spacing: 0.01em;
 }

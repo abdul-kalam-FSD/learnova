@@ -138,14 +138,10 @@
     var(--primary-color),
     var(--accent-color)
   );
-  /* Meets WCAG large-text (>=3:1) against both gradient stops at the
-     default 18px/800 size below. At the <=360px breakpoint further down
-     this shrinks to 16px, which falls just under the formal large-text
-     cutoff (~18.66px bold) - contrast there is ~3.3-3.7:1 in the light/
-     forest themes, short of the 4.5:1 normal-text bar. Known gap; fixing
-     it cleanly needs a bigger change (drop the gradient for a flat,
-     contrast-checked background, or add a text-shadow) rather than a
-     token swap. */
+  /* WCAG large-text contrast at 18px/800 below. Once this shrinks to
+     16px at the 360px breakpoint it falls just short of large-text
+     size, so contrast dips to ~3.3-3.7:1 in light/forest — known gap,
+     needs a flat background or text-shadow to fix properly. */
   color: var(--on-primary-accent-gradient);
   font-weight: 800;
   font-size: var(--fs-lg);

@@ -1,24 +1,12 @@
-/* =========================================================
-   Phase 1C — per-game visual identity layer.
-   Purely additive/CSS-only: everything here is keyed off the
-   optional [data-game-identity] attribute GamePage/GameResults
-   set on the page root (see GameShell.jsx). Games that don't
-   pass an `identity` prop get no attribute and are completely
-   unaffected by this file.
+/* Per-game visual identity layer, keyed off the optional
+   [data-game-identity] attribute set on the page root (GameShell.jsx).
+   Games without an `identity` prop are unaffected.
 
-   Each identity gets:
-     - a subtle background texture (page root)
-     - a topbar accent tint
-     - a panel entrance motion
-     - one small identity-specific touch, only where the
-       existing mechanic already supports it (timer glow for
-       "speed", hit-shake for "boss" on a wrong answer)
+   Each identity gets: background texture, topbar accent tint, panel
+   entrance motion, and one identity-specific touch where the mechanic
+   supports it (timer glow for "speed", hit-shake for "boss").
 
-   All motion respects the global
-   @media (prefers-reduced-motion: reduce) override already
-   defined in index.css (it zeroes every animation/transition
-   duration), so nothing extra is needed here for that.
-   ========================================================= */
+   reduced-motion is already handled globally in index.css. */
 
 @keyframes identity-panel-in {
   from {
