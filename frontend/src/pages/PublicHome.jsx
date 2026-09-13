@@ -68,6 +68,7 @@ function PublicHome() {
   useDrawerA11y(drawerRef, menuOpen, closeMenu);
 
   const [standards, setStandards] = useState([]);
+  const [standardsLoading, setStandardsLoading] = useState(true);
   const [standardsError, setStandardsError] = useState("");
 
   const [selectedGrade, setSelectedGrade] = useState(null);
@@ -106,7 +107,8 @@ function PublicHome() {
       .then((res) => setStandards(res.data.standards || []))
       .catch((err) =>
         setStandardsError(err.response?.data?.message || "Couldn't load standards"),
-      );
+      )
+      .finally(() => setStandardsLoading(false));
 
     if (alreadyIn) {
       api
@@ -483,6 +485,10 @@ function PublicHome() {
             <span className="ph-trail-chip__label">Standard {selectedGrade}</span>
             <span className="ph-trail-chip__change">Change</span>
           </button>
+        ) : standardsLoading ? (
+          <p className="ph-loading">Loading standards…</p>
+        ) : standards.length === 0 ? (
+          !standardsError && <p className="ph-empty">No standards published yet.</p>
         ) : (
           <div className="ph-standard-grid">
             {standards.map((g) => (
