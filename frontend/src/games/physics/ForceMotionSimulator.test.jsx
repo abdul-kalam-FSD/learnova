@@ -167,6 +167,24 @@ describe("ForceMotionSimulator - full play flow", () => {
     expect(navigateMock).toHaveBeenCalledWith("/home");
   });
 
+  test("Back during an active simulation asks to confirm, and Leave returns to level select", async () => {
+    mockHappyPath();
+    renderGame();
+    await screen.findByText("Push the Cart");
+    fireEvent.click(screen.getByText("Push the Cart"));
+    await screen.findByText("Start Mission");
+    fireEvent.click(screen.getByText("Start Mission"));
+    await screen.findByText("Free Play — no scenario yet");
+
+    fireEvent.click(screen.getByLabelText("Go back"));
+    expect(await screen.findByText("Leave this mission?")).toBeInTheDocument();
+    expect(screen.getByText("Free Play — no scenario yet")).toBeInTheDocument(); // still mid-simulation underneath
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }));
+    expect(screen.queryByText("Leave this mission?")).not.toBeInTheDocument();
+    await screen.findByText("Push the Cart"); // back on level select
+  });
+
   test("an incorrect prediction shows failure feedback and does not unlock the reward button", async () => {
     mockHappyPath();
     api.post.mockImplementation((url) => {

@@ -172,6 +172,41 @@ describe("FractionBossChallenge - full play flow", () => {
     expect(navigateMock).toHaveBeenCalledWith("/home");
   });
 
+  test("Back mid-boss-fight asks to confirm, and Leave returns to round select", async () => {
+    api.get.mockImplementation((url) => {
+      if (url === "/games/content") {
+        return Promise.resolve({ data: { content: [LEVEL] } });
+      }
+      if (url === "/home") {
+        return Promise.resolve({ data: { streak_count: 1, xp_total: 30 } });
+      }
+      return Promise.reject(new Error(`unmocked GET ${url}`));
+    });
+    api.post.mockImplementation((url) => {
+      if (url === "/games/start") {
+        return Promise.resolve({
+          data: { sessionId: "sess1", content: { payload: FULL_PAYLOAD } },
+        });
+      }
+      return Promise.reject(new Error(`unmocked POST ${url}`));
+    });
+
+    renderGame();
+    await screen.findByText("Defeat the Denominator Dragon");
+    fireEvent.click(screen.getByText("Defeat the Denominator Dragon"));
+    await screen.findByText("Start Mission");
+    fireEvent.click(screen.getByText("Start Mission"));
+    await screen.findByText("QUESTION 1 / 2");
+
+    fireEvent.click(screen.getByLabelText("Go back"));
+    expect(await screen.findByText("Leave this mission?")).toBeInTheDocument();
+    expect(screen.getByText("QUESTION 1 / 2")).toBeInTheDocument(); // still mid-fight underneath
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }));
+    expect(screen.queryByText("Leave this mission?")).not.toBeInTheDocument();
+    await screen.findByText("Defeat the Denominator Dragon"); // back on round select
+  });
+
   test("running out of lives on the very first question ends the round early with the boss escaping", async () => {
     const tightLevel = { ...LEVEL, payload: { ...LEVEL.payload, max_lives: 1 } };
     const tightPayload = { ...FULL_PAYLOAD, max_lives: 1 };

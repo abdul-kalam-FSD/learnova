@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { GameTopBar, GamePanel, GamePrimaryButton, GamePage, ShapeIcon, GameResults } from "./GameShell";
+import { GameTopBar, GamePanel, GamePrimaryButton, GamePage, ShapeIcon, GameResults, LeaveMissionDialog } from "./GameShell";
 import { MissionProvider } from "../../context/missionContext";
 
 describe("GameTopBar", () => {
@@ -353,5 +353,53 @@ describe("ShapeIcon", () => {
     const { container } = render(<ShapeIcon shape="not-a-real-shape" />);
     expect(container.querySelector("circle")).toBeInTheDocument();
     expect(container.querySelector("polygon")).not.toBeInTheDocument();
+  });
+});
+
+describe("LeaveMissionDialog", () => {
+  test("renders nothing when closed", () => {
+    render(<LeaveMissionDialog open={false} onStay={() => {}} onLeave={() => {}} />);
+    expect(screen.queryByText("Leave this mission?")).not.toBeInTheDocument();
+  });
+
+  test("shows the mission-leave copy and both actions when open", () => {
+    render(<LeaveMissionDialog open onStay={() => {}} onLeave={() => {}} />);
+    expect(screen.getByRole("alertdialog")).toBeInTheDocument();
+    expect(screen.getByText("Leave this mission?")).toBeInTheDocument();
+    expect(screen.getByText("You may lose your current progress.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Stay" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Leave" })).toBeInTheDocument();
+  });
+
+  test("Stay calls onStay, Leave calls onLeave", () => {
+    const onStay = vi.fn();
+    const onLeave = vi.fn();
+    render(<LeaveMissionDialog open onStay={onStay} onLeave={onLeave} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Stay" }));
+    expect(onStay).toHaveBeenCalledTimes(1);
+    expect(onLeave).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }));
+    expect(onLeave).toHaveBeenCalledTimes(1);
+  });
+
+  test("clicking the backdrop calls onStay (dismiss without leaving)", () => {
+    const onStay = vi.fn();
+    render(<LeaveMissionDialog open onStay={onStay} onLeave={() => {}} />);
+    fireEvent.click(screen.getByRole("alertdialog").parentElement);
+    expect(onStay).toHaveBeenCalledTimes(1);
+  });
+
+  test("Escape calls onStay", () => {
+    const onStay = vi.fn();
+    render(<LeaveMissionDialog open onStay={onStay} onLeave={() => {}} />);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onStay).toHaveBeenCalledTimes(1);
+  });
+
+  test("moves focus into the dialog when opened", () => {
+    render(<LeaveMissionDialog open onStay={() => {}} onLeave={() => {}} />);
+    expect(document.activeElement).toHaveTextContent("Stay");
   });
 });

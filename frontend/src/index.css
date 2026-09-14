@@ -17,23 +17,32 @@
   --error-color: #9E3D34;
   --error-bg: #FCE9E6;
   --shadow-card: 0 2px 10px rgba(31, 51, 41, 0.06);
-  /* Guaranteed >=4.5:1 against the matching background in this theme.
-     Use instead of hardcoding #fff — a fixed white fails contrast
-     once the underlying hue changes per theme. */
+  /* Text color guaranteed >=4.5:1 against the matching colored background
+     in THIS theme. Use these instead of hardcoding #fff on buttons/badges
+     that sit on --primary-color/--danger-color/--accent-color, since a
+     fixed white fails contrast once the underlying hue changes per theme. */
   --on-primary: #ffffff;
   --on-danger: #12140F;
   --on-accent: #12140F;
   --on-success: #ffffff;
-  /* For text on the primary->accent gradient (podium avatar initials).
-     Only meets large-text contrast (>=3:1) — bold ~18px+ only. */
+  /* For text sitting on the primary->accent gradient (e.g. podium avatar
+     initials). Only meets WCAG large-text (>=3:1, needs bold ~18px+), not
+     the 4.5:1 normal-text bar, against both gradient stops at once - use
+     only for bold text at that size or larger. */
   --on-primary-accent-gradient: #12140F;
-  /* Primary-hued text on a fixed white background (inverted CTA pill
-     on a colored hero). Raw --primary-color fails AA here in
-     dark/galaxy since those hues are tuned for a dark page bg. */
+  /* Primary-hued text on a fixed WHITE background (not --card-bg, which
+     varies by theme) - e.g. an inverted CTA pill on a colored hero. The
+     raw --primary-color fails AA here in the dark/galaxy themes (2.71:1 /
+     3.99:1), since those primaries are tuned to sit on a dark page
+     background, not white. */
   --primary-on-white: var(--primary-color);
 }
 
-/* ---------- TYPE SCALE (theme-independent, matches the sizes already dominant across the codebase) ---------- */
+/* ---------- TYPE SCALE ----------
+   Theme-independent (same across light/dark/forest). Values chosen to match
+   the sizes already dominant across the codebase, not a new visual style -
+   this just gives the existing scale names so future CSS stops inventing
+   one-off sizes (e.g. 12px vs 12.5px vs 13px with no reason for the delta). */
 :root {
   --fs-2xs: 10px;   /* smallest meta text: timestamps, tiny badges */
   --fs-xs: 11px;    /* helper text, secondary labels */
@@ -144,8 +153,9 @@
   --shadow-sm: 0 1px 4px rgba(31, 51, 41, 0.05);
   --shadow-lg: 0 8px 24px rgba(31, 51, 41, 0.12);
 
-  /* Derived via color-mix so every theme gets a correct value
-     automatically instead of 4x hardcoded hex duplicates. */
+  /* Derived tokens: computed from theme colors via color-mix so every
+     theme (light/dark/forest/galaxy) gets a correct, contrast-safe value
+     automatically instead of needing 4x hardcoded hex duplicates. */
   --tint-primary-soft: color-mix(in srgb, var(--primary-color) 14%, var(--card-bg));
   --tint-primary-ring: color-mix(in srgb, var(--primary-color) 45%, transparent);
   --disabled-bg: color-mix(in srgb, var(--primary-color) 32%, var(--surface-color));
@@ -230,7 +240,6 @@ button {
   filter: grayscale(0.35) brightness(0.92);
 }
 
-/* ---------- Pill button (used for strong CTAs on colored surfaces) ---------- */
 .btn-pill {
   display: inline-flex;
   align-items: center;
@@ -282,18 +291,48 @@ button {
   background-color: var(--surface-color);
   color: var(--text-secondary);
 }
-/* AppLayout remounts fresh on every route change (not a shared
-   <Outlet>), so this fade + tiny rise turns that remount into a
-   deliberate transition instead of an abrupt swap. */
+/* Page transition: AppLayout is instantiated fresh inside each
+   route's element (not a shared layout via <Outlet>), so this content
+   wrapper already fully unmounts/remounts on every navigation between
+   /home, /chapters, games, teacher and admin pages. A short slide + fade
+   on mount turns that remount into a deliberate "moving through the
+   learning journey" transition instead of an abrupt swap, without
+   needing router-level changes or a new animation library.
+   Direction (forward vs back) is decided in App.jsx's AppLayout — see
+   the comment there — and only ever changes which class is applied;
+   the animation itself stays identical in length/easing either way so
+   Back never feels slower or different in weight from Forward.
+   REPLACE navigations (redirects, e.g. session-expiry) get a plain
+   fade with no horizontal movement, since there's no "direction" a
+   redirect belongs to.
+   Kept brief (220ms) so it never feels like it's slowing navigation
+   down, and the horizontal travel is small (24px) so it reads as a
+   nudge, not a cinematic slide. */
+@keyframes page-slide-in-forward {
+  from { opacity: 0; transform: translateX(24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes page-slide-in-back {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
 @keyframes page-fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.page-transition {
+.page-transition-forward {
+  animation: page-slide-in-forward 220ms ease-out;
+}
+.page-transition-back {
+  animation: page-slide-in-back 220ms ease-out;
+}
+.page-transition-fade {
   animation: page-fade-in 220ms ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .page-transition {
+  .page-transition-forward,
+  .page-transition-back,
+  .page-transition-fade {
     animation: none;
   }
 }

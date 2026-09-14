@@ -1,12 +1,24 @@
-/* Per-game visual identity layer, keyed off the optional
-   [data-game-identity] attribute set on the page root (GameShell.jsx).
-   Games without an `identity` prop are unaffected.
+/* =========================================================
+   Phase 1C — per-game visual identity layer.
+   Purely additive/CSS-only: everything here is keyed off the
+   optional [data-game-identity] attribute GamePage/GameResults
+   set on the page root (see GameShell.jsx). Games that don't
+   pass an `identity` prop get no attribute and are completely
+   unaffected by this file.
 
-   Each identity gets: background texture, topbar accent tint, panel
-   entrance motion, and one identity-specific touch where the mechanic
-   supports it (timer glow for "speed", hit-shake for "boss").
+   Each identity gets:
+     - a subtle background texture (page root)
+     - a topbar accent tint
+     - a panel entrance motion
+     - one small identity-specific touch, only where the
+       existing mechanic already supports it (timer glow for
+       "speed", hit-shake for "boss" on a wrong answer)
 
-   reduced-motion is already handled globally in index.css. */
+   All motion respects the global
+   @media (prefers-reduced-motion: reduce) override already
+   defined in index.css (it zeroes every animation/transition
+   duration), so nothing extra is needed here for that.
+   ========================================================= */
 
 @keyframes identity-panel-in {
   from {
@@ -111,4 +123,59 @@
 
 .game-identity-mark {
   opacity: 0.85;
+}
+
+/* ---------- Leave Mission confirmation dialog ----------
+   Gameplay Special Rule: shown only when Back is pressed from active
+   "play"-stage gameplay (see useLeaveConfirmation.js / GameShell.jsx's
+   LeaveMissionDialog). Styled with the same card/shadow tokens as the
+   rest of the game shell, not the admin-portal Modal look. */
+.leave-mission__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 60;
+}
+
+.leave-mission__card {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 24px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  animation: identity-panel-in 180ms ease-out;
+}
+
+.leave-mission__title {
+  font-size: var(--fs-lg, 1.05rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+}
+
+.leave-mission__body {
+  font-size: var(--fs-sm, 0.9rem);
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+}
+
+.leave-mission__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.leave-mission__actions > * {
+  flex: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .leave-mission__card {
+    animation: none;
+  }
 }

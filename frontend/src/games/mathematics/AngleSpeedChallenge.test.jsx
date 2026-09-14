@@ -167,6 +167,24 @@ describe("AngleSpeedChallenge - full play flow", () => {
     expect(navigateMock).toHaveBeenCalledWith("/home");
   });
 
+  test("Back during an active round asks to confirm, and Leave returns to round select", async () => {
+    mockHappyPath();
+    renderGame();
+    await screen.findByText("Speed Round: Complementary or Supplementary?");
+    fireEvent.click(screen.getByText("Speed Round: Complementary or Supplementary?"));
+    await screen.findByText("Start Mission");
+    fireEvent.click(screen.getByText("Start Mission"));
+    await screen.findByText("QUESTION 1 / 2");
+
+    fireEvent.click(screen.getByLabelText("Go back"));
+    expect(await screen.findByText("Leave this mission?")).toBeInTheDocument();
+    expect(screen.getByText("QUESTION 1 / 2")).toBeInTheDocument(); // still mid-round underneath
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }));
+    expect(screen.queryByText("Leave this mission?")).not.toBeInTheDocument();
+    await screen.findByText("Speed Round: Complementary or Supplementary?"); // back on round select
+  });
+
   test("an imperfect round shows the 'nice try' verdict and explanation", async () => {
     mockHappyPath();
     api.post.mockImplementation((url) => {

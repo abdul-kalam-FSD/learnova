@@ -164,6 +164,24 @@ describe("GeometryStrategyChallenge - full play flow", () => {
     expect(navigateMock).toHaveBeenCalledWith("/home");
   });
 
+  test("Back mid-strategy-round asks to confirm, and Leave returns to level select", async () => {
+    mockHappyPath();
+    renderGame();
+    await screen.findByText("Rectangle Perimeter 12");
+    fireEvent.click(screen.getByText("Rectangle Perimeter 12"));
+    await screen.findByText("Start Mission");
+    fireEvent.click(screen.getByText("Start Mission"));
+    await screen.findByText("Target perimeter: 12 cm");
+
+    fireEvent.click(screen.getByLabelText("Go back"));
+    expect(await screen.findByText("Leave this mission?")).toBeInTheDocument();
+    expect(screen.getByText("Target perimeter: 12 cm")).toBeInTheDocument(); // still mid-round underneath
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }));
+    expect(screen.queryByText("Leave this mission?")).not.toBeInTheDocument();
+    await screen.findByText("Rectangle Perimeter 12"); // back on level select
+  });
+
   test("a wrong combo lets the student retry with a cleared board", async () => {
     mockHappyPath();
     api.post.mockImplementation((url) => {

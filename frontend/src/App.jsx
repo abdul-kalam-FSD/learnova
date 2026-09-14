@@ -1,5 +1,5 @@
-import { useEffect, useState, lazy } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useRef, useState, lazy } from "react";
+import { Routes, Route, useLocation, useNavigationType } from "react-router-dom";
 import Login from "./pages/Login";
 import SessionExpired from "./pages/SessionExpired";import Signup from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -38,6 +38,7 @@ import api from "./api/axios";
 import { LazyGameBoundary } from "./games/core/LazyGameBoundary";
 import GuestBanner from "./components/GuestBanner";
 import PortalEntry from "./components/PortalEntry";
+import { consumeBackIntent } from "./utils/navigationIntent";
 import AccessDenied from "./components/AccessDenied";
 import TeacherPendingApproval from "./components/TeacherPendingApproval";
 import RouteLoading from "./components/RouteLoading";
@@ -222,6 +223,27 @@ function AppLayout({ children }) {
   // focused or not.
   const [focused, setFocused] = useState(false);
 
+  // Back-button smooth-navigation, Task 1 (transition system only —
+  // Back-button targets/wiring themselves are a separate task).
+  // AppLayout is a fresh mount per navigation (see comment above this
+  // component), so this ref is naturally scoped to exactly one
+  // navigation's worth of direction: computed once on mount, guarded so
+  // React StrictMode's dev-only double-render never consumes the
+  // one-shot back-intent flag twice.
+  const navigationType = useNavigationType(); // "POP" | "PUSH" | "REPLACE"
+  const transitionDirectionRef = useRef(null);
+  if (transitionDirectionRef.current === null) {
+    transitionDirectionRef.current =
+      navigationType === "POP"
+        ? "back"
+        : navigationType === "PUSH"
+        ? consumeBackIntent()
+          ? "back"
+          : "forward"
+        : "fade"; // REPLACE (e.g. session-expiry redirects) — plain fade, no slide
+  }
+  const transitionClass = `page-transition-${transitionDirectionRef.current}`;
+
   useEffect(() => {
     api
       .get("/auth/me")
@@ -254,7 +276,7 @@ function AppLayout({ children }) {
             {!isPortalRoute && !focused && <BottomNav />}
             <div
               className={
-                hideChrome ? "page-transition" : "flex-1 pb-16 md:pb-0 page-transition"
+                hideChrome ? transitionClass : `flex-1 pb-16 md:pb-0 ${transitionClass}`
               }
             >
               {children}

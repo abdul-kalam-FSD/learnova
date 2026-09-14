@@ -44,6 +44,15 @@ beforeEach(() => {
 });
 
 describe("SubjectWorld", () => {
+  test("has a Back to Home button that navigates to /home", async () => {
+    mockApi({ progress: { chapters: [] } });
+    renderPage();
+    await screen.findByText("No worlds yet");
+
+    fireEvent.click(screen.getByText("← Back to Home"));
+    expect(navigateMock).toHaveBeenCalledWith("/home");
+  });
+
   test("shows an empty state when there are no chapters", async () => {
     mockApi({ progress: { chapters: [] } });
     renderPage();

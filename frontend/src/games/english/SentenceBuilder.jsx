@@ -13,19 +13,23 @@ import {
   GameErrorState,
   GameLobby,
   GameResults,
+  LeaveMissionDialog,
 } from "../core/GameShell";
 import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
+import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
 import { GameFrame } from "../core/GameFrame";
 
 // English's second mechanic alongside ENGLISH_WORD_FORGE (which
-// builds one word from morphemes). This builds a whole sentence from
-// scrambled words — same order-sensitive family as CS_CODE_ORDER_
-// BUILDER / MATH_EQUATION_BUILDER / HISTORY_TIMELINE_BUILDER /
-// GEOGRAPHY_ROUTE_BUILDER (see gameControllers.js's shared
-// orderedPieceIds === correct_order check), reusing that generic
-// backend logic — no new backend scoring code needed.
+// assembles a word from prefix/root/suffix pieces). This builds a
+// whole, correctly ordered English sentence from scrambled words —
+// same order-sensitive family as CS_CODE_ORDER_BUILDER /
+// TAMIL_SENTENCE_BUILDER / MATH_EQUATION_BUILDER (see
+// gameControllers.js's shared orderedPieceIds === correct_order
+// check), reusing that generic backend logic — no new backend
+// scoring code needed. UI chrome follows the convention already used
+// by WordForge.jsx.
 const GAME_TYPE = "ENGLISH_SENTENCE_BUILDER";
 
 // ---------- Level select ----------
@@ -34,10 +38,10 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
     <GamePage>
       <GameTopBar label="Sentence Builder" xp={xp} streak={streak} onBack={onBack} />
       <GamePanel>
-        <span className="clue-card__label">ENGLISH · SENTENCE CONSTRUCTION</span>
+        <span className="clue-card__label">ENGLISH · SENTENCE BUILDING</span>
         <h1 className="text-2xl font-bold mt-1 mb-3">Build the Sentence</h1>
         <p className="hint-text text-sm mb-4">
-          Arrange the scrambled words into a correctly ordered, meaningful sentence.
+          Arrange the scrambled words in the correct order to form a grammatically correct sentence.
         </p>
         <div className="flex flex-col gap-3">
           {levels.map((level) => (
@@ -71,7 +75,7 @@ function LobbyScreen({ level, levelIndex, totalLevels, xp, streak, xpInfo, onBac
       <GameTopBar label="Sentence Builder" xp={xp} streak={streak} onBack={onBack} />
       <GameLobby
         title={level.title}
-        subjectLabel="ENGLISH · SENTENCE CONSTRUCTION"
+        subjectLabel="ENGLISH · SENTENCE BUILDING"
         objective={level.concept_id?.explanation_text}
         difficulty={level.difficulty}
         levelIndex={levelIndex}
@@ -102,7 +106,7 @@ function SentenceBuilderScreen({ level, sessionId, xp, streak, onBack, onSolved,
   };
 
   // Tap a word already placed to undo back to it (same pattern as
-  // Code Order Builder / Route Builder / Timeline Builder).
+  // Tamil Sentence Builder / Code Order Builder / Route Builder).
   const undoFrom = (index) => {
     if (feedback?.isCorrect) return;
     const removed = placed.slice(index);
@@ -134,7 +138,7 @@ function SentenceBuilderScreen({ level, sessionId, xp, streak, onBack, onSolved,
         progress={totalLevels ? { current: levelIndex + 1, total: totalLevels } : undefined}
       />
       <GamePanel>
-        <GameObjective>Arrange the words in the order that makes a correct sentence.</GameObjective>
+        <GameObjective>Arrange the words in the correct sentence order.</GameObjective>
 
         <span className="clue-card__label">SCENARIO</span>
         <h2 className="text-lg font-bold mt-1 mb-4">{scenario_label}</h2>
@@ -185,7 +189,7 @@ function SentenceBuilderScreen({ level, sessionId, xp, streak, onBack, onSolved,
             explanation={!feedback.isCorrect ? feedback.hint || hint : null}
             whatYouLearned={
               feedback.isCorrect
-                ? "Word order shapes meaning in English — the same words in a different order can sound wrong or mean something else entirely."
+                ? "Word order shapes meaning in English — subject, verb, and object usually follow a fixed sequence, and rearranging them can change or break the sentence."
                 : null
             }
           />
@@ -234,6 +238,7 @@ function SentenceBuilderGame() {
   const { onBackToChapter, onNextGame } = useGameCompletionNav(GAME_TYPE);
   const goBack = useGameBackTarget();
   const [stage, setStage] = useState("loading");
+  const leaveMission = useLeaveConfirmation(() => setStage("select"));
   const [levels, setLevels] = useState([]);
   const [pendingLevel, setPendingLevel] = useState(null);
   const [activeLevel, setActiveLevel] = useState(null);
@@ -340,16 +345,23 @@ function SentenceBuilderGame() {
 
   if (stage === "play") {
     return (
+      <>
       <SentenceBuilderScreen
         level={activeLevel}
         sessionId={sessionId}
         xp={xp}
         streak={streak}
-        onBack={() => setStage("select")}
+        onBack={leaveMission.requestLeave}
         onSolved={solved}
         levelIndex={levels.findIndex((l) => l.id === activeLevel?.id)}
         totalLevels={levels.length}
       />
+      <LeaveMissionDialog
+        open={leaveMission.confirmOpen}
+        onStay={leaveMission.cancelLeave}
+        onLeave={leaveMission.confirmLeave}
+      />
+      </>
     );
   }
 

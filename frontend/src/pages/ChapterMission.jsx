@@ -11,6 +11,7 @@ import {
   GAME_TYPE_TO_ACTION,
 } from "../games/gameRegistry";
 import { getRecommendationReasonText } from "../utils/recommendationReason";
+import { useBackNavigation } from "../utils/useBackNavigation";
 import "../Chapters.css";
 
 // Phase 0C: Subject World -> Chapter Journey -> Mission Brief -> Game
@@ -88,6 +89,7 @@ export function getChapterRecommendation(recommendedGame, games) {
 function ChapterMission() {
   const { chapterId } = useParams();
   const navigate = useNavigate();
+  const goBack = useBackNavigation();
   const location = useLocation();
   const subjectNameFromNav = location.state?.subjectName || null;
 
@@ -104,13 +106,19 @@ function ChapterMission() {
   // falls back to the canonical Subject Chapters page for this
   // chapter's subject, or plain /subjects if the subject name wasn't
   // passed forward.
+  //
+  // Smooth-navigation task: routed through useBackNavigation() (goBack)
+  // instead of navigate directly, so the fallback branches (an actual
+  // PUSH, not history) still slide in from the left like a real Back
+  // action — the navigate(-1) branch already gets that automatically
+  // since react-router reports it as a POP.
   const goBackToChapters = () => {
     if (location.key !== "default") {
-      navigate(-1);
+      goBack();
     } else if (subjectNameFromNav) {
-      navigate(`/subjects/${encodeURIComponent(subjectNameFromNav)}`);
+      goBack(`/subjects/${encodeURIComponent(subjectNameFromNav)}`);
     } else {
-      navigate("/subjects");
+      goBack("/subjects");
     }
   };
 

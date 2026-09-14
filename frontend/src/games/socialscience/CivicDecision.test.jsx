@@ -157,6 +157,24 @@ describe("CivicDecision - full play flow", () => {
     expect(navigateMock).toHaveBeenCalledWith("/home");
   });
 
+  test("Back during an active scenario asks to confirm, and Leave returns to level select", async () => {
+    mockHappyPath();
+    renderGame();
+    await screen.findByText("The Contested Permit");
+    fireEvent.click(screen.getByText("The Contested Permit"));
+    await screen.findByText("Start Mission");
+    fireEvent.click(screen.getByText("Start Mission"));
+    await screen.findByText(/A neighborhood association wants to deny/);
+
+    fireEvent.click(screen.getByLabelText("Go back"));
+    expect(await screen.findByText("Leave this mission?")).toBeInTheDocument();
+    expect(screen.getByText(/A neighborhood association wants to deny/)).toBeInTheDocument(); // still mid-scenario underneath
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }));
+    expect(screen.queryByText("Leave this mission?")).not.toBeInTheDocument();
+    await screen.findByText("The Contested Permit"); // back on level select
+  });
+
   test("an incorrect decision shows failure feedback and does not unlock the reward button", async () => {
     mockHappyPath();
     api.post.mockImplementation((url) => {

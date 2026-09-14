@@ -9,6 +9,7 @@ import { iconFor } from "../utils/chapterIcon";
 import { getSubjectCategory } from "../utils/subjectTheme";
 import { getLevelProgress } from "../utils/level";
 import { GAME_TYPE_TO_ICON, GAME_TYPE_TO_ACTION } from "../games/gameRegistry";
+import { useBackNavigation } from "../utils/useBackNavigation";
 import "../Chapters.css";
 
 // Phase 0B: SubjectWorld is the game-world hub students land on from
@@ -22,6 +23,7 @@ import "../Chapters.css";
 // chapters within a world.
 function SubjectWorld() {
   const navigate = useNavigate();
+  const goBack = useBackNavigation();
   const [subjectGroups, setSubjectGroups] = useState(null);
   const [player, setPlayer] = useState(null);
   const [catalogBySubject, setCatalogBySubject] = useState({});
@@ -71,6 +73,10 @@ function SubjectWorld() {
 
   return (
     <div className="chapters-page p-4 max-w-md lg:max-w-3xl mx-auto min-h-screen">
+      <button onClick={() => goBack("/home")} className="chapter-detail__back">
+        ← Back to Home
+      </button>
+
       {player && (
         <PlayerHeader
           name={player.name}

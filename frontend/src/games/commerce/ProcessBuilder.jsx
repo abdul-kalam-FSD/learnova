@@ -13,21 +13,21 @@ import {
   GameErrorState,
   GameLobby,
   GameResults,
+  LeaveMissionDialog,
 } from "../core/GameShell";
 import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
+import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
 import { GameFrame } from "../core/GameFrame";
 
-// Commerce's second mechanic (Accountancy / Business Studies /
-// Economics, Grades 11-12): arranges the steps of a real accounting,
-// business, or economic process into the order they actually happen —
+// Commerce's second mechanic alongside COMMERCE_CONCEPT_MATCH (a
+// term-to-definition match). This arranges the steps of a real
+// business/commerce process into the order they actually happen —
 // same order-sensitive family as HISTORY_TIMELINE_BUILDER / CS_CODE_
-// ORDER_BUILDER / SOCIAL_SCIENCE_PROCESS_BUILDER (see
-// gameControllers.js's shared orderedPieceIds === correct_order
-// check), reusing that generic backend logic — no new backend
-// scoring code needed. UI cloned from
-// socialscience/ProcessBuilder.jsx.
+// ORDER_BUILDER / ENGLISH_SENTENCE_BUILDER (see gameControllers.js's
+// shared orderedPieceIds === correct_order check), reusing that
+// generic backend logic — no new backend scoring code needed.
 const GAME_TYPE = "COMMERCE_PROCESS_BUILDER";
 
 // ---------- Level select ----------
@@ -36,11 +36,10 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
     <GamePage>
       <GameTopBar label="Process Builder" xp={xp} streak={streak} onBack={onBack} />
       <GamePanel>
-        <span className="clue-card__label">COMMERCE · REAL-WORLD PROCESSES</span>
+        <span className="clue-card__label">COMMERCE · PROCESS SEQUENCING</span>
         <h1 className="text-2xl font-bold mt-1 mb-3">Build the Process</h1>
         <p className="hint-text text-sm mb-4">
-          Arrange the scrambled steps into the order they actually happen in accounting,
-          business, or the economy.
+          Arrange the scrambled steps into the order they actually happen in a real business process.
         </p>
         <div className="flex flex-col gap-3">
           {levels.map((level) => (
@@ -74,7 +73,7 @@ function LobbyScreen({ level, levelIndex, totalLevels, xp, streak, xpInfo, onBac
       <GameTopBar label="Process Builder" xp={xp} streak={streak} onBack={onBack} />
       <GameLobby
         title={level.title}
-        subjectLabel="COMMERCE · REAL-WORLD PROCESSES"
+        subjectLabel="COMMERCE · PROCESS SEQUENCING"
         objective={level.concept_id?.explanation_text}
         difficulty={level.difficulty}
         levelIndex={levelIndex}
@@ -105,7 +104,7 @@ function ProcessBuilderScreen({ level, sessionId, xp, streak, onBack, onSolved, 
   };
 
   // Tap a step already placed to undo back to it (same pattern as
-  // Timeline Builder / Code Order Builder / Civic Process Builder).
+  // Timeline Builder / Code Order Builder / Sentence Builder).
   const undoFrom = (index) => {
     if (feedback?.isCorrect) return;
     const removed = placed.slice(index);
@@ -188,7 +187,7 @@ function ProcessBuilderScreen({ level, sessionId, xp, streak, onBack, onSolved, 
             explanation={!feedback.isCorrect ? feedback.hint || hint : null}
             whatYouLearned={
               feedback.isCorrect
-                ? "Business and financial processes follow a logical sequence — each step depends on the one before it actually being completed first."
+                ? "Business processes usually follow a fixed sequence — each step depends on the one before it actually being completed first."
                 : null
             }
           />
@@ -237,6 +236,7 @@ function ProcessBuilderGame() {
   const { onBackToChapter, onNextGame } = useGameCompletionNav(GAME_TYPE);
   const goBack = useGameBackTarget();
   const [stage, setStage] = useState("loading");
+  const leaveMission = useLeaveConfirmation(() => setStage("select"));
   const [levels, setLevels] = useState([]);
   const [pendingLevel, setPendingLevel] = useState(null);
   const [activeLevel, setActiveLevel] = useState(null);
@@ -343,16 +343,23 @@ function ProcessBuilderGame() {
 
   if (stage === "play") {
     return (
+      <>
       <ProcessBuilderScreen
         level={activeLevel}
         sessionId={sessionId}
         xp={xp}
         streak={streak}
-        onBack={() => setStage("select")}
+        onBack={leaveMission.requestLeave}
         onSolved={solved}
         levelIndex={levels.findIndex((l) => l.id === activeLevel?.id)}
         totalLevels={levels.length}
       />
+      <LeaveMissionDialog
+        open={leaveMission.confirmOpen}
+        onStay={leaveMission.cancelLeave}
+        onLeave={leaveMission.confirmLeave}
+      />
+      </>
     );
   }
 

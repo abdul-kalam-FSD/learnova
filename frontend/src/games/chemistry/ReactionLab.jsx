@@ -13,10 +13,12 @@ import {
   GameErrorState,
   GameLobby,
   GameResults,
+  LeaveMissionDialog,
 } from "../core/GameShell";
 import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
+import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
 import { GameFrame } from "../core/GameFrame";
 
 const GAME_TYPE = "CHEMISTRY_REACTION_LAB";
@@ -248,6 +250,7 @@ function ReactionLabGame() {
   const { onBackToChapter, onNextGame } = useGameCompletionNav(GAME_TYPE);
   const goBack = useGameBackTarget();
   const [stage, setStage] = useState("loading");
+  const leaveMission = useLeaveConfirmation(() => setStage("select"));
   const [levels, setLevels] = useState([]);
   const [pendingLevel, setPendingLevel] = useState(null);
   const [activeLevel, setActiveLevel] = useState(null);
@@ -354,16 +357,23 @@ function ReactionLabGame() {
 
   if (stage === "play") {
     return (
+      <>
       <LabScreen
         level={activeLevel}
         sessionId={sessionId}
         xp={xp}
         streak={streak}
-        onBack={() => setStage("select")}
+        onBack={leaveMission.requestLeave}
         onSolved={solved}
         levelIndex={levels.findIndex((l) => l.id === activeLevel?.id)}
         totalLevels={levels.length}
       />
+      <LeaveMissionDialog
+        open={leaveMission.confirmOpen}
+        onStay={leaveMission.cancelLeave}
+        onLeave={leaveMission.confirmLeave}
+      />
+      </>
     );
   }
 

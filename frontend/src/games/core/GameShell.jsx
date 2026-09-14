@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import "../../Practice.css";
 import "./gameIdentity.css";
 import { FEEDBACK_COPY, HINT_LABEL } from "../../utils/gradeBand";
@@ -411,63 +411,15 @@ export function GamePanel({ children }) {
   return <div className="practice-panel p-5 flex-1">{children}</div>;
 }
 
-// BUGFIX (production bug 1 - duplicate game-completion requests):
-// this is the single shared button every one of the 54 games' "Check
-// X", "Claim Reward", "Start Mission", etc. actions render through.
-// None of them previously guarded against a fast double-click/double-
-// tap firing the same onClick handler twice in the same gesture —
-// most visibly on "Claim Reward", where that meant two near-
-// simultaneous POST /games/:id/complete requests for one click. The
-// backend is now idempotent either way (see gameControllers.js), but
-// stopping the duplicate request at the source is the more direct
-// fix. A short, self-resetting lock here — independent of the
-// caller's own `disabled` prop, which most callers of this button
-// don't set at all — blocks a second invocation without changing any
-// button's visible label, styling, or the caller's own click handler.
 export function GamePrimaryButton({ children, onClick, disabled, secondary }) {
-  const clickLockRef = useRef(false);
-  const lockTimeoutRef = useRef(null);
-
-  // The button at a given JSX slot (e.g. "Check Bridge" flipping to
-  // "Claim Reward" once the attempt is correct) is the same rendered
-  // component instance across that transition, not a remount — so a
-  // lock left over from clicking "Check Bridge" would otherwise still
-  // be active when "Claim Reward" first appears and block its very
-  // first, legitimate click. Resetting whenever the handler itself
-  // changes (a new logical action, always a new function reference
-  // every one of the 54 games passes) means the lock only ever blocks
-  // a second click on the *same* action, never a first click on the
-  // next one. This runs as an effect (not during render, which
-  // react-hooks/refs correctly disallows) — it still commits before
-  // the user can physically fire a next click, so a real same-render
-  // double-click (no re-render in between, same handler reference)
-  // stays correctly blocked.
-  useEffect(() => {
-    clickLockRef.current = false;
-    return () => clearTimeout(lockTimeoutRef.current);
-  }, [onClick]);
-
   const variant = secondary
     ? "btn-secondary"
     : disabled
       ? "btn-primary-disabled"
       : "btn-primary";
-
-  const handleClick = (event) => {
-    if (disabled || clickLockRef.current) return;
-    clickLockRef.current = true;
-    // 800ms is long enough to absorb a double-click/double-tap on the
-    // same gesture, short enough it never feels stuck for an action
-    // that doesn't itself trigger a re-render.
-    lockTimeoutRef.current = setTimeout(() => {
-      clickLockRef.current = false;
-    }, 800);
-    onClick?.(event);
-  };
-
   return (
     <button
-      onClick={handleClick}
+      onClick={onClick}
       disabled={disabled}
       className={`${variant} w-full py-3 rounded-lg font-semibold text-sm`}
     >
@@ -476,54 +428,97 @@ export function GamePrimaryButton({ children, onClick, disabled, secondary }) {
   );
 }
 
-// Shared post-game results screen (spec Phase 23). Every one of the
-// 54 game components previously hand-rolled its own near-identical
-// "X Complete" screen (badge + mastery line + XP/streak stats + two
-// buttons) — this is that same screen as a single implementation, so
-// fixing or extending it happens once instead of 54 times.
+// Gameplay Special Rule: leaving active gameplay (the "play" stage,
+// mid-mission) can silently discard real in-progress state, so Back
+// from there routes through useLeaveConfirmation() and this dialog
+// instead of navigating immediately. Level-select/lobby Back buttons
+// have nothing in progress yet and are untouched — they still call
+// their handlers directly, no dialog involved.
 //
-// Every stat prop is optional and renders only if actually passed —
-// this component does not invent accuracy, timing, or "skills
-// practiced" data. Today's completion API only returns
-// xpAwarded/newStreak/masteryUpdate, so that's all most callers will
-// have; accuracy/timeSpentSeconds/skillsPracticed/achievement are
-// here so a game (or the backend, later) can supply them without
-// another rewrite of this component.
-//
-// Action buttons are the same story: onPlayAgain and onDashboard are
-// the two nearly every game already had (under varying names);
-// onNextGame and onBackToChapter are optional and simply don't
-// render unless the caller actually has a real destination to send
-// the student to.
-//
-// Phase 5A (Phase 4F audit finding): the onNextGame button used to
-// read "Next Game →". It is wired, via useGameCompletionNav, to the
-// exact same getRecommendedGame() mastery-based pick that drives
-// Home's and Practice's "Recommended for You" hero — a personalized
-// recommendation, not a guaranteed curriculum-next game, and one that
-// can legitimately point at content the student has already
-// completed. "Recommended Next" makes the same real claim the engine
-// actually supports without implying a fixed sequence.
-//
-// Phase 6C-B resolved the limitation noted here through Phase 5A: this
-// component now surfaces the recommendation's `reason` text next to
-// "Recommended Next" — see `nextGameReason` below and
-// useGameCompletionNav.js, which attaches the reason directly to the
-// same `onNextGame` function every one of the 54 per-game
-// ResultScreen wrappers already forwards unmodified. That avoided
-// touching any of those 54 files to thread a new prop through, which
-// remains out of scope. `nextGameReason` itself is an ordinary optional
-// prop (for any future/direct caller of GameResults that isn't going
-// through the hook); no existing caller passes it explicitly today.
-//
-// Phase 6C-C: the recommendation can point at content the student already
-// completed (see the reason comment above and useGameCompletionNav.js).
-// Calling that "Recommended Next" implies something new, which isn't
-// always true. `nextGameAlreadyCompleted` resolves the same way
-// `nextGameReason` does — explicit prop first, then the `.alreadyCompleted`
-// useGameCompletionNav already attaches to the same onNextGame reference —
-// and only ever switches the label to "Review Recommended →"; it never
-// changes what onNextGame does on click.
+// Kept intentionally small and dependency-free (own focus trap +
+// Escape handling, matching components/Modal.jsx's pattern) rather
+// than reusing Modal.jsx directly, since that component is styled for
+// the admin/teacher portal (Admin.css) — this needed the game shell's
+// own card/button look (GamePrimaryButton) so it reads as part of the
+// mission, not an admin-style system dialog.
+const FOCUSABLE_SELECTOR =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+export function LeaveMissionDialog({ open, onStay, onLeave }) {
+  const dialogRef = useRef(null);
+  const previouslyFocusedRef = useRef(null);
+  const titleId = useId();
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    previouslyFocusedRef.current = document.activeElement;
+    const node = dialogRef.current;
+    if (node) {
+      const firstFocusable = node.querySelector(FOCUSABLE_SELECTOR);
+      (firstFocusable || node).focus();
+    }
+
+    function handleKeyDown(e) {
+      if (e.key === "Escape") {
+        e.stopPropagation();
+        onStay();
+        return;
+      }
+      if (e.key !== "Tab") return;
+
+      const current = dialogRef.current;
+      if (!current) return;
+      const focusable = Array.from(current.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
+        (el) => el.offsetParent !== null,
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown, true);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown, true);
+      if (previouslyFocusedRef.current?.focus) previouslyFocusedRef.current.focus();
+    };
+  }, [open, onStay]);
+
+  if (!open) return null;
+
+  return (
+    <div className="leave-mission__backdrop" onClick={onStay}>
+      <div
+        className="leave-mission__card"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        ref={dialogRef}
+        tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 id={titleId} className="leave-mission__title">
+          Leave this mission?
+        </h2>
+        <p className="leave-mission__body">You may lose your current progress.</p>
+        <div className="leave-mission__actions">
+          <GamePrimaryButton onClick={onStay} secondary>
+            Stay
+          </GamePrimaryButton>
+          <GamePrimaryButton onClick={onLeave}>Leave</GamePrimaryButton>
+        </div>
+      </div>
+    </div>
+  );
+}
 export function GameResults({
   completeLabel = "Level Complete",
   badgeText,
@@ -548,16 +543,7 @@ export function GameResults({
   gradeBand,
   identity,
 }) {
-  // Explicit prop wins if a caller ever supplies one directly; otherwise
-  // fall back to the reason useGameCompletionNav already attached to the
-  // onNextGame function itself. getRecommendationReasonText (called
-  // upstream, not here — no second reason map) returns null rather than
-  // inventing text for a missing/unrecognized reason, so this is simply
-  // null whenever there's nothing honest to say.
   const resolvedNextGameReason = nextGameReason ?? onNextGame?.reason ?? null;
-  // Same resolution order as the reason above; defaults to false (i.e. the
-  // original "Recommended Next" wording) whenever there's no positive
-  // evidence of completion, never the other way around.
   const resolvedNextGameAlreadyCompleted = Boolean(
     nextGameAlreadyCompleted ?? onNextGame?.alreadyCompleted ?? false,
   );
@@ -582,13 +568,6 @@ export function GameResults({
             <div className="clue-card rounded-lg p-4 mb-4 text-left">
               <span className="clue-card__label">CONCEPT MASTERY</span>
               <p className="text-sm mt-2">
-                {/* Phase 6B (P1-3): masteryUpdate.changed is additive —
-                    when it's genuinely true/false (the backend now
-                    always sends it), say plainly whether this attempt
-                    changed anything instead of always claiming an
-                    "update". When `changed` isn't present at all (an
-                    older/unknown response shape), fall back to the
-                    original wording rather than guessing. */}
                 {masteryUpdate.new_state
                   ? masteryUpdate.changed === true
                     ? `Mastery updated to: ${masteryUpdate.new_state}`
@@ -677,14 +656,6 @@ export function GameResults({
     </GamePage>
   );
 }
-
-// `identity` is optional and purely a CSS hook (Phase 1C §4/§22): it
-// sets data-game-identity on the page root so games/core/gameIdentity.css
-// can apply a distinct-but-related visual treatment (accent color,
-// background texture, panel/motion styling) per representative game,
-// without any of that living in JS or touching rendered text. Games
-// that don't pass it (all but the six Phase 1C representative games)
-// get no attribute and render byte-identical to before.
 export function GamePage({ children, identity }) {
   return (
     <div
@@ -708,13 +679,6 @@ const SHAPE_POINTS = {
   hexagon: "28,10 72,10 94,50 72,90 28,90 6,50",
   rhombus: "50,8 88,50 50,92 12,50",
 };
-
-// One small decorative SVG mark per Phase 1C representative-game
-// identity (§4/§22) — aria-hidden, purely presentational, truthful to
-// the game's actual mechanic (a magnifier for investigation, a
-// lightning bolt for the timed challenge, etc.), never implying a
-// mechanic that doesn't exist. Only the six games that opt into an
-// `identity` pass this; every other game renders nothing different.
 const IDENTITY_MARKS = {
   investigation: (
     <>

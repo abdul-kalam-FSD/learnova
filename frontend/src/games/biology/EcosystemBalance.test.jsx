@@ -150,6 +150,26 @@ describe("EcosystemBalance - full play flow", () => {
     expect(navigateMock).toHaveBeenCalledWith("/home");
   });
 
+  test("Back during active play asks to confirm, and Leave returns to level select", async () => {
+    mockHappyPath();
+    renderGame();
+    await screen.findByText("Wolves Return to the Valley");
+    fireEvent.click(screen.getByText("Wolves Return to the Valley"));
+    await screen.findByText("Start Mission");
+    fireEvent.click(screen.getByText("Start Mission"));
+    await screen.findByText("Wolves are reintroduced to a valley where deer had overgrazed.");
+
+    fireEvent.click(screen.getByLabelText("Go back"));
+    expect(await screen.findByText("Leave this mission?")).toBeInTheDocument();
+    expect(
+      screen.getByText("Wolves are reintroduced to a valley where deer had overgrazed."),
+    ).toBeInTheDocument(); // still on the play screen underneath, nothing discarded yet
+
+    fireEvent.click(screen.getByRole("button", { name: "Leave" }));
+    expect(screen.queryByText("Leave this mission?")).not.toBeInTheDocument();
+    await screen.findByText("Wolves Return to the Valley"); // back on level select
+  });
+
   test("a wrong-order chain shows failure feedback and does not unlock the reward button", async () => {
     mockHappyPath();
     api.post.mockImplementation((url) => {

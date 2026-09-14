@@ -7,6 +7,7 @@ import EmptyState from "../components/EmptyState";
 import PageLoading from "../components/PageLoading";
 import { iconFor } from "../utils/chapterIcon";
 import { GAME_TYPE_TO_ICON, GAME_TYPE_TO_ACTION } from "../games/gameRegistry";
+import { useBackNavigation } from "../utils/useBackNavigation";
 import "../Chapters.css";
 
 // Phase 0B: a single world's chapters, presented as a journey/trail
@@ -32,6 +33,7 @@ function SubjectChapters() {
   const { subjectName } = useParams();
   const decodedSubject = decodeURIComponent(subjectName);
   const navigate = useNavigate();
+  const goBack = useBackNavigation();
   const [unitGroups, setUnitGroups] = useState(null);
   const [currentChapter, setCurrentChapter] = useState(null);
   const [currentChapterGames, setCurrentChapterGames] = useState(null);
@@ -93,7 +95,7 @@ function SubjectChapters() {
 
   return (
     <div className="chapters-page p-4 max-w-md lg:max-w-3xl mx-auto min-h-screen">
-      <button onClick={() => navigate("/subjects")} className="chapter-detail__back">
+      <button onClick={() => goBack("/subjects")} className="chapter-detail__back">
         ← Back to Worlds
       </button>
       <div className="chapters-page__subject-heading mb-1">
