@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -29,15 +31,28 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const conceptTitles = [
-    "Diffusion, Osmosis, and Water Potential",
-    "Deficiency Symptoms",
-    "C4 Pathway and Factors Affecting Photosynthesis",
-    "Glycolysis and Fermentation",
-  ];
+  const subject = await Subject.findOne({ grade: 11, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 11 Science/Biology subject not found — run seedGrade11_batch4.js / seedGrade11_batch5.js first.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const conceptChapters = {
+    "Diffusion, Osmosis, and Water Potential": "Transport in Plants",
+    "Deficiency Symptoms": "Mineral Nutrition",
+    "C4 Pathway and Factors Affecting Photosynthesis": "Photosynthesis in Higher Plants",
+    "Glycolysis and Fermentation": "Respiration in Plants",
+  };
   const concepts = {};
-  for (const title of conceptTitles) {
-    const concept = await Concept.findOne({ title });
+  for (const [title, chapterTitle] of Object.entries(conceptChapters)) {
+    const chapter = await Chapter.findOne({ subject_id: subject._id, title: chapterTitle });
+    if (!chapter) {
+      console.error(`Chapter "${chapterTitle}" not found — run seedGrade11_batch4.js / seedGrade11_batch5.js first.`);
+      await mongoose.disconnect();
+      process.exit(1);
+    }
+    const concept = await Concept.findOne({ chapter_id: chapter._id, title });
     if (!concept) {
       console.error(`Concept "${title}" not found — run seedGrade11_batch4.js / seedGrade11_batch5.js first.`);
       await mongoose.disconnect();

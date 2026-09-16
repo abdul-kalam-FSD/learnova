@@ -9,7 +9,7 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Content-gap fill (genuine gap list item 5): Grade 7 Social Science
-// has History and Geography strand content (seedHistoryGrade7.js /
+// has History and Geography strand content (seedHistoryMughalTimelineGrade8.js /
 // seedHistoryCauseEffectGrade7.js / seedGeographyGrade7.js /
 // seedGeographyFeatureGrade7.js) but no Civics strand content at all
 // — unlike Grades 4-6 and 9, which each have at least one Civics
@@ -28,7 +28,7 @@ async function seed() {
 
   const subject = await Subject.findOne({ grade: 7, name: /social science/i });
   if (!subject) {
-    throw new Error("Grade 7 Social Science subject not found — run seedHistoryGrade7.js or seedGeographyGrade7.js first.");
+    throw new Error("Grade 7 Social Science subject not found — run seedHistoryMughalTimelineGrade8.js or seedGeographyGrade7.js first.");
   }
   console.log("Using existing subject:", subject._id);
 

@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -28,10 +30,23 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
+  const subject = await Subject.findOne({ grade: 10, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 10 Science subject not found — run seedGrade10.js first.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Control and Coordination" });
+  if (!chapter) {
+    console.error("Chapter 'Control and Coordination' not found — run seedGrade10.js first.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
   const conceptTitles = ["Nervous System", "Reflex Action", "Hormonal Coordination"];
   const concepts = {};
   for (const title of conceptTitles) {
-    const concept = await Concept.findOne({ title });
+    const concept = await Concept.findOne({ chapter_id: chapter._id, title });
     if (!concept) {
       console.error(`Concept "${title}" not found — run seedGrade10.js first.`);
       await mongoose.disconnect();

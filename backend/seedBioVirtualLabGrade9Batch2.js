@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -29,7 +31,28 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const membraneConcept = await Concept.findOne({ title: "Cell Membrane and Transport" });
+  const subject = await Subject.findOne({ grade: 9, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 9 Science subject not found — run seedGrade9.js first.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const cellChapter = await Chapter.findOne({
+    subject_id: subject._id,
+    title: "The Fundamental Unit of Life",
+  });
+  const tissuesChapter = await Chapter.findOne({ subject_id: subject._id, title: "Tissues" });
+  if (!cellChapter || !tissuesChapter) {
+    console.error("Grade 9 chapters not found — run seedGrade9.js first.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const membraneConcept = await Concept.findOne({
+    chapter_id: cellChapter._id,
+    title: "Cell Membrane and Transport",
+  });
   if (!membraneConcept) {
     console.error(
       "Concept 'Cell Membrane and Transport' not found — run seedGrade9.js first.",
@@ -38,7 +61,10 @@ async function seed() {
     process.exit(1);
   }
 
-  const xylemPhloemConcept = await Concept.findOne({ title: "Xylem and Phloem" });
+  const xylemPhloemConcept = await Concept.findOne({
+    chapter_id: tissuesChapter._id,
+    title: "Xylem and Phloem",
+  });
   if (!xylemPhloemConcept) {
     console.error(
       "Concept 'Xylem and Phloem' not found — run seedGrade9.js first.",

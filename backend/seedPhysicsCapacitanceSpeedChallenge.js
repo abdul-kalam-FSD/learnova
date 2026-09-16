@@ -9,15 +9,26 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Adds PHYSICS_CAPACITANCE_SPEED_CHALLENGE content to the SAME Grade
-// 11 "Electrostatics" chapter that seedPhysicsGrade11.js already
-// seeds with PHYSICS_CIRCUIT_BUILDER — a second mechanic for the same
-// chapter, same sibling pattern as seedPhysicsOhmsLawGrade10.js adding
-// a Speed Challenge alongside Circuit Builder on "Series and Parallel
-// Circuits". Circuit Builder there covers the *qualitative* side
-// (matching a capacitor scenario to its outcome); this covers the
-// *quantitative* side — C = Q/V, and combined capacitance for
+// 12 "Electrostatics" chapter that seedPhysicsCapacitorCircuitGrade12.js
+// already seeds with PHYSICS_CIRCUIT_BUILDER — a second mechanic for
+// the same chapter, same sibling pattern as seedPhysicsOhmsLawGrade10.js
+// adding a Speed Challenge alongside Circuit Builder on "Series and
+// Parallel Circuits". Circuit Builder there covers the *qualitative*
+// side (matching a capacitor scenario to its outcome); this covers
+// the *quantitative* side — C = Q/V, and combined capacitance for
 // series/parallel capacitors — that this chapter never had a
 // mechanic for.
+//
+// CORRECTED: this file originally targeted Grade 11, from before the
+// Gap 8 grade-correction/rename pass moved Electrostatics/Capacitance
+// content to Grade 12 (Class 11 Physics has no electricity/magnetism
+// content at all — see seedPhysicsCapacitorCircuitGrade12.js's own
+// comment). This file's Grade-11 reference was missed during that
+// pass and has now been corrected to match. If you already ran the
+// old Grade-11 version of this file, run migrateCapacitanceToGrade12.js
+// once first to re-parent that existing content instead of leaving a
+// duplicate behind — this file's own findOne guards prevent creating
+// new duplicates going forward but won't clean up an old run.
 //
 // New Concept since "calculate it" is a different objective from
 // "recognize the behavior", matching how every other Speed Challenge
@@ -29,10 +40,10 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  let subject = await Subject.findOne({ grade: 11, name: /physics/i });
+  let subject = await Subject.findOne({ grade: 12, name: /physics/i });
   if (!subject) {
-    subject = await Subject.create({ name: "Physics", grade: 11 });
-    console.log("Created new Grade 11 Physics subject:", subject._id);
+    subject = await Subject.create({ name: "Physics", grade: 12 });
+    console.log("Created new Grade 12 Physics subject:", subject._id);
   } else {
     console.log("Using existing subject:", subject._id);
   }
@@ -41,9 +52,9 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Electrostatics",
+      unit_name: "Electricity and Magnetism",
       title: "Electrostatics",
-      order_index: 2,
+      order_index: 1,
     });
     console.log("Created chapter:", chapter._id);
   } else {

@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -23,7 +25,21 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const concept = await Concept.findOne({ title: "Origin of Life and Evidence for Evolution" });
+  const subject = await Subject.findOne({ grade: 12, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 12 Science/Biology subject not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Evolution" });
+  if (!chapter) {
+    console.error("Chapter 'Evolution' not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const concept = await Concept.findOne({ chapter_id: chapter._id, title: "Origin of Life and Evidence for Evolution" });
   if (!concept) {
     console.error(
       "Concept 'Origin of Life and Evidence for Evolution' not found — run seedGrade12_batch2.js first.",

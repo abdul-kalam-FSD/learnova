@@ -9,8 +9,8 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Gap 4 fill: Grade 7's Social Science only had History
-// (seedHistoryGrade7.js) — Geography was entirely missing. Reuses
-// the "Social Science" Subject that seedHistoryGrade7.js already
+// (seedHistoryMughalTimelineGrade8.js) — Geography was entirely missing. Reuses
+// the "Social Science" Subject that seedHistoryMughalTimelineGrade8.js already
 // creates (find-or-create on {grade, name}, order between the two
 // files doesn't matter), tagging this chapter's strand: "Geography"
 // so mastery/analytics can still tell the two apart.

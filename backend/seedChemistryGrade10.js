@@ -8,10 +8,11 @@ const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
-// Gap 5 note: seedChemistryGrade8.js was originally a second grade
-// for CHEMISTRY_EQUATION_BALANCER, and exposed the getGameContentList
-// grade-filtering bug that this file's comment used to describe.
-// seedChemistryGrade8.js has since been moved to Grade 10 (NCERT
+// Gap 5 note: what's now seedChemistryEquationBalancerGrade10.js (then
+// named seedChemistryGrade8.js) was originally seeded at a second
+// grade for CHEMISTRY_EQUATION_BALANCER, and exposed the
+// getGameContentList grade-filtering bug that this file's comment
+// used to describe. It has since been moved to Grade 10 (NCERT
 // doesn't cover equation balancing until Class 10) and now merges
 // into this same chapter as a 2nd concept — so there's no longer a
 // cross-grade pairing here, just two concepts under one chapter.

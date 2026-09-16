@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -17,7 +19,21 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const concept = await Concept.findOne({ title: "Flower Structure and Pollination" });
+  const subject = await Subject.findOne({ grade: 12, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 12 Science/Biology subject not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Sexual Reproduction in Flowering Plants" });
+  if (!chapter) {
+    console.error("Chapter 'Sexual Reproduction in Flowering Plants' not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const concept = await Concept.findOne({ chapter_id: chapter._id, title: "Flower Structure and Pollination" });
   if (!concept) {
     console.error(
       "Concept 'Flower Structure and Pollination' not found — run seedGrade12_batch1.js first.",

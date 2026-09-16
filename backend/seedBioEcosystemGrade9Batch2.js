@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -38,7 +40,21 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const concept = await Concept.findOne({ title: "The Biosphere and Its Components" });
+  const subject = await Subject.findOne({ grade: 9, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 9 Science/Biology subject not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Natural Resources" });
+  if (!chapter) {
+    console.error("Chapter 'Natural Resources' not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const concept = await Concept.findOne({ chapter_id: chapter._id, title: "The Biosphere and Its Components" });
   if (!concept) {
     console.error(
       "Concept 'The Biosphere and Its Components' not found — run seedGrade9_batch2.js first.",

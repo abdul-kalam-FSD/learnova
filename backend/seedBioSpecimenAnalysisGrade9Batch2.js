@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -28,17 +30,30 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const conceptTitles = [
-    "Plant Cell vs Animal Cell",
-    "Plant Tissues",
-    "Animal Tissues",
-    "Classification Basics",
-    "Kingdom Plantae and Animalia Overview",
-  ];
+  const subject = await Subject.findOne({ grade: 9, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 9 Science subject not found — run seedGrade9.js first.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const conceptChapters = {
+    "Plant Cell vs Animal Cell": "The Fundamental Unit of Life",
+    "Plant Tissues": "Tissues",
+    "Animal Tissues": "Tissues",
+    "Classification Basics": "Diversity in Living Organisms",
+    "Kingdom Plantae and Animalia Overview": "Diversity in Living Organisms",
+  };
 
   const concepts = {};
-  for (const title of conceptTitles) {
-    const concept = await Concept.findOne({ title });
+  for (const [title, chapterTitle] of Object.entries(conceptChapters)) {
+    const chapter = await Chapter.findOne({ subject_id: subject._id, title: chapterTitle });
+    if (!chapter) {
+      console.error(`Chapter '${chapterTitle}' not found — run seedGrade9.js first.`);
+      await mongoose.disconnect();
+      process.exit(1);
+    }
+    const concept = await Concept.findOne({ chapter_id: chapter._id, title });
     if (!concept) {
       console.error(`Concept '${title}' not found — run seedGrade9.js first.`);
       await mongoose.disconnect();

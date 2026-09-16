@@ -9,7 +9,7 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Adds PHYSICS_OHMS_LAW_SPEED_CHALLENGE content to the SAME Grade 10
-// "Series and Parallel Circuits" chapter that seedPhysicsGrade9.js
+// "Series and Parallel Circuits" chapter that seedPhysicsSeriesParallelGrade10.js
 // already seeds with PHYSICS_CIRCUIT_BUILDER — a second mechanic for
 // the same chapter, same sibling pattern as Grade 6 (Circuit Builder
 // + Magnetism Match on different chapters) or Grade 9's own

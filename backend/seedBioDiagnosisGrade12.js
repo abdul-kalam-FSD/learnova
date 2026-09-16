@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -21,7 +23,21 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const concept = await Concept.findOne({ title: "Common Diseases in Humans" });
+  const subject = await Subject.findOne({ grade: 12, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 12 Science/Biology subject not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Human Health and Disease" });
+  if (!chapter) {
+    console.error("Chapter 'Human Health and Disease' not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const concept = await Concept.findOne({ chapter_id: chapter._id, title: "Common Diseases in Humans" });
   if (!concept) {
     console.error(
       "Concept 'Common Diseases in Humans' not found — run seedGrade12_batch3.js first.",

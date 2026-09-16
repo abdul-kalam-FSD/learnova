@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -24,7 +26,21 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const concept = await Concept.findOne({ title: "Lymph and Circulatory Disorders" });
+  const subject = await Subject.findOne({ grade: 11, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 11 Science/Biology subject not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Body Fluids and Circulation" });
+  if (!chapter) {
+    console.error("Chapter 'Body Fluids and Circulation' not found.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const concept = await Concept.findOne({ chapter_id: chapter._id, title: "Lymph and Circulatory Disorders" });
   if (!concept) {
     console.error(
       "Concept 'Lymph and Circulatory Disorders' not found — run seedGrade11_batch6.js first.",

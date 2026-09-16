@@ -8,7 +8,7 @@ const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
-// Fills the Grade 6 Physics hole left by the seedPhysicsGrade6.js
+// Fills the Grade 6 Physics hole left by the seedPhysicsCircuitBasicsGrade7.js
 // grade-correction: circuits moved to Grade 7 (confirmed exact match,
 // Ch.3 "Electricity - Circuits and their Components"), which left
 // Grade 6 with no Physics content at all. Under the current

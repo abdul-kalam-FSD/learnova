@@ -9,7 +9,7 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Fills the content hole left by the Gap 5 curriculum-citation fix:
-// seedHistoryGrade7.js ("The Mughal Empire") was regraded to Grade 8,
+// seedHistoryMughalTimelineGrade8.js ("The Mughal Empire") was regraded to Grade 8,
 // since Grade 7's current Social Science book drops medieval India
 // in favour of expanded ancient-India coverage — confirmed via
 // multiple independent sources on the 2025-26 Class 7 textbook

@@ -9,7 +9,7 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Fills the content hole left by the Gap 5 curriculum-citation fix:
-// the old seedChemistryGrade8.js ("Chemical Equations") was regraded
+// the old seedChemistryEquationBalancerGrade10.js ("Chemical Equations") was regraded
 // to Grade 10, since NCERT doesn't introduce balancing equations
 // until Class 10. That file's own comment already named Grade 8's
 // actual chemistry content: "Materials: Metals and Non-Metals" — a

@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const dns = require("dns");
 dns.setServers(["8.8.8.8", "8.8.4.4"]);
 
+const Subject = require("./src/models/Subject");
+const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
@@ -30,14 +32,27 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const conceptTitles = [
-    "Kingdom Monera and Kingdom Protista",
-    "Pteridophytes and Gymnosperms",
-    "Non-Chordates (Porifera to Echinodermata)",
-  ];
+  const subject = await Subject.findOne({ grade: 11, name: /biology|science/i });
+  if (!subject) {
+    console.error("Grade 11 Science/Biology subject not found — run seedGrade11.js / seedGrade11_batch2.js first.");
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+
+  const conceptChapters = {
+    "Kingdom Monera and Kingdom Protista": "Biological Classification",
+    "Pteridophytes and Gymnosperms": "Plant Kingdom",
+    "Non-Chordates (Porifera to Echinodermata)": "Animal Kingdom",
+  };
   const concepts = {};
-  for (const title of conceptTitles) {
-    const concept = await Concept.findOne({ title });
+  for (const [title, chapterTitle] of Object.entries(conceptChapters)) {
+    const chapter = await Chapter.findOne({ subject_id: subject._id, title: chapterTitle });
+    if (!chapter) {
+      console.error(`Chapter "${chapterTitle}" not found — run seedGrade11.js / seedGrade11_batch2.js first.`);
+      await mongoose.disconnect();
+      process.exit(1);
+    }
+    const concept = await Concept.findOne({ chapter_id: chapter._id, title });
     if (!concept) {
       console.error(`Concept "${title}" not found — run seedGrade11.js / seedGrade11_batch2.js first.`);
       await mongoose.disconnect();

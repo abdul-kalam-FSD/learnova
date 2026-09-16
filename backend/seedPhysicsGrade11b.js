@@ -11,11 +11,11 @@ const GameContent = require("./src/models/GameContent");
 // Fills the actual Grade 11 Physics hole. Grade 11 previously had
 // Biology (7 batch files, fully seeded — see seedGrade11.js through
 // seedGrade11_batch7.js) and Chemistry (via seedChemistryGrade11.js),
-// but no Physics at all. The file named seedPhysicsGrade11.js is
-// mislabeled the same way the old seedPhysicsGrade9.js was — its
-// Subject.findOne/create calls actually target { grade: 12,
-// name: /physics/i }, so it seeds Grade 12 content ("Electrostatics"),
-// not Grade 11.
+// but no Physics at all. seedPhysicsCapacitorCircuitGrade12.js (formerly
+// misnamed seedPhysicsGrade11.js, the same way seedPhysicsGrade9.js
+// was before it became seedPhysicsSeriesParallelGrade10.js) seeds
+// Grade 12 content ("Electrostatics") via { grade: 12,
+// name: /physics/i } — not Grade 11.
 //
 // Grounded in the current NCERT Class 11 Physics textbook (Physics
 // Part I, unchanged core mechanics sequence for the 2026-27 CBSE

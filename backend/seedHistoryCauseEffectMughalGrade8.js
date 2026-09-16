@@ -9,7 +9,7 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Mechanic-diversity pass for Grade 8 History: reuses the existing
-// "The Mughal Empire" chapter from seedHistoryGrade7.js (filename is
+// "The Mughal Empire" chapter from seedHistoryMughalTimelineGrade8.js (filename is
 // historical — the file actually seeds Grade 8, see its own header
 // comment; currently HISTORY_TIMELINE_BUILDER only), adds a new
 // Concept + HISTORY_CAUSE_EFFECT_MATCH. Distinct from the existing
@@ -22,12 +22,12 @@ async function seed() {
 
   const subject = await Subject.findOne({ grade: 8, name: "Social Science" });
   if (!subject) {
-    throw new Error("Grade 8 Social Science subject not found — run seedHistoryGrade7.js first.");
+    throw new Error("Grade 8 Social Science subject not found — run seedHistoryMughalTimelineGrade8.js first.");
   }
 
   const chapter = await Chapter.findOne({ subject_id: subject._id, title: "The Mughal Empire" });
   if (!chapter) {
-    throw new Error("Chapter 'The Mughal Empire' not found — run seedHistoryGrade7.js first.");
+    throw new Error("Chapter 'The Mughal Empire' not found — run seedHistoryMughalTimelineGrade8.js first.");
   }
   console.log("Using existing chapter:", chapter._id);
 

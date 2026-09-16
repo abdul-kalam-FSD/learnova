@@ -9,7 +9,7 @@ const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
 // Fills the actual Grade 9 Physics hole in the integrated Science
-// subject. The existing seedPhysicsGrade9.js is mislabeled — despite
+// subject. The existing seedPhysicsSeriesParallelGrade10.js is mislabeled — despite
 // its filename, its Subject.findOne/create calls target { grade: 10,
 // name: "Science" }, so it seeds Grade 10 content, not Grade 9.
 // Grade 9 itself had Biology (Cell Biology, Diversity, via
