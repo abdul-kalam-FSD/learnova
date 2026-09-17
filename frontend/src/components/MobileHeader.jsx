@@ -1,11 +1,6 @@
+import { Link } from "react-router-dom";
 import { useTheme } from "../context/themeContext";
 import "../Shell.css";
-
-/**
- * App-wide top header: hamburger (opens drawer) + brand + theme toggle
- * + streak pill. Theme toggle here is a quick light/dark flip; the
- * full 4-theme picker still lives in Profile via ThemeSwitcher.
- */
 function MobileHeader({ onMenuClick, streak = 0 }) {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
@@ -20,12 +15,12 @@ function MobileHeader({ onMenuClick, streak = 0 }) {
         <span aria-hidden="true">☰</span>
       </button>
 
-      <div className="app-header__brand">
+      <Link to="/" className="app-header__brand" aria-label="Learnova home">
         <span className="app-header__brand-icon" aria-hidden="true">
           🎓
         </span>
         <span className="app-header__brand-text">Learnova</span>
-      </div>
+      </Link>
 
       <div className="app-header__right">
         <button

@@ -1,9 +1,3 @@
-/* =========================================================
-   App shell: top header + hamburger drawer.
-   Bottom nav (Nav.css) is unchanged — this covers the pieces
-   that were missing (header, theme toggle, streak, drawer).
-   ========================================================= */
-
 .app-header {
   position: sticky;
   top: 0;
@@ -27,6 +21,7 @@
   font-size: var(--fs-md);
   color: var(--text-color);
   letter-spacing: 0.02em;
+  text-decoration: none;
 }
 
 .app-header__brand-icon {
