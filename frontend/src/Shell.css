@@ -27,13 +27,6 @@
 .app-header__brand-icon {
   font-size: var(--fs-lg);
 }
-
-.app-header__brand-text {
-  /* inherits sizing/color from .app-header__brand — kept as its
-     own element for consistency, not because it needs its own
-     styling right now. */
-}
-
 .app-header__right {
   display: flex;
   align-items: center;
