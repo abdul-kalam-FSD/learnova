@@ -32,17 +32,30 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
+  // NCERT accuracy fix (2026-27 session): the current Our Wondrous
+  // World Unit 5 ("Our Environment") chapters are "Different Lands,
+  // Different Lives" and "Our Sky" — neither is a water-cycle
+  // chapter. This content is real and useful but doesn't map to any
+  // current NCERT Grade 4 chapter, so it's kept (not deleted) and
+  // clearly labelled as Learnova enrichment rather than mislabeled
+  // as NCERT-mapped content.
+  const ENRICHMENT_UNIT_LABEL = "Learnova Enrichment (not in current NCERT Grade 4 chapter list)";
   let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Water Around Us" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Our Environment",
+      unit_name: ENRICHMENT_UNIT_LABEL,
       title: "Water Around Us",
       order_index: 1,
       strand: "Geography",
     });
     console.log("Created chapter:", chapter._id);
   } else {
+    if (chapter.unit_name !== ENRICHMENT_UNIT_LABEL) {
+      chapter.unit_name = ENRICHMENT_UNIT_LABEL;
+      await chapter.save();
+      console.log("Relabelled chapter as enrichment:", chapter._id);
+    }
     console.log("Using existing chapter:", chapter._id);
   }
 

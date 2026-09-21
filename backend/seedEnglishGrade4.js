@@ -25,17 +25,31 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
+  // NCERT accuracy fix (2026-27 session): "Compound Words" isn't one
+  // of Santoor's 12 real chapters (see seedEnglishTogetherWeCanGrade4.js
+  // through seedEnglishMaheshwarGrade4.js for those). This vocabulary
+  // content is still useful, so it's kept — not deleted — and clearly
+  // labelled as Learnova enrichment rather than mislabeled as an NCERT
+  // chapter. order_index moved past the 12 real chapters.
+  const ENRICHMENT_UNIT_LABEL = "Learnova Enrichment (not one of Santoor's 12 chapters)";
   let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Compound Words" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Vocabulary Building",
+      unit_name: ENRICHMENT_UNIT_LABEL,
       title: "Compound Words",
-      order_index: 1,
+      order_index: 13,
     });
     console.log("Created chapter:", chapter._id);
   } else {
-    console.log("Using existing chapter:", chapter._id);
+    if (chapter.unit_name !== ENRICHMENT_UNIT_LABEL) {
+      chapter.unit_name = ENRICHMENT_UNIT_LABEL;
+      chapter.order_index = 13;
+      await chapter.save();
+      console.log("Relabelled chapter as enrichment:", chapter._id);
+    } else {
+      console.log("Using existing chapter:", chapter._id);
+    }
   }
 
   let concept = await Concept.findOne({ chapter_id: chapter._id, title: "Joining Two Words Into One" });

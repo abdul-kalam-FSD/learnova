@@ -32,18 +32,35 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Simple Circuits" });
+  // NCERT accuracy fix (2026-27 session): Grade 4 EVS is now the
+  // single integrated "Our Wondrous World" book, whose Unit 4
+  // ("Things Around Us") chapter "How Things Work" is where simple
+  // circuits/electricity content actually lives. Find the chapter
+  // under its old title first (pre-existing DB docs), and rename it
+  // in place so existing concept_id/GameContent relationships are
+  // preserved — never delete-and-recreate.
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "How Things Work" });
+  if (!chapter) {
+    chapter = await Chapter.findOne({ subject_id: subject._id, title: "Simple Circuits" });
+  }
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Electricity Basics",
-      title: "Simple Circuits",
+      unit_name: "Things Around Us",
+      title: "How Things Work",
       order_index: 1,
       strand: "Physics",
     });
     console.log("Created chapter:", chapter._id);
   } else {
-    console.log("Using existing chapter:", chapter._id);
+    if (chapter.title !== "How Things Work" || chapter.unit_name !== "Things Around Us") {
+      chapter.title = "How Things Work";
+      chapter.unit_name = "Things Around Us";
+      await chapter.save();
+      console.log("Renamed chapter to NCERT title:", chapter._id);
+    } else {
+      console.log("Using existing chapter:", chapter._id);
+    }
   }
 
   let concept = await Concept.findOne({ chapter_id: chapter._id, title: "Making a Bulb Light Up" });

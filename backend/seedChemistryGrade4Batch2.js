@@ -29,9 +29,11 @@ async function seed() {
   }
   console.log("Using existing subject:", subject._id);
 
-  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Tiny Building Blocks" });
+  const chapter =
+    (await Chapter.findOne({ subject_id: subject._id, title: "How Things are Made" })) ||
+    (await Chapter.findOne({ subject_id: subject._id, title: "Tiny Building Blocks" }));
   if (!chapter) {
-    console.error('Chapter "Tiny Building Blocks" not found — run seedChemistryGrade4.js first.');
+    console.error('Chapter "How Things are Made" not found — run seedChemistryGrade4.js first.');
     process.exit(1);
   }
   console.log("Using existing chapter:", chapter._id);

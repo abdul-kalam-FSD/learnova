@@ -25,17 +25,30 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Shapes All Around" });
+  // NCERT accuracy fix (2026-27 session): renamed in place to match
+  // the official Maths Mela Class 4 Chapter 1 title ("Shapes Around
+  // Us"), preserving existing concept/GameContent relationships.
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Shapes Around Us" });
+  if (!chapter) {
+    chapter = await Chapter.findOne({ subject_id: subject._id, title: "Shapes All Around" });
+  }
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Geometry Basics",
-      title: "Shapes All Around",
+      unit_name: "Maths Mela",
+      title: "Shapes Around Us",
       order_index: 1,
     });
     console.log("Created chapter:", chapter._id);
   } else {
-    console.log("Using existing chapter:", chapter._id);
+    if (chapter.title !== "Shapes Around Us") {
+      chapter.title = "Shapes Around Us";
+      chapter.unit_name = "Maths Mela";
+      await chapter.save();
+      console.log("Renamed chapter to NCERT title:", chapter._id);
+    } else {
+      console.log("Using existing chapter:", chapter._id);
+    }
   }
 
   let concept = await Concept.findOne({ chapter_id: chapter._id, title: "Naming Basic Shapes" });

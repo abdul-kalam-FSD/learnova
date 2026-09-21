@@ -26,9 +26,11 @@ async function seed() {
     throw new Error("Grade 4 Social Science subject not found — run seedSocialScienceGrade4.js first.");
   }
 
-  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Being a Good Citizen" });
+  const chapter =
+    (await Chapter.findOne({ subject_id: subject._id, title: "Living Together" })) ||
+    (await Chapter.findOne({ subject_id: subject._id, title: "Being a Good Citizen" }));
   if (!chapter) {
-    throw new Error("Chapter 'Being a Good Citizen' not found — run seedSocialScienceGrade4.js first.");
+    throw new Error("Chapter 'Living Together' not found — run seedSocialScienceGrade4.js first.");
   }
   console.log("Using existing chapter:", chapter._id);
 

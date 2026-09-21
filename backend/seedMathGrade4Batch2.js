@@ -33,9 +33,11 @@ async function seed() {
   }
   console.log("Using existing subject:", subject._id);
 
-  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Shapes All Around" });
+  const chapter =
+    (await Chapter.findOne({ subject_id: subject._id, title: "Shapes Around Us" })) ||
+    (await Chapter.findOne({ subject_id: subject._id, title: "Shapes All Around" }));
   if (!chapter) {
-    console.error('Chapter "Shapes All Around" not found — run seedMathGrade4.js first.');
+    console.error('Chapter "Shapes Around Us" not found — run seedMathGrade4.js first.');
     process.exit(1);
   }
   console.log("Using existing chapter:", chapter._id);

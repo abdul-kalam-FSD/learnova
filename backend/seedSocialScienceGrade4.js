@@ -24,17 +24,34 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Being a Good Citizen" });
+  // NCERT accuracy fix (2026-27 session): "Being a Good Citizen" was
+  // not an actual Our Wondrous World chapter title — "Living
+  // Together" (Unit 1: Our Community) is. Rename in place rather
+  // than delete-and-recreate, so existing concepts/GameContent stay
+  // attached to the same chapter document.
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Living Together" });
+  if (!chapter) {
+    chapter = await Chapter.findOne({ subject_id: subject._id, title: "Being a Good Citizen" });
+  }
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Living Together",
-      title: "Being a Good Citizen",
+      unit_name: "Our Community",
+      title: "Living Together",
       order_index: 1,
+      strand: "Civics",
     });
     console.log("Created chapter:", chapter._id);
   } else {
-    console.log("Using existing chapter:", chapter._id);
+    if (chapter.title !== "Living Together" || chapter.unit_name !== "Our Community") {
+      chapter.title = "Living Together";
+      chapter.unit_name = "Our Community";
+      if (!chapter.strand) chapter.strand = "Civics";
+      await chapter.save();
+      console.log("Renamed chapter to NCERT title:", chapter._id);
+    } else {
+      console.log("Using existing chapter:", chapter._id);
+    }
   }
 
   let concept = await Concept.findOne({ chapter_id: chapter._id, title: "Making Fair, Honest Choices" });

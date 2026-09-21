@@ -31,18 +31,32 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Tiny Building Blocks" });
+  // NCERT accuracy fix (2026-27 session): renames the chapter in
+  // place (find-old-title -> update) so it now matches Grade 4 "Our
+  // Wondrous World" Unit 4 ("Things Around Us") chapter "How Things
+  // are Made", without breaking existing concept_id relationships.
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "How Things are Made" });
+  if (!chapter) {
+    chapter = await Chapter.findOne({ subject_id: subject._id, title: "Tiny Building Blocks" });
+  }
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Everyday Materials",
-      title: "Tiny Building Blocks",
+      unit_name: "Things Around Us",
+      title: "How Things are Made",
       order_index: 1,
       strand: "Chemistry",
     });
     console.log("Created chapter:", chapter._id);
   } else {
-    console.log("Using existing chapter:", chapter._id);
+    if (chapter.title !== "How Things are Made" || chapter.unit_name !== "Things Around Us") {
+      chapter.title = "How Things are Made";
+      chapter.unit_name = "Things Around Us";
+      await chapter.save();
+      console.log("Renamed chapter to NCERT title:", chapter._id);
+    } else {
+      console.log("Using existing chapter:", chapter._id);
+    }
   }
 
   let concept = await Concept.findOne({ chapter_id: chapter._id, title: "What Everyday Things Are Made Of" });

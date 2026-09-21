@@ -31,18 +31,33 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Animal Groups" });
+  // NCERT accuracy fix (2026-27 session): "Animal Groups" is renamed
+  // in place to "Growing up with Nature" (Our Wondrous World Unit 2:
+  // Life Around Us). The classification content below still fits —
+  // see seedBiologyGrowingUpConceptGrade4.js for the added life-cycle
+  // concept that completes this chapter's real NCERT scope.
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Growing up with Nature" });
+  if (!chapter) {
+    chapter = await Chapter.findOne({ subject_id: subject._id, title: "Animal Groups" });
+  }
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Living Things Around Us",
-      title: "Animal Groups",
+      unit_name: "Life Around Us",
+      title: "Growing up with Nature",
       order_index: 1,
       strand: "Biology",
     });
     console.log("Created chapter:", chapter._id);
   } else {
-    console.log("Using existing chapter:", chapter._id);
+    if (chapter.title !== "Growing up with Nature" || chapter.unit_name !== "Life Around Us") {
+      chapter.title = "Growing up with Nature";
+      chapter.unit_name = "Life Around Us";
+      await chapter.save();
+      console.log("Renamed chapter to NCERT title:", chapter._id);
+    } else {
+      console.log("Using existing chapter:", chapter._id);
+    }
   }
 
   let concept = await Concept.findOne({ chapter_id: chapter._id, title: "Sorting Animals by Features" });

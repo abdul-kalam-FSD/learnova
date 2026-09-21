@@ -32,9 +32,11 @@ async function seed() {
   }
   console.log("Using existing subject:", subject._id);
 
-  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Animal Groups" });
+  const chapter =
+    (await Chapter.findOne({ subject_id: subject._id, title: "Growing up with Nature" })) ||
+    (await Chapter.findOne({ subject_id: subject._id, title: "Animal Groups" }));
   if (!chapter) {
-    console.error('Chapter "Animal Groups" not found — run seedBiologyGrade4.js first.');
+    console.error('Chapter "Growing up with Nature" not found — run seedBiologyGrade4.js first.');
     process.exit(1);
   }
   console.log("Using existing chapter:", chapter._id);
