@@ -26,7 +26,7 @@ async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  let subject = await Subject.findOne({ grade: 7, name: /science/i });
+  let subject = await Subject.findOne({ grade: 7, name: "Science" });
   if (!subject) {
     subject = await Subject.create({ name: "Science", grade: 7 });
     console.log("Created new Grade 7 Science subject:", subject._id);

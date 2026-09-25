@@ -24,13 +24,13 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Geometry" });
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Playing with Constructions" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Shapes and Space",
-      title: "Geometry",
-      order_index: 2,
+      unit_name: "Ganita Prakash",
+      title: "Playing with Constructions",
+      order_index: 8,
     });
     console.log("Created chapter:", chapter._id);
   } else {
@@ -43,7 +43,7 @@ async function seed() {
       chapter_id: chapter._id,
       title: "Classifying Shapes",
       explanation_text:
-        "2D shapes can be classified by their number of sides, the sum of their interior angles, and defining properties like equal sides or right angles. A triangle has 3 sides and its angles always add up to 180°; each extra side adds another 180° to that angle sum.",
+        "2D shapes can be classified by their number of sides and by defining properties such as equal sides or right angles. A triangle has 3 sides, a quadrilateral 4 and a pentagon 5; a square has four equal sides and four right angles, and a rectangle has equal opposite sides and four right angles.",
     });
     console.log("Created concept:", concept._id);
   } else {
@@ -68,34 +68,13 @@ async function seed() {
           { id: "s3", shape: "pentagon", label: "Pentagon" },
         ],
         components: [
-          { id: "c1", label: "3 sides" },
-          { id: "c2", label: "4 sides" },
-          { id: "c3", label: "5 sides" },
           { id: "c4", label: "6 sides" },
+          { id: "c3", label: "5 sides" },
+          { id: "c2", label: "4 sides" },
+          { id: "c1", label: "3 sides" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Count the straight edges around each shape.",
-      },
-    },
-    {
-      title: "Match: Shape to Angle Sum",
-      difficulty: "medium",
-      order_index: 2,
-      payload: {
-        scenario: "Match each shape to the sum of its interior angles.",
-        slots: [
-          { id: "s1", shape: "triangle", label: "Triangle" },
-          { id: "s2", shape: "rectangle", label: "Rectangle" },
-          { id: "s3", shape: "hexagon", label: "Hexagon" },
-        ],
-        components: [
-          { id: "c1", label: "180°" },
-          { id: "c2", label: "360°" },
-          { id: "c3", label: "720°" },
-          { id: "c4", label: "540°" },
-        ],
-        correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
-        hint: "Every extra side adds another 180° to the total.",
       },
     },
     {
@@ -110,10 +89,10 @@ async function seed() {
           { id: "s3", shape: "rhombus", label: "Rhombus" },
         ],
         components: [
-          { id: "c1", label: "All sides equal, all angles 90°" },
-          { id: "c2", label: "Opposite sides equal, all angles 90°" },
-          { id: "c3", label: "All sides equal, opposite angles equal" },
           { id: "c4", label: "Opposite sides equal, opposite angles equal" },
+          { id: "c3", label: "All sides equal, opposite angles equal" },
+          { id: "c2", label: "Opposite sides equal, all angles 90°" },
+          { id: "c1", label: "All sides equal, all angles 90°" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Check side lengths first, then check if the angles are 90°.",

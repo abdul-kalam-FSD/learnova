@@ -37,9 +37,9 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Numbers",
+      unit_name: "Learnova Enrichment",
       title: "Ratio and Proportion",
-      order_index: 3,
+      order_index: 11,
     });
     console.log("Created chapter:", chapter._id);
   } else {
@@ -73,15 +73,15 @@ async function seed() {
         slots: [
           { id: "s1", label: "4 : 8" },
           { id: "s2", label: "6 : 9" },
-          { id: "s3", label: "10 : 15" },
+          { id: "s3", label: "9 : 12" },
         ],
         components: [
-          { id: "c1", label: "1 : 2" },
-          { id: "c2", label: "2 : 3" },
-          { id: "c3", label: "3 : 4" },
           { id: "c4", label: "1 : 3" },
+          { id: "c3", label: "3 : 4" },
+          { id: "c2", label: "2 : 3" },
+          { id: "c1", label: "1 : 2" },
         ],
-        correct_mapping: { s1: "c1", s2: "c2", s3: "c2" },
+        correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Divide both terms of the ratio by their greatest common factor.",
       },
     },
@@ -97,10 +97,10 @@ async function seed() {
           { id: "s3", label: "5 : 6" },
         ],
         components: [
-          { id: "c1", label: "4 : 10" },
-          { id: "c2", label: "9 : 21" },
-          { id: "c3", label: "10 : 12" },
           { id: "c4", label: "6 : 11" },
+          { id: "c3", label: "10 : 12" },
+          { id: "c2", label: "9 : 21" },
+          { id: "c1", label: "4 : 10" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Multiply both terms of the ratio by the same number to find an equivalent one.",
@@ -119,10 +119,10 @@ async function seed() {
           { id: "s3", label: "₹100 shared 3 : 2" },
         ],
         components: [
-          { id: "c1", label: "₹10 and ₹30" },
-          { id: "c2", label: "₹40 and ₹20" },
-          { id: "c3", label: "₹60 and ₹40" },
           { id: "c4", label: "₹20 and ₹20" },
+          { id: "c3", label: "₹60 and ₹40" },
+          { id: "c2", label: "₹40 and ₹20" },
+          { id: "c1", label: "₹10 and ₹30" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Add the ratio's terms to find how many equal parts the total splits into.",

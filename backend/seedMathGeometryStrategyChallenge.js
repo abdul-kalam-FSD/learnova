@@ -27,13 +27,13 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Geometry" });
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Perimeter and Area" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Shapes and Space",
-      title: "Geometry",
-      order_index: 2,
+      unit_name: "Ganita Prakash",
+      title: "Perimeter and Area",
+      order_index: 6,
     });
     console.log("Created chapter:", chapter._id);
   } else {

@@ -8,75 +8,63 @@ const Chapter = require("./src/models/Chapter");
 const Concept = require("./src/models/Concept");
 const GameContent = require("./src/models/GameContent");
 
-// Boss capstone for the Equations family (Builder, Speed Calculation,
-// Word Problem Match, Balance Strategy already exist). Same
-// payload/scoring shape as the other boss challenges — a timed MCQ
-// batch, checked by the shared checkMultiQuestionAttempt, no new
-// backend scoring logic.
+// Boss capstone for the Grade 7 "Simple Equations" mechanic family
+// (Equation Builder, Speed Calculation, Word Problem Match, Balance
+// Strategy already exist under this chapter). Same payload/scoring
+// shape as the other equation content — a timed MCQ batch, checked by
+// the shared checkMultiQuestionAttempt, no new backend scoring logic.
 //
-// UNLIKE seedMathAngleSpeedChallenge.js / seedMathGeometryBossChallenge.js,
-// this script does NOT know the exact Chapter/Concept titles already
-// used for Equations content in earlier sessions — those seed files
-// weren't available when this one was written. To avoid creating a
-// duplicate Concept (which would fragment mastery tracking for the
-// same skill), this script:
-//   1. Finds the Mathematics subject (grade 6, same as Geometry).
-//   2. Finds a Chapter under it whose title matches /equation/i.
-//   3. Picks the FIRST Concept under that chapter, whatever it's
-//      named, and logs it clearly.
-//   4. Refuses to run (throws, no GameContent created) if step 2 or 3
-//      finds nothing — safer than guessing a title and silently
-//      creating a new, disconnected Concept.
-//
-// BEFORE trusting this in production: check the "Using concept:" log
-// line below against your actual DB and confirm it's the concept you
-// expect Equation content to map to. If it's the wrong one, edit the
-// CONCEPT_TITLE_OVERRIDE constant below to pin an exact title instead.
-const CONCEPT_TITLE_OVERRIDE = null; // e.g. "Solving Linear Equations"
-
+// Grade 7 Audit fix (Batch 1, Defect 2): this file previously picked
+// "whatever concept is first" under a regex-matched chapter, which was
+// fragile and invisible to the structural audit. It now uses the same
+// exact subject/chapter/concept lookup convention as every other
+// Grade 7 seed file (see seedMathNumberMachine.js), anchoring to the
+// existing "Solving for the Unknown" concept under "Simple Equations"
+// — the general equation-solving skill this capstone tests across both
+// direct solving (Round 1) and word-problem translation (Round 2).
 async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
   console.log("Connected to MongoDB");
 
-  const subject = await Subject.findOne({ grade: 7, name: /mathematics|math/i });
+  const subject = await Subject.findOne({ grade: 7, name: "Mathematics" });
   if (!subject) {
     throw new Error(
-      "No Grade 7 Mathematics subject found — run seedMathGrade7.js (Integers) first, or check the grade/name filter above.",
+      "No Grade 7 Mathematics subject found — run seedMathGrade7.js (Integers) first.",
     );
   }
   console.log("Using subject:", subject._id);
 
-  const chapter = await Chapter.findOne({
-    subject_id: subject._id,
-    title: /equation/i,
-  });
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Simple Equations" });
   if (!chapter) {
     throw new Error(
-      "No Chapter matching /equation/i found under Mathematics. Check your DB for the real chapter title and either rename it to include 'Equation', or hardcode chapter lookup here.",
+      "No 'Simple Equations' chapter found under Grade 7 Mathematics — run seedMathNumberMachine.js or seedMathEquationBuilder.js first.",
     );
   }
-  console.log("Using chapter:", chapter._id, `(title: "${chapter.title}")`);
+  console.log("Using chapter:", chapter._id);
 
-  let concept;
-  if (CONCEPT_TITLE_OVERRIDE) {
-    concept = await Concept.findOne({ chapter_id: chapter._id, title: CONCEPT_TITLE_OVERRIDE });
-    if (!concept) {
-      throw new Error(`CONCEPT_TITLE_OVERRIDE "${CONCEPT_TITLE_OVERRIDE}" not found under chapter "${chapter.title}".`);
-    }
-  } else {
-    concept = await Concept.findOne({ chapter_id: chapter._id }).sort({ _id: 1 });
-    if (!concept) {
-      throw new Error(
-        `Chapter "${chapter.title}" has no Concepts yet — nothing to anchor GameContent to. Seed a concept first, or set CONCEPT_TITLE_OVERRIDE.`,
-      );
-    }
+  const concept = await Concept.findOne({ chapter_id: chapter._id, title: "Solving for the Unknown" });
+  if (!concept) {
+    throw new Error(
+      "No 'Solving for the Unknown' concept found under 'Simple Equations' — run seedMathNumberMachine.js first.",
+    );
   }
-  console.log(`Using concept: ${concept._id} (title: "${concept.title}") — VERIFY this is correct before trusting this seed's output.`);
+  console.log("Using concept:", concept._id);
 
+  // Grade 7 Audit fix (Batch 1, Defect 1): "boss" is not a valid
+  // GameContent.difficulty value (schema enum is easy/medium/hard).
+  // Both rounds are the hardest content in this mechanic family, so
+  // they map to "hard".
+  //
+  // Grade 7 Audit fix (Batch 1, Defect 9): the original 12 questions
+  // had a first-option bias (a=6, b=5, c=1). The three questions below
+  // marked "rebalanced" have had their option order (and matching
+  // correct_option_id) changed — content and correctness are
+  // unchanged, only which lettered slot holds the correct answer.
+  // New distribution: a=4, b=4, c=4.
   const equationBossRounds = [
     {
       title: "Boss Round 1: The Balance Keeper Rises",
-      difficulty: "boss",
+      difficulty: "hard",
       order_index: 1,
       payload: {
         time_limit_seconds: 9,
@@ -105,22 +93,24 @@ async function seed() {
           {
             id: "q3",
             prompt: "A shop sells pens at ₹x each. 4 pens cost ₹48. Which equation represents this?",
+            // rebalanced: correct answer moved from slot a to slot c
             options: [
-              { id: "a", label: "4x = 48" },
-              { id: "b", label: "x + 4 = 48" },
-              { id: "c", label: "x - 4 = 48" },
+              { id: "a", label: "x + 4 = 48" },
+              { id: "b", label: "x - 4 = 48" },
+              { id: "c", label: "4x = 48" },
             ],
-            correct_option_id: "a",
+            correct_option_id: "c",
           },
           {
             id: "q4",
             prompt: "Solve: x - 9 = 4",
+            // rebalanced: correct answer moved from slot b to slot c
             options: [
               { id: "a", label: "x = 5" },
-              { id: "b", label: "x = 13" },
-              { id: "c", label: "x = -5" },
+              { id: "b", label: "x = -5" },
+              { id: "c", label: "x = 13" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "c",
           },
           {
             id: "q5",
@@ -147,7 +137,7 @@ async function seed() {
     },
     {
       title: "Boss Round 2: Final Balance",
-      difficulty: "boss",
+      difficulty: "hard",
       order_index: 2,
       payload: {
         time_limit_seconds: 8,
@@ -156,12 +146,13 @@ async function seed() {
           {
             id: "q1",
             prompt: "Solve: 2x + 3 = 11",
+            // rebalanced: correct answer moved from slot a to slot c
             options: [
-              { id: "a", label: "x = 4" },
-              { id: "b", label: "x = 7" },
-              { id: "c", label: "x = 5.5" },
+              { id: "a", label: "x = 7" },
+              { id: "b", label: "x = 5.5" },
+              { id: "c", label: "x = 4" },
             ],
-            correct_option_id: "a",
+            correct_option_id: "c",
           },
           {
             id: "q2",

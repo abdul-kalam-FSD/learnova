@@ -44,9 +44,9 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Physics",
+      unit_name: "Curiosity",
       title: "Exploring Magnets",
-      order_index: 1,
+      order_index: 4,
       strand: "Physics",
     });
     console.log("Created chapter:", chapter._id);
@@ -68,28 +68,30 @@ async function seed() {
   }
 
   // payload shape: same mapping-equality check as CHEMISTRY_MATCH —
-  // student matches each object/effect card (slot) to Magnetic or
-  // Non-Magnetic (component); the tray always has both category
-  // labels, with the third round adding decoy labels to stop simple
-  // elimination.
+  // student matches each object/effect card (slot) to one distinct
+  // explanation card (component). The Match UI consumes a tray card
+  // once it is placed, so every slot needs its OWN correct card;
+  // decoy cards are added to stop simple elimination.
   const physicsMatchChallenges = [
     {
       title: "Match: Magnetic or Non-Magnetic",
       difficulty: "easy",
       order_index: 1,
       payload: {
-        scenario: "Match each object to whether a magnet attracts it or not.",
+        scenario: "Match each object to what a magnet does to it, and why.",
         slots: [
           { id: "s1", label: "Iron Nail" },
           { id: "s2", label: "Wooden Ruler" },
           { id: "s3", label: "Steel Paperclip" },
         ],
         components: [
-          { id: "c1", label: "Magnetic" },
-          { id: "c2", label: "Non-Magnetic" },
+          { id: "c3", label: "Attracted — steel is made mostly of iron" },
+          { id: "c4", label: "Attracted — every metal is magnetic" },
+          { id: "c2", label: "Not attracted — wood is not a magnetic material" },
+          { id: "c1", label: "Attracted — iron is a magnetic metal" },
         ],
-        correct_mapping: { s1: "c1", s2: "c2", s3: "c1" },
-        hint: "A magnet attracts iron and steel objects, but has no effect on wood.",
+        correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
+        hint: "A magnet attracts iron and steel objects, but has no effect on wood — and not every metal is magnetic.",
       },
     },
     {
@@ -97,7 +99,7 @@ async function seed() {
       difficulty: "medium",
       order_index: 2,
       payload: {
-        scenario: "Match each everyday material to the category it belongs to.",
+        scenario: "Match each everyday material to what a magnet does to it, and why.",
         slots: [
           { id: "s1", label: "Aluminium Foil" },
           { id: "s2", label: "Cobalt Sample" },
@@ -105,10 +107,13 @@ async function seed() {
           { id: "s4", label: "Nickel Coin" },
         ],
         components: [
-          { id: "c1", label: "Magnetic" },
-          { id: "c2", label: "Non-Magnetic" },
+          { id: "c3", label: "Not attracted — plastic has no magnetic material in it" },
+          { id: "c5", label: "Attracted — because it is shiny" },
+          { id: "c2", label: "Attracted — cobalt is one of the magnetic metals" },
+          { id: "c1", label: "Not attracted — aluminium is not one of the magnetic metals" },
+          { id: "c4", label: "Attracted — nickel is one of the magnetic metals" },
         ],
-        correct_mapping: { s1: "c2", s2: "c1", s3: "c2", s4: "c1" },
+        correct_mapping: { s1: "c1", s2: "c2", s3: "c3", s4: "c4" },
         hint: "Only iron, nickel, cobalt, and materials made from them are magnetic — aluminium and plastic are not.",
       },
     },
@@ -125,10 +130,10 @@ async function seed() {
           { id: "s3", label: "Holding a magnet near a piece of gold" },
         ],
         components: [
-          { id: "c1", label: "The poles repel" },
-          { id: "c2", label: "The poles attract" },
           { id: "c3", label: "Nothing happens — gold isn't magnetic" },
+          { id: "c1", label: "The poles repel" },
           { id: "c4", label: "The gold becomes permanently magnetized" },
+          { id: "c2", label: "The poles attract" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Like poles push apart, unlike poles pull together — and gold isn't one of the magnetic metals.",

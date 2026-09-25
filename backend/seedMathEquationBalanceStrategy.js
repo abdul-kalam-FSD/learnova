@@ -12,7 +12,7 @@ const GameContent = require("./src/models/GameContent");
 // CHALLENGE — limited moves, must choose the optimal solution — same
 // idea Fraction Strategy Challenge used for Fractions, applied here to
 // balancing an equation instead of picking fraction pieces). Reuses
-// the existing Grade 6 Mathematics subject + Simple Equations chapter,
+// the existing Grade 7 Mathematics subject + Simple Equations chapter,
 // its own concept: this is about *choosing the right operations in the
 // right order*, distinct from Number Machine (just dial in the final
 // answer) and Equation Speed Calculation (same, but timed).
@@ -23,7 +23,7 @@ async function seed() {
   let subject = await Subject.findOne({ grade: 7, name: /mathematics|math/i });
   if (!subject) {
     subject = await Subject.create({ name: "Mathematics", grade: 7 });
-    console.log("Created new Grade 6 Mathematics subject:", subject._id);
+    console.log("Created new Grade 7 Mathematics subject:", subject._id);
   } else {
     console.log("Using existing subject:", subject._id);
   }

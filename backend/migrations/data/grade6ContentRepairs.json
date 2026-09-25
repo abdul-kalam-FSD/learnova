@@ -1,0 +1,1995 @@
+[
+ {
+  "game_type": "CHEMISTRY_MATCH",
+  "title": "Match: Method to a Trickier Mixture",
+  "difficulty": "hard",
+  "payload": {
+   "scenario": "These mixtures are less obvious than rice-and-stones. Match each one to the method that actually works — extra methods are listed to test your reasoning.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Iron nails mixed into sand"
+    },
+    {
+     "id": "s2",
+     "label": "Sugar dissolved in tea"
+    },
+    {
+     "id": "s3",
+     "label": "Fine flour mixed with a few small pebbles"
+    }
+   ],
+   "components": [
+    {
+     "id": "c5",
+     "label": "Filtration"
+    },
+    {
+     "id": "c4",
+     "label": "Winnowing"
+    },
+    {
+     "id": "c3",
+     "label": "Sieving"
+    },
+    {
+     "id": "c2",
+     "label": "Evaporation"
+    },
+    {
+     "id": "c1",
+     "label": "Magnetic Separation"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "One of these mixtures has a metal in it — think about what property makes that one different from the rest."
+  }
+ },
+ {
+  "game_type": "CHEMISTRY_MATCH",
+  "title": "Match: Mixture to Separation Method",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "Match each mixture to the method that would separate it.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Stones mixed into rice"
+    },
+    {
+     "id": "s2",
+     "label": "Salt dissolved in water"
+    },
+    {
+     "id": "s3",
+     "label": "Husk mixed into grain"
+    }
+   ],
+   "components": [
+    {
+     "id": "c3",
+     "label": "Winnowing"
+    },
+    {
+     "id": "c2",
+     "label": "Evaporation"
+    },
+    {
+     "id": "c1",
+     "label": "Hand-picking / Sieving"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Ask whether the mixture is solid-in-solid, dissolved, or light chaff mixed with heavier grain."
+  }
+ },
+ {
+  "game_type": "CHEMISTRY_MATCH",
+  "title": "Match: Muddy Water Cleanup",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "A jar of muddy pond water needs to be cleaned up in stages. Match each stage to what it does.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Letting the jar sit untouched for an hour"
+    },
+    {
+     "id": "s2",
+     "label": "Pouring the clearer water through a cloth"
+    },
+    {
+     "id": "s3",
+     "label": "Heating the filtered water until it boils away"
+    }
+   ],
+   "components": [
+    {
+     "id": "c3",
+     "label": "Evaporation — removes the water, leaving dissolved salts behind"
+    },
+    {
+     "id": "c2",
+     "label": "Filtration — traps remaining fine particles"
+    },
+    {
+     "id": "c1",
+     "label": "Sedimentation — heavier mud settles to the bottom"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "The order matters: settle the heavy stuff first, then filter what's left, then deal with what's actually dissolved."
+  }
+ },
+ {
+  "game_type": "GEOGRAPHY_FEATURE_MATCH",
+  "title": "Continents and Their Features",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "Match each continent to the fact that actually describes it.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Asia"
+    },
+    {
+     "id": "s2",
+     "label": "Africa"
+    },
+    {
+     "id": "s3",
+     "label": "Antarctica"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "A continent located entirely underwater beneath the Pacific Ocean"
+    },
+    {
+     "id": "c3",
+     "label": "The coldest continent, almost entirely covered by a thick sheet of ice, with no permanent population"
+    },
+    {
+     "id": "c2",
+     "label": "The continent crossed by the equator, home to the Sahara, the world's largest hot desert"
+    },
+    {
+     "id": "c1",
+     "label": "The largest continent by both area and population, home to Mount Everest"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "One continent is the largest and most populated, one has the world's biggest hot desert, and one is permanently frozen."
+  }
+ },
+ {
+  "game_type": "GEOGRAPHY_FEATURE_MATCH",
+  "title": "How Continents and Oceans Connect",
+  "difficulty": "hard",
+  "payload": {
+   "scenario": "Match each geographic connection to what it actually means for travel or trade.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "The Indian Ocean lies between Africa, Asia and Australia"
+    },
+    {
+     "id": "s2",
+     "label": "The Isthmus of Panama connects North and South America"
+    },
+    {
+     "id": "s3",
+     "label": "The Suez Canal connects the Mediterranean Sea to the Red Sea"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "Means all three oceans are actually the exact same body of water"
+    },
+    {
+     "id": "c3",
+     "label": "Lets ships travel between Europe and Asia without going all the way around Africa"
+    },
+    {
+     "id": "c2",
+     "label": "Is a narrow strip of land that ships must sail around unless a canal is built through it"
+    },
+    {
+     "id": "c1",
+     "label": "Makes it a major route for trade ships travelling between these three continents"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Each geographic connection either enables trade routes or creates a barrier that a canal can solve."
+  }
+ },
+ {
+  "game_type": "GEOGRAPHY_FEATURE_MATCH",
+  "title": "Oceans and Their Facts",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "Match each ocean to the fact that actually describes it.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "The Pacific Ocean"
+    },
+    {
+     "id": "s2",
+     "label": "The Atlantic Ocean"
+    },
+    {
+     "id": "s3",
+     "label": "The Arctic Ocean"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "An ocean located entirely within the continent of Australia"
+    },
+    {
+     "id": "c3",
+     "label": "The smallest and shallowest ocean, mostly covered in ice near the North Pole"
+    },
+    {
+     "id": "c2",
+     "label": "The second-largest ocean, separating the Americas from Europe and Africa"
+    },
+    {
+     "id": "c1",
+     "label": "The largest and deepest ocean on Earth, bordering Asia and the Americas"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Think about size and location — one is the biggest by far, one connects the Americas to Europe/Africa, and one is small and icy."
+  }
+ },
+ {
+  "game_type": "HISTORY_CAUSE_EFFECT_MATCH",
+  "title": "Decline of the Harappan Civilisation → Effect",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "Match each likely cause of Harappan decline to the effect it had on the civilisation.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "The course of a major river (like the Ghaggar-Hakra) dried up or shifted over time"
+    },
+    {
+     "id": "s2",
+     "label": "Monsoon rainfall patterns weakened in the region"
+    },
+    {
+     "id": "s3",
+     "label": "Trade routes with Mesopotamia gradually declined"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "The population of Harappan cities suddenly tripled in a few years"
+    },
+    {
+     "id": "c3",
+     "label": "Harappan cities lost an important source of wealth and foreign goods"
+    },
+    {
+     "id": "c2",
+     "label": "Agriculture that depended on regular rains became harder to sustain"
+    },
+    {
+     "id": "c1",
+     "label": "Farming communities along the river had to abandon their settlements"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Most theories about the decline point to environmental changes making the old way of life harder to sustain — not a sudden disaster."
+  }
+ },
+ {
+  "game_type": "HISTORY_CAUSE_EFFECT_MATCH",
+  "title": "Harappan Town Planning → Effect",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "Match each feature of Harappan town planning to the effect it actually had.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Cities built on a grid pattern with streets crossing at right angles"
+    },
+    {
+     "id": "s2",
+     "label": "Every house connected to a covered underground drainage system"
+    },
+    {
+     "id": "s3",
+     "label": "A large citadel built on a raised platform, separate from the lower town"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "Allowed the city to expand rapidly with no planning at all"
+    },
+    {
+     "id": "c3",
+     "label": "Set apart important buildings for rulers or priests from ordinary homes"
+    },
+    {
+     "id": "c2",
+     "label": "Kept waste water away from homes and helped maintain public health"
+    },
+    {
+     "id": "c1",
+     "label": "Made it easier to organize traffic, buildings and public spaces in an orderly city"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Think about what problem each planning choice actually solved for the people living there."
+  }
+ },
+ {
+  "game_type": "HISTORY_CAUSE_EFFECT_MATCH",
+  "title": "Harappan Trade and Seals → Effect",
+  "difficulty": "hard",
+  "payload": {
+   "scenario": "Match each Harappan practice around trade to what it actually tells historians.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Harappan traders used standardized weights and measures across the region"
+    },
+    {
+     "id": "s2",
+     "label": "Seals carved with animals and an undeciphered script were used on goods"
+    },
+    {
+     "id": "s3",
+     "label": "Harappan beads and cotton cloth have been found as far away as Mesopotamia"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "Proves Harappans and Mesopotamians spoke exactly the same language"
+    },
+    {
+     "id": "c3",
+     "label": "Shows the Harappans were part of a wider long-distance trade network"
+    },
+    {
+     "id": "c2",
+     "label": "Likely marked ownership or origin of goods, though the script still can't be read"
+    },
+    {
+     "id": "c1",
+     "label": "Made trade fair and consistent, since buyers and sellers everywhere used the same units"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Be careful with the seals — historians know they were used for something, but the script itself has never been deciphered."
+  }
+ },
+ {
+  "game_type": "HISTORY_TIMELINE_BUILDER",
+  "title": "Building and Running a Harappan City",
+  "difficulty": "medium",
+  "payload": {
+   "era_label": "Town-Planning and Water Management",
+   "scrambled_events": [
+    {
+     "id": "a3",
+     "label": "Merchants use the well-planned city's roads to set up trade with distant regions"
+    },
+    {
+     "id": "a1",
+     "label": "City planners lay out streets in an organized grid pattern"
+    },
+    {
+     "id": "a2",
+     "label": "Engineers build drains and wells to manage the city's water supply"
+    }
+   ],
+   "correct_order": [
+    "a1",
+    "a2",
+    "a3"
+   ],
+   "hint": "The physical layout of the city had to exist before its water systems could be built into it, and both had to be in place before trade could flourish through it."
+  }
+ },
+ {
+  "game_type": "HISTORY_TIMELINE_BUILDER",
+  "title": "The Decline of the Harappan Civilisation",
+  "difficulty": "hard",
+  "payload": {
+   "era_label": "Trade and the End",
+   "scrambled_events": [
+    {
+     "id": "b2",
+     "label": "Changes in climate and rivers make farming and trade harder to sustain"
+    },
+    {
+     "id": "b3",
+     "label": "Cities are gradually abandoned as people move to find better conditions elsewhere"
+    },
+    {
+     "id": "b1",
+     "label": "The Harappan civilisation reaches its peak, with extensive trade across long distances"
+    }
+   ],
+   "correct_order": [
+    "b1",
+    "b2",
+    "b3"
+   ],
+   "hint": "A civilisation has to reach a peak before it can decline — think about what conditions had to worsen before people would leave their cities."
+  }
+ },
+ {
+  "game_type": "MATH_ANGLE_SPEED_CHALLENGE",
+  "title": "Speed Round: Angles on a Straight Line and Around a Point",
+  "difficulty": "hard",
+  "payload": {
+   "time_limit_seconds": 10,
+   "hint": "Angles on a straight line add up to 180°; angles that go all the way around a point add up to 360°.",
+   "questions": [
+    {
+     "id": "q1",
+     "prompt": "Two angles on a straight line are 110° and x. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "80°"
+      },
+      {
+       "id": "b",
+       "label": "70°"
+      },
+      {
+       "id": "c",
+       "label": "60°"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q2",
+     "prompt": "Three angles around a point are 90°, 120°, and x. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "150°"
+      },
+      {
+       "id": "b",
+       "label": "140°"
+      },
+      {
+       "id": "c",
+       "label": "160°"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q3",
+     "prompt": "Two angles on a straight line are 65° and x. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "105°"
+      },
+      {
+       "id": "b",
+       "label": "125°"
+      },
+      {
+       "id": "c",
+       "label": "115°"
+      }
+     ],
+     "correct_option_id": "c"
+    },
+    {
+     "id": "q4",
+     "prompt": "Four angles around a point are 90°, 90°, 90°, and x. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "80°"
+      },
+      {
+       "id": "b",
+       "label": "100°"
+      },
+      {
+       "id": "c",
+       "label": "90°"
+      }
+     ],
+     "correct_option_id": "c"
+    },
+    {
+     "id": "q5",
+     "prompt": "Two angles on a straight line are 148° and x. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "42°"
+      },
+      {
+       "id": "b",
+       "label": "32°"
+      },
+      {
+       "id": "c",
+       "label": "22°"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q6",
+     "prompt": "Three angles around a point are 100°, 140°, and x. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "120°"
+      },
+      {
+       "id": "b",
+       "label": "110°"
+      },
+      {
+       "id": "c",
+       "label": "130°"
+      }
+     ],
+     "correct_option_id": "a"
+    }
+   ]
+  }
+ },
+ {
+  "game_type": "MATH_ANGLE_SPEED_CHALLENGE",
+  "title": "Speed Round: Vertically Opposite Angles",
+  "difficulty": "hard",
+  "payload": {
+   "time_limit_seconds": 10,
+   "hint": "Vertically opposite angles (formed by two crossing lines) are always equal; angles next to each other on the same straight line are supplementary (add to 180°).",
+   "questions": [
+    {
+     "id": "q1",
+     "prompt": "Two lines cross, forming a 70° angle on one side. Find the angle vertically opposite to it.",
+     "options": [
+      {
+       "id": "a",
+       "label": "110°"
+      },
+      {
+       "id": "b",
+       "label": "70°"
+      },
+      {
+       "id": "c",
+       "label": "20°"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q2",
+     "prompt": "Two lines cross, forming a 115° angle. Find its vertically opposite angle.",
+     "options": [
+      {
+       "id": "a",
+       "label": "115°"
+      },
+      {
+       "id": "b",
+       "label": "65°"
+      },
+      {
+       "id": "c",
+       "label": "155°"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q3",
+     "prompt": "Two lines cross, forming angles of 40° and x next to each other on a straight line. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "40°"
+      },
+      {
+       "id": "b",
+       "label": "50°"
+      },
+      {
+       "id": "c",
+       "label": "140°"
+      }
+     ],
+     "correct_option_id": "c"
+    },
+    {
+     "id": "q4",
+     "prompt": "Two lines cross, forming a 25° angle. Find its vertically opposite angle.",
+     "options": [
+      {
+       "id": "a",
+       "label": "155°"
+      },
+      {
+       "id": "b",
+       "label": "65°"
+      },
+      {
+       "id": "c",
+       "label": "25°"
+      }
+     ],
+     "correct_option_id": "c"
+    },
+    {
+     "id": "q5",
+     "prompt": "Two lines cross, forming angles of 162° and x next to each other on a straight line. Find x.",
+     "options": [
+      {
+       "id": "a",
+       "label": "162°"
+      },
+      {
+       "id": "b",
+       "label": "18°"
+      },
+      {
+       "id": "c",
+       "label": "28°"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q6",
+     "prompt": "Two lines cross, forming a 90° angle. Find its vertically opposite angle.",
+     "options": [
+      {
+       "id": "a",
+       "label": "90°"
+      },
+      {
+       "id": "b",
+       "label": "180°"
+      },
+      {
+       "id": "c",
+       "label": "45°"
+      }
+     ],
+     "correct_option_id": "a"
+    }
+   ]
+  }
+ },
+ {
+  "game_type": "MATH_FRACTION_MATCH",
+  "title": "Match: Fraction to Decimal (Enrichment)",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "Match each fraction card to its decimal equivalent.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "1/4"
+    },
+    {
+     "id": "s2",
+     "label": "3/5"
+    },
+    {
+     "id": "s3",
+     "label": "5/8"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "0.5"
+    },
+    {
+     "id": "c3",
+     "label": "0.625"
+    },
+    {
+     "id": "c2",
+     "label": "0.6"
+    },
+    {
+     "id": "c1",
+     "label": "0.25"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Divide the numerator by the denominator to get the decimal."
+  }
+ },
+ {
+  "game_type": "MATH_FRACTION_MATCH",
+  "title": "Match: Simplest Form",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "Match each fraction card to its simplest form.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "2/4"
+    },
+    {
+     "id": "s2",
+     "label": "3/9"
+    },
+    {
+     "id": "s3",
+     "label": "6/8"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "2/3"
+    },
+    {
+     "id": "c3",
+     "label": "3/4"
+    },
+    {
+     "id": "c2",
+     "label": "1/3"
+    },
+    {
+     "id": "c1",
+     "label": "1/2"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Divide numerator and denominator by their greatest common factor."
+  }
+ },
+ {
+  "game_type": "MATH_FRACTION_MATCH",
+  "title": "Match: Sum to Simplest Form",
+  "difficulty": "hard",
+  "payload": {
+   "scenario": "Add each pair, then match it to its simplest-form result.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "1/4 + 1/4"
+    },
+    {
+     "id": "s2",
+     "label": "1/6 + 1/12"
+    },
+    {
+     "id": "s3",
+     "label": "1/2 + 1/8"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "3/4"
+    },
+    {
+     "id": "c3",
+     "label": "1/4"
+    },
+    {
+     "id": "c2",
+     "label": "5/8"
+    },
+    {
+     "id": "c1",
+     "label": "1/2"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c3",
+    "s3": "c2"
+   },
+   "hint": "Convert to a common denominator before adding, then simplify the result."
+  }
+ },
+ {
+  "game_type": "MATH_FRACTION_SPEED_CHALLENGE",
+  "title": "Speed Round: Add Them Fast",
+  "difficulty": "hard",
+  "payload": {
+   "time_limit_seconds": 10,
+   "hint": "Convert to a common denominator first, then add the numerators.",
+   "questions": [
+    {
+     "id": "q1",
+     "prompt": "1/4 + 1/4 = ?",
+     "options": [
+      {
+       "id": "a",
+       "label": "2/8"
+      },
+      {
+       "id": "b",
+       "label": "1/2"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q2",
+     "prompt": "1/2 + 1/4 = ?",
+     "options": [
+      {
+       "id": "a",
+       "label": "3/4"
+      },
+      {
+       "id": "b",
+       "label": "2/6"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q3",
+     "prompt": "1/3 + 1/6 = ?",
+     "options": [
+      {
+       "id": "a",
+       "label": "1/2"
+      },
+      {
+       "id": "b",
+       "label": "2/9"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q4",
+     "prompt": "2/5 + 1/5 = ?",
+     "options": [
+      {
+       "id": "a",
+       "label": "3/10"
+      },
+      {
+       "id": "b",
+       "label": "3/5"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q5",
+     "prompt": "1/2 + 1/3 = ?",
+     "options": [
+      {
+       "id": "a",
+       "label": "2/5"
+      },
+      {
+       "id": "b",
+       "label": "5/6"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q6",
+     "prompt": "1/4 + 1/2 = ?",
+     "options": [
+      {
+       "id": "a",
+       "label": "3/4"
+      },
+      {
+       "id": "b",
+       "label": "2/6"
+      }
+     ],
+     "correct_option_id": "a"
+    }
+   ]
+  }
+ },
+ {
+  "game_type": "MATH_FRACTION_SPEED_CHALLENGE",
+  "title": "Speed Round: Add and Simplify",
+  "difficulty": "hard",
+  "payload": {
+   "time_limit_seconds": 12,
+   "hint": "Add first, then check whether the result can be simplified to a smaller fraction.",
+   "questions": [
+    {
+     "id": "q1",
+     "prompt": "2/6 + 1/6 = ? (in simplest form)",
+     "options": [
+      {
+       "id": "a",
+       "label": "3/6"
+      },
+      {
+       "id": "b",
+       "label": "1/2"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q2",
+     "prompt": "1/8 + 3/8 = ? (in simplest form)",
+     "options": [
+      {
+       "id": "a",
+       "label": "1/2"
+      },
+      {
+       "id": "b",
+       "label": "4/8"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q3",
+     "prompt": "1/6 + 1/3 = ? (in simplest form)",
+     "options": [
+      {
+       "id": "a",
+       "label": "1/2"
+      },
+      {
+       "id": "b",
+       "label": "2/9"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q4",
+     "prompt": "3/10 + 1/5 = ? (in simplest form)",
+     "options": [
+      {
+       "id": "a",
+       "label": "4/15"
+      },
+      {
+       "id": "b",
+       "label": "1/2"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q5",
+     "prompt": "1/4 + 1/8 = ? (in simplest form)",
+     "options": [
+      {
+       "id": "a",
+       "label": "2/12"
+      },
+      {
+       "id": "b",
+       "label": "3/8"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q6",
+     "prompt": "2/9 + 1/9 = ? (in simplest form)",
+     "options": [
+      {
+       "id": "a",
+       "label": "1/3"
+      },
+      {
+       "id": "b",
+       "label": "3/9"
+      }
+     ],
+     "correct_option_id": "a"
+    }
+   ]
+  }
+ },
+ {
+  "game_type": "MATH_FRACTION_SPEED_CHALLENGE",
+  "title": "Speed Round: Which is Bigger?",
+  "difficulty": "easy",
+  "payload": {
+   "time_limit_seconds": 8,
+   "hint": "Convert to a common denominator to compare quickly.",
+   "questions": [
+    {
+     "id": "q1",
+     "prompt": "Which is bigger?",
+     "options": [
+      {
+       "id": "a",
+       "label": "1/3"
+      },
+      {
+       "id": "b",
+       "label": "1/2"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q2",
+     "prompt": "Which is bigger?",
+     "options": [
+      {
+       "id": "a",
+       "label": "3/5"
+      },
+      {
+       "id": "b",
+       "label": "2/5"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q3",
+     "prompt": "Which is bigger?",
+     "options": [
+      {
+       "id": "a",
+       "label": "3/4"
+      },
+      {
+       "id": "b",
+       "label": "5/8"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q4",
+     "prompt": "Which is bigger?",
+     "options": [
+      {
+       "id": "a",
+       "label": "1/6"
+      },
+      {
+       "id": "b",
+       "label": "1/4"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q5",
+     "prompt": "Which is bigger?",
+     "options": [
+      {
+       "id": "a",
+       "label": "7/9"
+      },
+      {
+       "id": "b",
+       "label": "5/6"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q6",
+     "prompt": "Which is bigger?",
+     "options": [
+      {
+       "id": "a",
+       "label": "2/3"
+      },
+      {
+       "id": "b",
+       "label": "3/5"
+      }
+     ],
+     "correct_option_id": "a"
+    }
+   ]
+  }
+ },
+ {
+  "game_type": "MATH_GEOMETRY_BOSS_CHALLENGE",
+  "title": "Boss Round 1: The Shape Golem Awakens",
+  "difficulty": "hard",
+  "payload": {
+   "time_limit_seconds": 8,
+   "hint": "Angles by size, shapes by sides, perimeter by adding every edge — the Golem tests all three.",
+   "questions": [
+    {
+     "id": "q1",
+     "prompt": "A triangle with all three sides equal is called:",
+     "options": [
+      {
+       "id": "a",
+       "label": "Scalene"
+      },
+      {
+       "id": "b",
+       "label": "Equilateral"
+      },
+      {
+       "id": "c",
+       "label": "Right-angled"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q2",
+     "prompt": "A 100° angle is:",
+     "options": [
+      {
+       "id": "a",
+       "label": "Obtuse"
+      },
+      {
+       "id": "b",
+       "label": "Acute"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q3",
+     "prompt": "A rectangle has sides 6 cm and 4 cm. Its perimeter is:",
+     "options": [
+      {
+       "id": "a",
+       "label": "10 cm"
+      },
+      {
+       "id": "b",
+       "label": "24 cm"
+      },
+      {
+       "id": "c",
+       "label": "20 cm"
+      }
+     ],
+     "correct_option_id": "c"
+    },
+    {
+     "id": "q4",
+     "prompt": "The supplement of a 70° angle is:",
+     "options": [
+      {
+       "id": "a",
+       "label": "20°"
+      },
+      {
+       "id": "b",
+       "label": "130°"
+      },
+      {
+       "id": "c",
+       "label": "110°"
+      }
+     ],
+     "correct_option_id": "c"
+    },
+    {
+     "id": "q5",
+     "prompt": "A shape with 5 equal sides is called a:",
+     "options": [
+      {
+       "id": "a",
+       "label": "Hexagon"
+      },
+      {
+       "id": "b",
+       "label": "Pentagon"
+      },
+      {
+       "id": "c",
+       "label": "Octagon"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q6",
+     "prompt": "A square has a perimeter of 32 cm. Each side is:",
+     "options": [
+      {
+       "id": "a",
+       "label": "8 cm"
+      },
+      {
+       "id": "b",
+       "label": "6 cm"
+      },
+      {
+       "id": "c",
+       "label": "16 cm"
+      }
+     ],
+     "correct_option_id": "a"
+    }
+   ]
+  }
+ },
+ {
+  "game_type": "MATH_GEOMETRY_BOSS_CHALLENGE",
+  "title": "Boss Round 2: Final Stand",
+  "difficulty": "hard",
+  "payload": {
+   "time_limit_seconds": 7,
+   "hint": "Read every prompt fully — the Golem mixes an angle question right after a perimeter one on purpose.",
+   "questions": [
+    {
+     "id": "q1",
+     "prompt": "Two angles are 90° and 90°. They are:",
+     "options": [
+      {
+       "id": "a",
+       "label": "Complementary"
+      },
+      {
+       "id": "b",
+       "label": "Supplementary"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q2",
+     "prompt": "A triangle with sides 5 cm, 7 cm and 9 cm has perimeter:",
+     "options": [
+      {
+       "id": "a",
+       "label": "21 cm"
+      },
+      {
+       "id": "b",
+       "label": "19 cm"
+      },
+      {
+       "id": "c",
+       "label": "24 cm"
+      }
+     ],
+     "correct_option_id": "a"
+    },
+    {
+     "id": "q3",
+     "prompt": "A shape with all sides and angles equal is called:",
+     "options": [
+      {
+       "id": "a",
+       "label": "Irregular"
+      },
+      {
+       "id": "b",
+       "label": "Convex"
+      },
+      {
+       "id": "c",
+       "label": "Regular"
+      }
+     ],
+     "correct_option_id": "c"
+    },
+    {
+     "id": "q4",
+     "prompt": "A 45° angle is:",
+     "options": [
+      {
+       "id": "a",
+       "label": "Obtuse"
+      },
+      {
+       "id": "b",
+       "label": "Acute"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q5",
+     "prompt": "A regular hexagon has one side of 9 cm. Its perimeter is:",
+     "options": [
+      {
+       "id": "a",
+       "label": "45 cm"
+      },
+      {
+       "id": "b",
+       "label": "54 cm"
+      },
+      {
+       "id": "c",
+       "label": "63 cm"
+      }
+     ],
+     "correct_option_id": "b"
+    },
+    {
+     "id": "q6",
+     "prompt": "The complement of a 62° angle is:",
+     "options": [
+      {
+       "id": "a",
+       "label": "28°"
+      },
+      {
+       "id": "b",
+       "label": "38°"
+      },
+      {
+       "id": "c",
+       "label": "118°"
+      }
+     ],
+     "correct_option_id": "a"
+    }
+   ]
+  }
+ },
+ {
+  "game_type": "MATH_RATIO_MATCH",
+  "title": "Match: Equivalent Ratios",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "Match each ratio card to an equivalent ratio.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "2 : 5"
+    },
+    {
+     "id": "s2",
+     "label": "3 : 7"
+    },
+    {
+     "id": "s3",
+     "label": "5 : 6"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "6 : 11"
+    },
+    {
+     "id": "c3",
+     "label": "10 : 12"
+    },
+    {
+     "id": "c2",
+     "label": "9 : 21"
+    },
+    {
+     "id": "c1",
+     "label": "4 : 10"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Multiply both terms of the ratio by the same number to find an equivalent one."
+  }
+ },
+ {
+  "game_type": "MATH_RATIO_MATCH",
+  "title": "Match: Sharing in a Ratio",
+  "difficulty": "hard",
+  "payload": {
+   "scenario": "Each card gives a total shared in a ratio. Match it to the correct simplified split.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "₹40 shared 1 : 3"
+    },
+    {
+     "id": "s2",
+     "label": "₹60 shared 2 : 1"
+    },
+    {
+     "id": "s3",
+     "label": "₹100 shared 3 : 2"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "₹20 and ₹20"
+    },
+    {
+     "id": "c3",
+     "label": "₹60 and ₹40"
+    },
+    {
+     "id": "c2",
+     "label": "₹40 and ₹20"
+    },
+    {
+     "id": "c1",
+     "label": "₹10 and ₹30"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Add the ratio's terms to find how many equal parts the total splits into."
+  }
+ },
+ {
+  "game_type": "MATH_RATIO_MATCH",
+  "title": "Match: Simplest Form",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "Match each ratio card to its simplest form.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "4 : 8"
+    },
+    {
+     "id": "s2",
+     "label": "6 : 9"
+    },
+    {
+     "id": "s3",
+     "label": "9 : 12"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "1 : 3"
+    },
+    {
+     "id": "c3",
+     "label": "3 : 4"
+    },
+    {
+     "id": "c2",
+     "label": "2 : 3"
+    },
+    {
+     "id": "c1",
+     "label": "1 : 2"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Divide both terms of the ratio by their greatest common factor."
+  }
+ },
+ {
+  "game_type": "MATH_SHAPE_MATCH",
+  "title": "Match: Quadrilateral Properties",
+  "difficulty": "hard",
+  "payload": {
+   "scenario": "Match each quadrilateral to its defining property.",
+   "slots": [
+    {
+     "id": "s1",
+     "shape": "square",
+     "label": "Square"
+    },
+    {
+     "id": "s2",
+     "shape": "rectangle",
+     "label": "Rectangle"
+    },
+    {
+     "id": "s3",
+     "shape": "rhombus",
+     "label": "Rhombus"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "Opposite sides equal, opposite angles equal"
+    },
+    {
+     "id": "c3",
+     "label": "All sides equal, opposite angles equal"
+    },
+    {
+     "id": "c2",
+     "label": "Opposite sides equal, all angles 90°"
+    },
+    {
+     "id": "c1",
+     "label": "All sides equal, all angles 90°"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Check side lengths first, then check if the angles are 90°."
+  }
+ },
+ {
+  "game_type": "MATH_SHAPE_MATCH",
+  "title": "Match: Shape to Angle Sum",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "Match each shape to the sum of its interior angles.",
+   "slots": [
+    {
+     "id": "s1",
+     "shape": "triangle",
+     "label": "Triangle"
+    },
+    {
+     "id": "s2",
+     "shape": "rectangle",
+     "label": "Rectangle"
+    },
+    {
+     "id": "s3",
+     "shape": "hexagon",
+     "label": "Hexagon"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "540°"
+    },
+    {
+     "id": "c3",
+     "label": "720°"
+    },
+    {
+     "id": "c2",
+     "label": "360°"
+    },
+    {
+     "id": "c1",
+     "label": "180°"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Every extra side adds another 180° to the total."
+  }
+ },
+ {
+  "game_type": "MATH_SHAPE_MATCH",
+  "title": "Match: Shape to Sides",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "Match each shape to its number of sides.",
+   "slots": [
+    {
+     "id": "s1",
+     "shape": "triangle",
+     "label": "Triangle"
+    },
+    {
+     "id": "s2",
+     "shape": "square",
+     "label": "Square"
+    },
+    {
+     "id": "s3",
+     "shape": "pentagon",
+     "label": "Pentagon"
+    }
+   ],
+   "components": [
+    {
+     "id": "c4",
+     "label": "6 sides"
+    },
+    {
+     "id": "c3",
+     "label": "5 sides"
+    },
+    {
+     "id": "c2",
+     "label": "4 sides"
+    },
+    {
+     "id": "c1",
+     "label": "3 sides"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Count the straight edges around each shape."
+  }
+ },
+ {
+  "game_type": "PHYSICS_MATCH",
+  "title": "Match: Everyday Materials",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "Match each everyday material to what a magnet does to it, and why.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Aluminium Foil"
+    },
+    {
+     "id": "s2",
+     "label": "Cobalt Sample"
+    },
+    {
+     "id": "s3",
+     "label": "Plastic Ruler"
+    },
+    {
+     "id": "s4",
+     "label": "Nickel Coin"
+    }
+   ],
+   "components": [
+    {
+     "id": "c3",
+     "label": "Not attracted — plastic has no magnetic material in it"
+    },
+    {
+     "id": "c5",
+     "label": "Attracted — because it is shiny"
+    },
+    {
+     "id": "c2",
+     "label": "Attracted — cobalt is one of the magnetic metals"
+    },
+    {
+     "id": "c1",
+     "label": "Not attracted — aluminium is not one of the magnetic metals"
+    },
+    {
+     "id": "c4",
+     "label": "Attracted — nickel is one of the magnetic metals"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3",
+    "s4": "c4"
+   },
+   "hint": "Only iron, nickel, cobalt, and materials made from them are magnetic — aluminium and plastic are not."
+  }
+ },
+ {
+  "game_type": "PHYSICS_MATCH",
+  "title": "Match: Magnetic or Non-Magnetic",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "Match each object to what a magnet does to it, and why.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Iron Nail"
+    },
+    {
+     "id": "s2",
+     "label": "Wooden Ruler"
+    },
+    {
+     "id": "s3",
+     "label": "Steel Paperclip"
+    }
+   ],
+   "components": [
+    {
+     "id": "c3",
+     "label": "Attracted — steel is made mostly of iron"
+    },
+    {
+     "id": "c4",
+     "label": "Attracted — every metal is magnetic"
+    },
+    {
+     "id": "c2",
+     "label": "Not attracted — wood is not a magnetic material"
+    },
+    {
+     "id": "c1",
+     "label": "Attracted — iron is a magnetic metal"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "A magnet attracts iron and steel objects, but has no effect on wood — and not every metal is magnetic."
+  }
+ },
+ {
+  "game_type": "PHYSICS_MATCH",
+  "title": "Match: Poles and Effects",
+  "difficulty": "hard",
+  "payload": {
+   "scenario": "Magnet behaviour goes beyond just attraction. Match each situation to what actually happens.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "Bringing two North poles close together"
+    },
+    {
+     "id": "s2",
+     "label": "Bringing a North pole and a South pole close together"
+    },
+    {
+     "id": "s3",
+     "label": "Holding a magnet near a piece of gold"
+    }
+   ],
+   "components": [
+    {
+     "id": "c3",
+     "label": "Nothing happens — gold isn't magnetic"
+    },
+    {
+     "id": "c1",
+     "label": "The poles repel"
+    },
+    {
+     "id": "c4",
+     "label": "The gold becomes permanently magnetized"
+    },
+    {
+     "id": "c2",
+     "label": "The poles attract"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2",
+    "s3": "c3"
+   },
+   "hint": "Like poles push apart, unlike poles pull together — and gold isn't one of the magnetic metals."
+  }
+ },
+ {
+  "game_type": "TAMIL_PROVERB_MATCH",
+  "title": "பழமொழி பொருத்துக (Grade 6) — 1",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "ஒவ்வொரு பழமொழிக்கும் சரியான பொருளைப் பொருத்துக.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "நாளைக் காய்ச்சப்படாத அரிசி இல்லை"
+    },
+    {
+     "id": "s2",
+     "label": "விதைத்தவன் அறுப்பான்"
+    }
+   ],
+   "components": [
+    {
+     "id": "c3",
+     "label": "எதையும் எளிதாகப் பெறலாம் என்ற எண்ணம்"
+    },
+    {
+     "id": "c2",
+     "label": "எல்லாம் ஒரு நாள் நடக்கும் என்ற உறுதி"
+    },
+    {
+     "id": "c1",
+     "label": "செய்த செயலுக்கேற்ப பலன் கிடைக்கும்"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c2",
+    "s2": "c1"
+   },
+   "hint": "முதல் பழமொழி நேரம் ஆனாலும் நடக்கும் என்பதைப் பற்றியது; இரண்டாவது விதைத்ததற்கேற்ப அறுவடை என்பதைப் பற்றியது."
+  }
+ },
+ {
+  "game_type": "TAMIL_PROVERB_MATCH",
+  "title": "பழமொழி பொருத்துக (Grade 6) — 2",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "மூன்று பழமொழிகளுக்கும் சரியான பொருளைப் பொருத்துக.",
+   "slots": [
+    {
+     "id": "t1",
+     "label": "கிணறு வெட்டி தாகம் தீர்க்க முடியாது"
+    },
+    {
+     "id": "t2",
+     "label": "நல்லது செய்தால் நல்லதே கிடைக்கும்"
+    },
+    {
+     "id": "t3",
+     "label": "விதைத்தவன் அறுப்பான்"
+    }
+   ],
+   "components": [
+    {
+     "id": "d4",
+     "label": "எல்லோரும் ஒரே நேரத்தில் தண்ணீர் குடிக்க வேண்டும்"
+    },
+    {
+     "id": "d3",
+     "label": "செய்த செயலுக்கேற்ப பலன் கிடைக்கும்"
+    },
+    {
+     "id": "d2",
+     "label": "நல்ல செயல்களுக்கு நல்ல பலனே திரும்பி வரும்"
+    },
+    {
+     "id": "d1",
+     "label": "அவசரமாக ஒரு காரியத்தைத் தொடங்கினால் உடனடி பலன் கிடைக்காது"
+    }
+   ],
+   "correct_mapping": {
+    "t1": "d1",
+    "t2": "d2",
+    "t3": "d3"
+   },
+   "hint": "ஒவ்வொரு பழமொழியும் வெவ்வேறு அறிவுரையை சொல்கிறது — பொறுமை, நல்வினை, செய்த செயலின் பலன்."
+  }
+ },
+ {
+  "game_type": "TAMIL_PROVERB_MATCH",
+  "title": "பழமொழி பொருத்துக (Grade 6) — 3",
+  "difficulty": "easy",
+  "payload": {
+   "scenario": "ஒவ்வொரு பழமொழிக்கும் சரியான பொருளைப் பொருத்துக.",
+   "slots": [
+    {
+     "id": "s1",
+     "label": "பேசுவது வெள்ளி; பேசாமலிருப்பது பொன்"
+    },
+    {
+     "id": "s2",
+     "label": "கடுகு சிறுத்தாலும் காரம் குறையாது"
+    }
+   ],
+   "components": [
+    {
+     "id": "c3",
+     "label": "எப்போதும் அதிகமாகப் பேசுவதே சிறந்தது"
+    },
+    {
+     "id": "c2",
+     "label": "சிறியது என்று எதையும் குறைவாக மதிப்பிடக் கூடாது"
+    },
+    {
+     "id": "c1",
+     "label": "தேவைக்கு மேல் பேசாமல் இருப்பதே பெரும்பாலும் நல்லது"
+    }
+   ],
+   "correct_mapping": {
+    "s1": "c1",
+    "s2": "c2"
+   },
+   "hint": "முதல் பழமொழி பேச்சில் அளவைப் பற்றியது; இரண்டாவது கடுகைப் போல சிறியதன் திறமையைப் பற்றியது."
+  }
+ },
+ {
+  "game_type": "TAMIL_PROVERB_MATCH",
+  "title": "பழமொழி பொருத்துக (Grade 6) — 4",
+  "difficulty": "medium",
+  "payload": {
+   "scenario": "மூன்று பழமொழிகளுக்கும் சரியான பொருளைப் பொருத்துக.",
+   "slots": [
+    {
+     "id": "t1",
+     "label": "எறும்பூரும் பாதை புற்றாகும்"
+    },
+    {
+     "id": "t2",
+     "label": "கல்லானாலும் கை பட்டால் சிலை ஆகும்"
+    },
+    {
+     "id": "t3",
+     "label": "நல்ல நண்பன் நல்வழி காட்டுவான்"
+    }
+   ],
+   "components": [
+    {
+     "id": "d4",
+     "label": "எல்லோரும் ஒரே மாதிரி நடந்துகொள்ள வேண்டும்"
+    },
+    {
+     "id": "d3",
+     "label": "நல்ல நட்பு நம் குணத்தையும் வழியையும் நல்லதாக்கும்"
+    },
+    {
+     "id": "d2",
+     "label": "பயிற்சியும் முயற்சியும் சாதாரண திறனையும் சிறப்பானதாக மாற்றும்"
+    },
+    {
+     "id": "d1",
+     "label": "தொடர்ந்து செய்யும் சிறு செயல்கள் காலப்போக்கில் பெரிய மாற்றத்தை உருவாக்கும்"
+    }
+   ],
+   "correct_mapping": {
+    "t1": "d1",
+    "t2": "d2",
+    "t3": "d3"
+   },
+   "hint": "ஒவ்வொன்றும் வெவ்வேறு அறிவுரை — தொடர் செயலின் பலன், பயிற்சியின் மேன்மை, நல்ல நட்பு."
+  }
+ }
+]

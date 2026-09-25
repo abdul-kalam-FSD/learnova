@@ -69,7 +69,7 @@ async function seed() {
         ],
         components: [
           { id: "c1", label: "x + 5 = 12" },
-          { id: "c2", label: "4x = 3" },
+          { id: "c2", label: "x / 4 = 3" },
           { id: "c3", label: "x - 6 = 9" },
           { id: "c4", label: "x + 6 = 9" },
         ],

@@ -41,9 +41,9 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Chemistry",
+      unit_name: "Curiosity",
       title: "Methods of Separation in Everyday Life",
-      order_index: 1,
+      order_index: 9,
       strand: "Chemistry",
     });
     console.log("Created chapter:", chapter._id);
@@ -80,9 +80,9 @@ async function seed() {
           { id: "s3", label: "Husk mixed into grain" },
         ],
         components: [
-          { id: "c1", label: "Hand-picking / Sieving" },
-          { id: "c2", label: "Evaporation" },
           { id: "c3", label: "Winnowing" },
+          { id: "c2", label: "Evaporation" },
+          { id: "c1", label: "Hand-picking / Sieving" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Ask whether the mixture is solid-in-solid, dissolved, or light chaff mixed with heavier grain.",
@@ -100,9 +100,9 @@ async function seed() {
           { id: "s3", label: "Heating the filtered water until it boils away" },
         ],
         components: [
-          { id: "c1", label: "Sedimentation — heavier mud settles to the bottom" },
-          { id: "c2", label: "Filtration — traps remaining fine particles" },
           { id: "c3", label: "Evaporation — removes the water, leaving dissolved salts behind" },
+          { id: "c2", label: "Filtration — traps remaining fine particles" },
+          { id: "c1", label: "Sedimentation — heavier mud settles to the bottom" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "The order matters: settle the heavy stuff first, then filter what's left, then deal with what's actually dissolved.",
@@ -121,11 +121,11 @@ async function seed() {
           { id: "s3", label: "Fine flour mixed with a few small pebbles" },
         ],
         components: [
-          { id: "c1", label: "Magnetic Separation" },
-          { id: "c2", label: "Evaporation" },
-          { id: "c3", label: "Sieving" },
-          { id: "c4", label: "Winnowing" },
           { id: "c5", label: "Filtration" },
+          { id: "c4", label: "Winnowing" },
+          { id: "c3", label: "Sieving" },
+          { id: "c2", label: "Evaporation" },
+          { id: "c1", label: "Magnetic Separation" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "One of these mixtures has a metal in it — think about what property makes that one different from the rest.",

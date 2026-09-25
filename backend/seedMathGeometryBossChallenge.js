@@ -28,13 +28,13 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Geometry" });
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Geometry Extensions" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Shapes and Space",
-      title: "Geometry",
-      order_index: 2,
+      unit_name: "Learnova Enrichment",
+      title: "Geometry Extensions",
+      order_index: 12,
     });
     console.log("Created chapter:", chapter._id);
   } else {
@@ -42,39 +42,26 @@ async function seed() {
   }
 
   // Boss rounds mix skills but each GameContent doc still needs one
-  // concept_id for grade access + mastery tracking. Round 1 anchors
-  // to Measuring Angles, round 2 to Perimeter — matching whichever
-  // skill that round leans on most heavily.
-  let anglesConcept = await Concept.findOne({ chapter_id: chapter._id, title: "Measuring Angles" });
+  // concept_id for grade access + mastery tracking. Both rounds
+  // are anchored to the enrichment concept because they mix angle-relationship
+  // questions that are beyond the verified Grade 6 scope with perimeter.
+  let anglesConcept = await Concept.findOne({ chapter_id: chapter._id, title: "Angle Relationships (Enrichment)" });
   if (!anglesConcept) {
     anglesConcept = await Concept.create({
       chapter_id: chapter._id,
-      title: "Measuring Angles",
+      title: "Angle Relationships (Enrichment)",
       explanation_text:
-        "Angles are classified by size: acute (less than 90°), right (exactly 90°), obtuse (between 90° and 180°), and straight (exactly 180°). Two angles are complementary if they add up to 90°, and supplementary if they add up to 180°.",
+        "Enrichment beyond the verified Grade 6 scope: two angles are complementary if they add up to 90° and supplementary if they add up to 180°; angles on a straight line add up to 180°, angles around a point add up to 360°, and vertically opposite angles are equal.",
     });
     console.log("Created concept:", anglesConcept._id);
   } else {
     console.log("Using existing concept:", anglesConcept._id);
   }
 
-  let perimeterConcept = await Concept.findOne({ chapter_id: chapter._id, title: "Perimeter" });
-  if (!perimeterConcept) {
-    perimeterConcept = await Concept.create({
-      chapter_id: chapter._id,
-      title: "Perimeter",
-      explanation_text:
-        "Perimeter is the total distance around a shape's boundary — add up the lengths of every side. The same perimeter can be built from many different combinations of side lengths, which is why planning which pieces to use matters as much as knowing how to add.",
-    });
-    console.log("Created concept:", perimeterConcept._id);
-  } else {
-    console.log("Using existing concept:", perimeterConcept._id);
-  }
-
   const geometryBossRounds = [
     {
       title: "Boss Round 1: The Shape Golem Awakens",
-      difficulty: "boss",
+      difficulty: "hard",
       order_index: 1,
       conceptId: anglesConcept._id,
       payload: {
@@ -95,30 +82,30 @@ async function seed() {
             id: "q2",
             prompt: "A 100° angle is:",
             options: [
-              { id: "a", label: "Acute" },
-              { id: "b", label: "Obtuse" },
+              { id: "a", label: "Obtuse" },
+              { id: "b", label: "Acute" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "a",
           },
           {
             id: "q3",
             prompt: "A rectangle has sides 6 cm and 4 cm. Its perimeter is:",
             options: [
               { id: "a", label: "10 cm" },
-              { id: "b", label: "20 cm" },
-              { id: "c", label: "24 cm" },
+              { id: "b", label: "24 cm" },
+              { id: "c", label: "20 cm" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "c",
           },
           {
             id: "q4",
             prompt: "The supplement of a 70° angle is:",
             options: [
               { id: "a", label: "20°" },
-              { id: "b", label: "110°" },
-              { id: "c", label: "130°" },
+              { id: "b", label: "130°" },
+              { id: "c", label: "110°" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "c",
           },
           {
             id: "q5",
@@ -134,20 +121,20 @@ async function seed() {
             id: "q6",
             prompt: "A square has a perimeter of 32 cm. Each side is:",
             options: [
-              { id: "a", label: "6 cm" },
-              { id: "b", label: "8 cm" },
+              { id: "a", label: "8 cm" },
+              { id: "b", label: "6 cm" },
               { id: "c", label: "16 cm" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "a",
           },
         ],
       },
     },
     {
       title: "Boss Round 2: Final Stand",
-      difficulty: "boss",
+      difficulty: "hard",
       order_index: 2,
-      conceptId: perimeterConcept._id,
+      conceptId: anglesConcept._id,
       payload: {
         time_limit_seconds: 7,
         hint: "Read every prompt fully — the Golem mixes an angle question right after a perimeter one on purpose.",
@@ -165,30 +152,30 @@ async function seed() {
             id: "q2",
             prompt: "A triangle with sides 5 cm, 7 cm and 9 cm has perimeter:",
             options: [
-              { id: "a", label: "19 cm" },
-              { id: "b", label: "21 cm" },
+              { id: "a", label: "21 cm" },
+              { id: "b", label: "19 cm" },
               { id: "c", label: "24 cm" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "a",
           },
           {
             id: "q3",
             prompt: "A shape with all sides and angles equal is called:",
             options: [
               { id: "a", label: "Irregular" },
-              { id: "b", label: "Regular" },
-              { id: "c", label: "Convex" },
+              { id: "b", label: "Convex" },
+              { id: "c", label: "Regular" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "c",
           },
           {
             id: "q4",
             prompt: "A 45° angle is:",
             options: [
-              { id: "a", label: "Acute" },
-              { id: "b", label: "Obtuse" },
+              { id: "a", label: "Obtuse" },
+              { id: "b", label: "Acute" },
             ],
-            correct_option_id: "a",
+            correct_option_id: "b",
           },
           {
             id: "q5",

@@ -14,10 +14,19 @@ const GameContent = require("./src/models/GameContent");
 // Gap 1/3's migration never touched Grade 7). Seeded directly into a
 // new integrated "Science" subject with a strand tag.
 //
-// Source basis (Gap 5): grounded in NCERT Class 7 Science, the
-// "Acids, Bases and Salts" chapter — classifying common substances
-// using an indicator — reworded into an original classification task,
-// not textbook text.
+// Source basis (Gap 5): grounded in NCERT Class 7 Science ("Curiosity",
+// NCF-SE 2023, 2026-27 session), Chapter 2 "Exploring Substances:
+// Acidic, Basic and Neutral" — classifying common substances using an
+// indicator — reworded into an original classification task, not
+// textbook text.
+//
+// Grade 7 Audit fix (Batch 1, curriculum alignment): this chapter was
+// originally titled "Acids, Bases, and Salts", which was the title
+// used in the pre-NCF-SE-2023 NCERT edition. The current "Curiosity"
+// textbook's actual Chapter 2 title is "Exploring Substances: Acidic,
+// Basic and Neutral" — renamed below to match. This only changes the
+// chapter's title string; its _id, concepts, and GameContent are
+// unaffected.
 //
 // Reuses CHEMISTRY_REACTION_LAB's mapping-equality check (same
 // beaker-to-outcome mapping as the Grade 10 version — see
@@ -35,12 +44,12 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Acids, Bases, and Salts" });
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Exploring Substances: Acidic, Basic and Neutral" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
       unit_name: "Materials Around Us",
-      title: "Acids, Bases, and Salts",
+      title: "Exploring Substances: Acidic, Basic and Neutral",
       order_index: 1,
       strand: "Chemistry",
     });

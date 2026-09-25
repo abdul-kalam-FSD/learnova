@@ -23,26 +23,26 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Geometry" });
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Geometry Extensions" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Shapes and Space",
-      title: "Geometry",
-      order_index: 2,
+      unit_name: "Learnova Enrichment",
+      title: "Geometry Extensions",
+      order_index: 12,
     });
     console.log("Created chapter:", chapter._id);
   } else {
     console.log("Using existing chapter:", chapter._id);
   }
 
-  let concept = await Concept.findOne({ chapter_id: chapter._id, title: "Measuring Angles" });
+  let concept = await Concept.findOne({ chapter_id: chapter._id, title: "Angle Relationships (Enrichment)" });
   if (!concept) {
     concept = await Concept.create({
       chapter_id: chapter._id,
-      title: "Measuring Angles",
+      title: "Angle Relationships (Enrichment)",
       explanation_text:
-        "Angles are classified by size: acute (less than 90°), right (exactly 90°), obtuse (between 90° and 180°), and straight (exactly 180°). Two angles are complementary if they add up to 90°, and supplementary if they add up to 180°.",
+        "Enrichment beyond the verified Grade 6 scope: two angles are complementary if they add up to 90° and supplementary if they add up to 180°; angles on a straight line add up to 180°, angles around a point add up to 360°, and vertically opposite angles are equal.",
     });
     console.log("Created concept:", concept._id);
   } else {
@@ -56,71 +56,6 @@ async function seed() {
   // no new backend logic needed beyond registering the game_type in
   // MULTI_QUESTION_GAME_TYPES.
   const angleSpeedChallengeRounds = [
-    {
-      title: "Speed Round: Name That Angle",
-      difficulty: "easy",
-      order_index: 1,
-      payload: {
-        time_limit_seconds: 8,
-        hint: "Acute < 90° < Right = 90° < Obtuse < 180° = Straight.",
-        questions: [
-          {
-            id: "q1",
-            prompt: "A 45° angle is:",
-            options: [
-              { id: "a", label: "Acute" },
-              { id: "b", label: "Obtuse" },
-            ],
-            correct_option_id: "a",
-          },
-          {
-            id: "q2",
-            prompt: "A 90° angle is:",
-            options: [
-              { id: "a", label: "Acute" },
-              { id: "b", label: "Right" },
-            ],
-            correct_option_id: "b",
-          },
-          {
-            id: "q3",
-            prompt: "A 120° angle is:",
-            options: [
-              { id: "a", label: "Obtuse" },
-              { id: "b", label: "Acute" },
-            ],
-            correct_option_id: "a",
-          },
-          {
-            id: "q4",
-            prompt: "A 180° angle is:",
-            options: [
-              { id: "a", label: "Right" },
-              { id: "b", label: "Straight" },
-            ],
-            correct_option_id: "b",
-          },
-          {
-            id: "q5",
-            prompt: "A 15° angle is:",
-            options: [
-              { id: "a", label: "Acute" },
-              { id: "b", label: "Obtuse" },
-            ],
-            correct_option_id: "a",
-          },
-          {
-            id: "q6",
-            prompt: "A 100° angle is:",
-            options: [
-              { id: "a", label: "Acute" },
-              { id: "b", label: "Obtuse" },
-            ],
-            correct_option_id: "b",
-          },
-        ],
-      },
-    },
     {
       title: "Speed Round: Complementary or Supplementary?",
       difficulty: "medium",

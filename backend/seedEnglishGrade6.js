@@ -33,9 +33,9 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Vocabulary and Morphology",
+      unit_name: "Learnova Enrichment",
       title: "Word Building",
-      order_index: 1,
+      order_index: 17,
     });
     console.log("Created chapter:", chapter._id);
   } else {

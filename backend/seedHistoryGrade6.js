@@ -45,9 +45,9 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Ancient India",
+      unit_name: "Theme B: Tapestry of the Past",
       title: "The Beginnings of Indian Civilisation",
-      order_index: 3,
+      order_index: 6,
       strand: "History",
     });
     console.log("Created chapter:", chapter._id);
@@ -91,9 +91,9 @@ async function seed() {
       payload: {
         era_label: "Town-Planning and Water Management",
         scrambled_events: [
+          { id: "a3", label: "Merchants use the well-planned city's roads to set up trade with distant regions" },
           { id: "a1", label: "City planners lay out streets in an organized grid pattern" },
           { id: "a2", label: "Engineers build drains and wells to manage the city's water supply" },
-          { id: "a3", label: "Merchants use the well-planned city's roads to set up trade with distant regions" },
         ],
         correct_order: ["a1", "a2", "a3"],
         hint: "The physical layout of the city had to exist before its water systems could be built into it, and both had to be in place before trade could flourish through it.",
@@ -106,9 +106,9 @@ async function seed() {
       payload: {
         era_label: "Trade and the End",
         scrambled_events: [
-          { id: "b1", label: "The Harappan civilisation reaches its peak, with extensive trade across long distances" },
           { id: "b2", label: "Changes in climate and rivers make farming and trade harder to sustain" },
           { id: "b3", label: "Cities are gradually abandoned as people move to find better conditions elsewhere" },
+          { id: "b1", label: "The Harappan civilisation reaches its peak, with extensive trade across long distances" },
         ],
         correct_order: ["b1", "b2", "b3"],
         hint: "A civilisation has to reach a peak before it can decline — think about what conditions had to worsen before people would leave their cities.",

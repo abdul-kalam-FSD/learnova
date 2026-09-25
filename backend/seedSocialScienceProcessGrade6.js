@@ -26,7 +26,7 @@ async function seed() {
     throw new Error("Grade 6 Social Science subject not found — run seedSocialScienceGrade6.js first.");
   }
 
-  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Understanding and Respecting Diversity" });
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Unity in Diversity, or 'Many in the One'" });
   if (!chapter) {
     throw new Error("Chapter 'Understanding and Respecting Diversity' not found — run seedSocialScienceGrade6.js first.");
   }

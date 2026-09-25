@@ -29,9 +29,9 @@ async function seed() {
   }
   console.log("Using existing subject:", subject._id);
 
-  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Acids, Bases, and Salts" });
+  const chapter = await Chapter.findOne({ subject_id: subject._id, title: "Exploring Substances: Acidic, Basic and Neutral" });
   if (!chapter) {
-    console.error('Chapter "Acids, Bases, and Salts" not found — run seedScienceGrade7.js first.');
+    console.error('Chapter "Exploring Substances: Acidic, Basic and Neutral" not found — run seedScienceGrade7.js first.');
     process.exit(1);
   }
   console.log("Using existing chapter:", chapter._id);

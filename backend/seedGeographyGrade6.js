@@ -42,7 +42,7 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Our Earth",
+      unit_name: "Theme A: India and the World: Land and the People",
       title: "Oceans and Continents",
       order_index: 2,
       strand: "Geography",

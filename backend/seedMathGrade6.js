@@ -27,9 +27,9 @@ async function seed() {
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Numbers",
+      unit_name: "Ganita Prakash",
       title: "Fractions",
-      order_index: 1,
+      order_index: 7,
     });
     console.log("Created chapter:", chapter._id);
   } else {
@@ -140,10 +140,10 @@ async function seed() {
           { id: "s3", label: "6/8" },
         ],
         components: [
-          { id: "c1", label: "1/2" },
-          { id: "c2", label: "1/3" },
-          { id: "c3", label: "3/4" },
           { id: "c4", label: "2/3" },
+          { id: "c3", label: "3/4" },
+          { id: "c2", label: "1/3" },
+          { id: "c1", label: "1/2" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Divide numerator and denominator by their greatest common factor.",
@@ -161,10 +161,10 @@ async function seed() {
           { id: "s3", label: "5/8" },
         ],
         components: [
-          { id: "c1", label: "0.25" },
-          { id: "c2", label: "0.6" },
-          { id: "c3", label: "0.625" },
           { id: "c4", label: "0.5" },
+          { id: "c3", label: "0.625" },
+          { id: "c2", label: "0.6" },
+          { id: "c1", label: "0.25" },
         ],
         correct_mapping: { s1: "c1", s2: "c2", s3: "c3" },
         hint: "Divide the numerator by the denominator to get the decimal.",
@@ -178,14 +178,14 @@ async function seed() {
         scenario: "Add each pair, then match it to its simplest-form result.",
         slots: [
           { id: "s1", label: "1/4 + 1/4" },
-          { id: "s2", label: "1/6 + 1/3" },
+          { id: "s2", label: "1/6 + 1/12" },
           { id: "s3", label: "1/2 + 1/8" },
         ],
         components: [
-          { id: "c1", label: "1/2" },
-          { id: "c2", label: "5/8" },
-          { id: "c3", label: "1/2" },
           { id: "c4", label: "3/4" },
+          { id: "c3", label: "1/4" },
+          { id: "c2", label: "5/8" },
+          { id: "c1", label: "1/2" },
         ],
         correct_mapping: { s1: "c1", s2: "c3", s3: "c2" },
         hint: "Convert to a common denominator before adding, then simplify the result.",
@@ -233,19 +233,19 @@ async function seed() {
             id: "q1",
             prompt: "Which is bigger?",
             options: [
-              { id: "a", label: "1/2" },
-              { id: "b", label: "1/3" },
+              { id: "a", label: "1/3" },
+              { id: "b", label: "1/2" },
             ],
-            correct_option_id: "a",
+            correct_option_id: "b",
           },
           {
             id: "q2",
             prompt: "Which is bigger?",
             options: [
-              { id: "a", label: "2/5" },
-              { id: "b", label: "3/5" },
+              { id: "a", label: "3/5" },
+              { id: "b", label: "2/5" },
             ],
-            correct_option_id: "b",
+            correct_option_id: "a",
           },
           {
             id: "q3",
@@ -269,10 +269,10 @@ async function seed() {
             id: "q5",
             prompt: "Which is bigger?",
             options: [
-              { id: "a", label: "5/6" },
-              { id: "b", label: "7/9" },
+              { id: "a", label: "7/9" },
+              { id: "b", label: "5/6" },
             ],
-            correct_option_id: "a",
+            correct_option_id: "b",
           },
           {
             id: "q6",

@@ -34,13 +34,13 @@ async function seed() {
     console.log("Using existing subject:", subject._id);
   }
 
-  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Diversity in Living World" });
+  let chapter = await Chapter.findOne({ subject_id: subject._id, title: "Diversity in the Living World" });
   if (!chapter) {
     chapter = await Chapter.create({
       subject_id: subject._id,
-      unit_name: "Biology",
-      title: "Diversity in Living World",
-      order_index: 1,
+      unit_name: "Curiosity",
+      title: "Diversity in the Living World",
+      order_index: 2,
       strand: "Biology",
     });
     console.log("Created chapter:", chapter._id);
