@@ -196,6 +196,62 @@ const applyMasteryTransition = (currentState, isCorrect, currentStreak) => {
   }
 };
 
+// Mirrors gameControllers.buildAlreadyCompletedResponse, adapted for a
+// multi-question quiz session's response shape (masteryUpdates is an
+// array here, not a single masteryUpdate object). Reconstructs the
+// stored result of a completion that already happened — never
+// re-awards XP, never re-runs a mastery transition.
+const buildAlreadyCompletedQuizResponse = async (session, userId) => {
+  const conceptGroups = {};
+  for (const q of session.questions) {
+    const key = q.concept_id.toString();
+    if (!conceptGroups[key]) conceptGroups[key] = [];
+    conceptGroups[key].push(q);
+  }
+
+  const conceptIds = Object.keys(conceptGroups);
+  const masteries = await UserConceptMastery.find({
+    user_id: userId,
+    concept_id: { $in: conceptIds },
+  }).select("concept_id state");
+  const masteryStateByConceptId = {};
+  for (const m of masteries) {
+    masteryStateByConceptId[m.concept_id.toString()] = m.state;
+  }
+  // A duplicate/losing request never applies its own transition, so
+  // there's nothing case-specific to report here beyond the concept's
+  // current stored state — same "no re-computation" rule as
+  // buildAlreadyCompletedResponse's masteryUpdate.
+  const masteryUpdates = conceptIds.map((conceptId) => ({
+    concept_id: conceptId,
+    new_state: masteryStateByConceptId[conceptId] ?? "weak",
+  }));
+
+  const correctCount = session.questions.filter((q) => q.is_correct).length;
+  const totalQuestions = session.questions.length;
+
+  const user = await User.findById(userId).select("streak_count");
+
+  return {
+    totalQuestions,
+    correctCount,
+    xpAwarded: session.xp_awarded || 0,
+    // The daily cap (case-investigation only) was already correctly
+    // applied — or not — on the request that actually completed the
+    // session; a duplicate never re-checks it and never re-awards XP.
+    xpCapped: false,
+    isPerfectQuiz: totalQuestions > 0 && correctCount === totalQuestions,
+    streakMultiplier: 1,
+    newStreak: user?.streak_count ?? 0,
+    masteryUpdates,
+    performanceSync: session.sync_status,
+    // Additive-only, same as gameControllers' equivalent flag — lets a
+    // caller that cares distinguish this from a fresh completion
+    // without changing what existing callers already read.
+    alreadyCompleted: true,
+  };
+};
+
 const completeQuiz = async (req, res) => {
   const { sessionId } = req.params;
 
@@ -204,18 +260,25 @@ const completeQuiz = async (req, res) => {
   }
 
   const dbSession = await mongoose.startSession();
+  const userId = req.userId;
+  // Bounded retry count for the transient-write-conflict case handled
+  // in the catch block below (Task 1A) — deliberately small since a
+  // real conflict only needs one retry to resolve (the other request
+  // will have finished by then); this just guards against looping
+  // forever if something is genuinely, persistently wrong.
+  const MAX_COMPLETE_QUIZ_ATTEMPTS = 5;
 
   try {
-    dbSession.startTransaction();
+    for (let attempt = 1; attempt <= MAX_COMPLETE_QUIZ_ATTEMPTS; attempt++) {
+    try {
+      dbSession.startTransaction();
 
-    const userId = req.userId;
+      const session = await QuizSession.findById(sessionId).session(dbSession);
 
-    const session = await QuizSession.findById(sessionId).session(dbSession);
-
-    if (!session) {
-      await dbSession.abortTransaction();
-      return res.status(404).json({ message: "Session not found" });
-    }
+      if (!session) {
+        await dbSession.abortTransaction();
+        return res.status(404).json({ message: "Session not found" });
+      }
 
     if (session.user_id.toString() !== userId) {
       await dbSession.abortTransaction();
@@ -223,16 +286,53 @@ const completeQuiz = async (req, res) => {
     }
 
     if (session.completed_at) {
+      // Plain duplicate request arriving after the session was
+      // genuinely already completed (client retry, or the student
+      // re-opening an already-finished session) — reuse the stored
+      // result instead of a confusing 400. Mirrors
+      // gameControllers.completeGame's identical duplicate-handling
+      // path; see buildAlreadyCompletedQuizResponse above. Built
+      // before aborting so a read error here still lands in the catch
+      // block below with a transaction that's still abortable.
+      const alreadyCompleted = await buildAlreadyCompletedQuizResponse(session, userId);
       await dbSession.abortTransaction();
-      return res
-        .status(400)
-        .json({ message: "This session is already completed" });
+      return res.status(200).json(alreadyCompleted);
     }
 
     if (session.questions.length === 0) {
       await dbSession.abortTransaction();
       return res.status(400).json({ message: "No answers submitted yet" });
     }
+
+    // BUGFIX (idempotency parity with gameControllers.completeGame):
+    // two near-simultaneous completion requests for the same session
+    // (client retry after a slow/lost response, a double-tap on
+    // "Submit Quiz") could both pass the plain `if (session.completed_at)`
+    // check above if they read the session at nearly the same instant,
+    // before either had written completed_at back — previously this
+    // controller had no protection against that at all. This atomic
+    // conditional update — flipping completed_at from null to now in
+    // the same operation that requires it still be null — closes that
+    // window exactly like completeGame's claim: MongoDB guarantees at
+    // most one such update can succeed for a given document, so at
+    // most one request can ever proceed past this point.
+    const completionTimestamp = new Date();
+    const claim = await QuizSession.updateOne(
+      { _id: sessionId, completed_at: null },
+      { $set: { completed_at: completionTimestamp } },
+      { session: dbSession },
+    );
+    if (claim.modifiedCount === 0) {
+      // Lost the race — another request completed this session
+      // between our read above and this claim. Fetch it fresh
+      // (outside this transaction) and reuse its stored result
+      // exactly like the plain duplicate path above.
+      const winningSession = await QuizSession.findById(sessionId);
+      const alreadyCompleted = await buildAlreadyCompletedQuizResponse(winningSession, userId);
+      await dbSession.abortTransaction();
+      return res.status(200).json(alreadyCompleted);
+    }
+    session.completed_at = completionTimestamp;
 
     const conceptGroups = {};
     for (const q of session.questions) {
@@ -334,7 +434,9 @@ const completeQuiz = async (req, res) => {
     user.xp_total += xpAwarded;
     await user.save({ session: dbSession });
 
-    session.completed_at = new Date();
+    // completed_at was already set atomically by the claim above — not
+    // reassigned here, so the timestamp reflects the moment this
+    // request won the race, not whenever this later save happens to run.
     session.xp_awarded = xpAwarded;
     session.streak_counted = streakCounted;
     await session.save({ session: dbSession });
@@ -396,7 +498,13 @@ const completeQuiz = async (req, res) => {
     // in gameControllers.completeGame.
     const syncResult = await syncSessionToExcel(session._id);
 
-    res.status(200).json({
+    // Explicit return: this function now retries on a transient
+    // transaction error (see the catch block below), so falling
+    // through without returning here would let the retry loop
+    // re-execute the whole transaction a second time after a
+    // completion that already succeeded and was already sent to the
+    // client.
+    return res.status(200).json({
       totalQuestions: session.questions.length,
       correctCount,
       xpAwarded,
@@ -408,11 +516,52 @@ const completeQuiz = async (req, res) => {
       performanceSync: syncResult.status,
     });
   } catch (err) {
-    await dbSession.abortTransaction();
-    sendError(res, err);
-  } finally {
-    dbSession.endSession();
+    // BUGFIX (Task 1A — concurrent completion failure): two genuinely
+    // simultaneous completion requests for the same session don't
+    // just race on the atomic claim's `modifiedCount`. MongoDB's
+    // WiredTiger storage engine takes a per-document write lock
+    // inside a transaction, so when both transactions try to write to
+    // this same QuizSession document at nearly the same instant, the
+    // *second* one gets an immediate WriteConflict — MongoDB error
+    // code 112, labeled "TransientTransactionError" — rather than
+    // waiting and then cleanly seeing modifiedCount: 0. This is
+    // documented, expected MongoDB behavior for concurrent
+    // transactions on the same document, and the driver does NOT
+    // retry it automatically for a manually-managed session (only the
+    // higher-level session.withTransaction() helper does that, which
+    // this controller doesn't use) — so this error previously escaped
+    // straight to sendError as a raw 500.
+    //
+    // The fix follows MongoDB's own documented retry pattern: catch
+    // specifically TransientTransactionError-labeled errors and retry
+    // the whole transaction from scratch, bounded so a genuinely
+    // stuck conflict can't loop forever. On retry, the fresh read of
+    // the session will see completed_at already set by whichever
+    // request actually won, and correctly fall into the existing
+    // "already completed" replay path above — no new logic is needed
+    // for that, just the chance to re-run it. Non-transient errors
+    // (a real bug, a validation failure, etc.) are never retried —
+    // they go straight to sendError exactly as before.
+    if (dbSession.inTransaction()) {
+      // Guard against calling abortTransaction on a transaction the
+      // server may have already ended on its own after the conflict —
+      // that would itself throw and mask the real error.
+      await dbSession.abortTransaction().catch(() => {});
+    }
+
+    const isTransientConflict =
+      typeof err.hasErrorLabel === "function" && err.hasErrorLabel("TransientTransactionError");
+
+    if (isTransientConflict && attempt < MAX_COMPLETE_QUIZ_ATTEMPTS) {
+      continue;
+    }
+
+    return sendError(res, err);
   }
+  }
+} finally {
+  dbSession.endSession();
+}
 };
 
 const getHome = async (req, res) => {
