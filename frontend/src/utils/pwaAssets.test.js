@@ -86,8 +86,9 @@ describe("index.html linkage", () => {
     expect(exists("public/icons/apple-touch-icon.png")).toBe(true);
   });
 
-  it("keeps the existing favicon and Vite entry script", () => {
-    expect(html).toMatch(/<link rel="icon" type="image\/svg\+xml" href="\/favicon\.svg"/);
+  it("links the Learnova favicon and Vite entry script", () => {
+    expect(html).toMatch(/<link rel="icon" type="image\/png" sizes="64x64" href="\/favicon\.png"/);
+    expect(exists("public/favicon.png")).toBe(true);
     expect(html).toMatch(/<script type="module" src="\/src\/main\.jsx">/);
   });
 });
