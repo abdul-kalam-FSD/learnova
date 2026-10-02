@@ -36,6 +36,16 @@ function SubjectWorld() {
       api.get("/games/catalog").catch(() => null),
     ])
       .then(([progressRes, homeRes, catalogRes]) => {
+        // Same distinction as the other /progress consumers
+        // (Chapters.jsx, Progress.jsx, SubjectChapters.jsx): a
+        // malformed `chapters` field is not the same thing as a
+        // genuinely empty one.
+        if (!Array.isArray(progressRes.data?.chapters)) {
+          setError(
+            "We couldn't understand the response from the server. Please try again in a moment.",
+          );
+          return;
+        }
         const bySubject = {};
         for (const ch of progressRes.data.chapters) {
           const subject = ch.subject_name || "General";

@@ -24,8 +24,20 @@ export function ThemeProvider({ children }) {
     setThemeState(next);
   };
 
+  // Single-click cycling (light -> dark -> forest -> galaxy -> light...)
+  // for the compact icon-button toggle used in MobileHeader (every
+  // authenticated page) and PublicHome's header (guest/landing page).
+  // Lives here, next to THEMES, so both call sites share one order
+  // instead of each hardcoding "what's next" themselves.
+  const cycleTheme = () => {
+    setThemeState((current) => {
+      const currentIndex = THEMES.indexOf(current);
+      return THEMES[(currentIndex + 1) % THEMES.length];
+    });
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, themes: THEMES }}>
+    <ThemeContext.Provider value={{ theme, setTheme, cycleTheme, themes: THEMES }}>
       {children}
     </ThemeContext.Provider>
   );

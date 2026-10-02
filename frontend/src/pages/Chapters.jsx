@@ -16,6 +16,23 @@ function Chapters() {
     api
       .get("/progress")
       .then((res) => {
+        // Distinguish a malformed/unexpected response shape from a
+        // genuinely empty result. `chapters: []` is a normal, valid
+        // state (a grade with no content yet) and already renders the
+        // EmptyState below — but `chapters` missing or not an array
+        // at all means something is wrong with the response itself
+        // (a contract change, a proxy/gateway returning something
+        // unexpected with a 200, etc.), and silently treating that as
+        // "zero chapters" would show the same friendly EmptyState as
+        // if nothing were actually wrong. That previously surfaced as
+        // an uncaught `TypeError` (from iterating a non-iterable)
+        // whose raw message ended up as the on-screen error text.
+        if (!Array.isArray(res.data?.chapters)) {
+          setError(
+            "We couldn't understand the response from the server. Please try again in a moment.",
+          );
+          return;
+        }
         const bySubject = {};
         for (const ch of res.data.chapters) {
           const subject = ch.subject_name || "General";

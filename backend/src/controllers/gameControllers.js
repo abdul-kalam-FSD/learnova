@@ -18,6 +18,16 @@ const {
 } = require("../utils/gameTypeRegistry");
 const { getGradeBandConfig, applyTimePressure, capDistractors } = require("../utils/gradeBandConfig");
 const { syncSessionToExcel } = require("../utils/performanceSync");
+const {
+  resolveContestForPlay,
+  checkContestSessionOpen,
+  isDuplicateKeyError,
+} = require("../utils/contestParticipation");
+
+// Sends a contest-validation failure in the project's usual error shape
+// (`message`, plus the additive `code` some callers key off).
+const sendContestError = (res, error) =>
+  res.status(error.status).json({ message: error.message, ...(error.code ? { code: error.code } : {}) });
 
 // Section 26 (grade-band complexity): which payload field holds a
 // game type's authored tile/card pool, for the subset-sum "builder"
@@ -62,6 +72,28 @@ const getGameContentList = async (req, res) => {
     }
     const gradeConceptIds = await getGradeConceptIds(user.grade);
 
+    // OPTIONAL contest scoping (?contestId=). When present, the list is
+    // narrowed to that contest's challenges of this game type that the
+    // student hasn't finished yet, so the game's own level-select shows
+    // exactly what can still be played for the contest. The contest is
+    // fully re-validated here (published, student's grade, active now);
+    // without contestId nothing about this endpoint changes.
+    const { contestId } = req.query;
+    let contestScope = null;
+    if (contestId !== undefined && contestId !== "") {
+      const resolved = await resolveContestForPlay({ userId: req.userId, contestId });
+      if (resolved.error) return sendContestError(res, resolved.error);
+      const finishedIds = await QuizSession.distinct("content_id", {
+        user_id: req.userId,
+        contest_id: resolved.contest._id,
+        completed_at: { $ne: null },
+      });
+      contestScope = {
+        include: resolved.contest.challenges.map((c) => c.game_content_id),
+        exclude: finishedIds,
+      };
+    }
+
     // Phase 11 (Game Lobby): populate the concept's real title +
     // explanation_text so the lobby can show an honest "mission
     // objective" instead of inventing flavor text — this is the same
@@ -70,6 +102,7 @@ const getGameContentList = async (req, res) => {
     const rawContent = await GameContent.find({
       game_type: gameType,
       concept_id: { $in: gradeConceptIds },
+      ...(contestScope ? { _id: { $in: contestScope.include, $nin: contestScope.exclude } } : {}),
     })
       .sort({ order_index: 1 })
       .select("title difficulty payload order_index concept_id")
@@ -173,7 +206,7 @@ const sanitizePayloadForClient = (gameType, payload, bandConfig) => {
 
 const startGame = async (req, res) => {
   try {
-    const { gameType, contentId } = req.body;
+    const { gameType, contentId, contestId } = req.body;
     const userId = req.userId;
 
     if (!gameType || !contentId) {
@@ -201,16 +234,73 @@ const startGame = async (req, res) => {
     // verifyGradeAccess already fetched, no extra query.
     const bandConfig = getGradeBandConfig(userGrade);
 
-    const session = await QuizSession.create({
-      user_id: userId,
-      session_type: "game-session",
-      game_type: gameType,
-      content_id: content._id,
-      started_at: new Date(),
-    });
+    // OPTIONAL contest context. A contestId sent by the client is never
+    // trusted on its own: the server re-checks that the contest exists,
+    // is PUBLISHED, is for this student's grade, is active right now
+    // (server clock), and that THIS content is one of its challenges.
+    // Only after all of that does it stamp contest_id on the new session
+    // — the sole place anywhere that field is ever written. Without a
+    // contestId this is the unchanged normal practice flow.
+    let contest = null;
+    if (contestId !== undefined && contestId !== null && contestId !== "") {
+      const resolved = await resolveContestForPlay({
+        userId,
+        contestId,
+        contentId: content._id.toString(),
+      });
+      if (resolved.error) return sendContestError(res, resolved.error);
+      contest = resolved.contest;
+    }
 
-    res.status(201).json({
+    const contestKey = contest ? { user_id: userId, contest_id: contest._id, content_id: content._id } : null;
+    const alreadyCompleted = () =>
+      res.status(409).json({
+        message: "You've already completed this contest challenge",
+        code: "CONTEST_CHALLENGE_COMPLETED",
+      });
+
+    // One session per student per contest challenge (also enforced by a
+    // unique partial index): an unfinished one is resumed, so a refresh
+    // or leaving and coming back doesn't burn the challenge; a finished
+    // one can't be played for the contest again.
+    let session = null;
+    let resumed = false;
+    if (contestKey) {
+      const existing = await QuizSession.findOne(contestKey);
+      if (existing) {
+        if (existing.completed_at) return alreadyCompleted();
+        session = existing;
+        resumed = true;
+      }
+    }
+
+    if (!session) {
+      try {
+        session = await QuizSession.create({
+          user_id: userId,
+          session_type: "game-session",
+          game_type: gameType,
+          content_id: content._id,
+          started_at: new Date(),
+          ...(contest ? { contest_id: contest._id } : {}),
+        });
+      } catch (createErr) {
+        // Two simultaneous starts for the same contest challenge: the
+        // unique index let one through — treat the loser like a repeat.
+        if (contestKey && isDuplicateKeyError(createErr)) {
+          const winner = await QuizSession.findOne(contestKey);
+          if (!winner || winner.completed_at) return alreadyCompleted();
+          session = winner;
+          resumed = true;
+        } else {
+          throw createErr;
+        }
+      }
+    }
+
+    res.status(resumed ? 200 : 201).json({
       sessionId: session._id,
+      ...(contest ? { contestId: contest._id } : {}),
       content: {
         id: content._id,
         title: content.title,
@@ -560,6 +650,14 @@ const submitGameAttempt = async (req, res) => {
         .json({ message: "This session is already completed" });
     }
 
+    // Contest sessions can only be scored while the contest is still
+    // open (server clock). Practice sessions skip this entirely.
+    if (session.contest_id) {
+      const closed = await checkContestSessionOpen(session.contest_id);
+      if (closed) return sendContestError(res, closed.error);
+      session.attempt_count = (session.attempt_count || 0) + 1;
+    }
+
     const content = await GameContent.findById(session.content_id);
     if (!content) {
       return res.status(404).json({ message: "Game content not found" });
@@ -672,222 +770,285 @@ const completeGame = async (req, res) => {
   }
 
   const dbSession = await mongoose.startSession();
+  const userId = req.userId;
+  // Bounded retry count for the transient-write-conflict case handled in
+  // the catch block below — same bound as completeQuiz. A real conflict
+  // needs one retry to resolve (the competing request will have finished
+  // by then); this only guards against looping forever if something is
+  // persistently wrong.
+  const MAX_COMPLETE_GAME_ATTEMPTS = 5;
+  let committed = false;
 
   try {
-    dbSession.startTransaction();
+    for (let attempt = 1; attempt <= MAX_COMPLETE_GAME_ATTEMPTS; attempt++) {
+      try {
+        dbSession.startTransaction();
 
-    const userId = req.userId;
-    const session = await QuizSession.findById(sessionId).session(dbSession);
+        const session = await QuizSession.findById(sessionId).session(dbSession);
 
-    if (!session) {
-      await dbSession.abortTransaction();
-      return res.status(404).json({ message: "Session not found" });
-    }
-    if (session.user_id.toString() !== userId) {
-      await dbSession.abortTransaction();
-      return res.status(403).json({ message: "Not your session" });
-    }
-    if (session.completed_at) {
-      // Plain duplicate request arriving after the session was
-      // genuinely already completed (e.g. a client retry, or a
-      // student re-opening an already-finished session) — reuse the
-      // stored result instead of a fatal error. See
-      // buildAlreadyCompletedResponse above; this never re-awards
-      // XP/mastery. Built before aborting the transaction so a read
-      // error here still lands in the catch block below with a
-      // transaction that's still in a normal abortable state.
-      const alreadyCompleted = await buildAlreadyCompletedResponse(session, userId);
-      await dbSession.abortTransaction();
-      return res.status(200).json(alreadyCompleted);
-    }
-    if (!session.game_payload || session.game_payload.is_correct === undefined) {
-      await dbSession.abortTransaction();
-      return res.status(400).json({ message: "No attempt submitted yet" });
-    }
+        if (!session) {
+          await dbSession.abortTransaction();
+          return res.status(404).json({ message: "Session not found" });
+        }
+        if (session.user_id.toString() !== userId) {
+          await dbSession.abortTransaction();
+          return res.status(403).json({ message: "Not your session" });
+        }
+        if (session.completed_at) {
+          // Plain duplicate request arriving after the session was
+          // genuinely already completed (e.g. a client retry, or a
+          // student re-opening an already-finished session) — reuse the
+          // stored result instead of a fatal error. See
+          // buildAlreadyCompletedResponse above; this never re-awards
+          // XP/mastery. Built before aborting the transaction so a read
+          // error here still lands in the catch block below with a
+          // transaction that's still in a normal abortable state.
+          const alreadyCompleted = await buildAlreadyCompletedResponse(session, userId);
+          await dbSession.abortTransaction();
+          return res.status(200).json(alreadyCompleted);
+        }
+        // A contest session can only be completed while the contest is
+        // open. (An already-completed one returned its stored result above,
+        // so a finished result is never lost when the window closes.)
+        if (session.contest_id) {
+          const closed = await checkContestSessionOpen(session.contest_id);
+          if (closed) {
+            await dbSession.abortTransaction();
+            return sendContestError(res, closed.error);
+          }
+        }
+        if (!session.game_payload || session.game_payload.is_correct === undefined) {
+          await dbSession.abortTransaction();
+          return res.status(400).json({ message: "No attempt submitted yet" });
+        }
 
-    // BUGFIX (production bug 1 - duplicate completion race): two
-    // near-simultaneous completion requests for the same session
-    // (fast double-click on "Claim Reward", a slow first response
-    // that the client retries, etc.) can both pass the plain
-    // `if (session.completed_at)` check above if they read the
-    // session at nearly the same instant, before either has written
-    // completed_at back. This atomic conditional update — flipping
-    // completed_at from null to now in the same operation that
-    // requires it still be null — closes that window: MongoDB
-    // guarantees at most one such update can succeed for a given
-    // document, so at most one request can ever proceed past this
-    // point for a given session, regardless of timing.
-    const completionTimestamp = new Date();
-    const claim = await QuizSession.updateOne(
-      { _id: sessionId, completed_at: null },
-      { $set: { completed_at: completionTimestamp } },
-      { session: dbSession },
-    );
-    if (claim.modifiedCount === 0) {
-      // Lost the race — another request completed this session
-      // between our read above and this claim. Fetch it fresh
-      // (outside this transaction) and reuse its stored result
-      // exactly like the plain duplicate path above. Built before
-      // aborting, for the same reason as above.
-      const winningSession = await QuizSession.findById(sessionId);
-      const alreadyCompleted = await buildAlreadyCompletedResponse(winningSession, userId);
-      await dbSession.abortTransaction();
-      return res.status(200).json(alreadyCompleted);
-    }
-    session.completed_at = completionTimestamp;
+        // BUGFIX (production bug 1 - duplicate completion race): two
+        // near-simultaneous completion requests for the same session
+        // (fast double-click on "Claim Reward", a slow first response
+        // that the client retries, etc.) can both pass the plain
+        // `if (session.completed_at)` check above if they read the
+        // session at nearly the same instant, before either has written
+        // completed_at back. This atomic conditional update — flipping
+        // completed_at from null to now in the same operation that
+        // requires it still be null — closes that window: MongoDB
+        // guarantees at most one such update can succeed for a given
+        // document, so at most one request can ever proceed past this
+        // point for a given session, regardless of timing.
+        const completionTimestamp = new Date();
+        const claim = await QuizSession.updateOne(
+          { _id: sessionId, completed_at: null },
+          { $set: { completed_at: completionTimestamp } },
+          { session: dbSession },
+        );
+        if (claim.modifiedCount === 0) {
+          // Lost the race — another request completed this session
+          // between our read above and this claim. Fetch it fresh
+          // (outside this transaction) and reuse its stored result
+          // exactly like the plain duplicate path above. Built before
+          // aborting, for the same reason as above.
+          const winningSession = await QuizSession.findById(sessionId);
+          const alreadyCompleted = await buildAlreadyCompletedResponse(winningSession, userId);
+          await dbSession.abortTransaction();
+          return res.status(200).json(alreadyCompleted);
+        }
+        session.completed_at = completionTimestamp;
 
-    const content = await GameContent.findById(session.content_id).session(dbSession);
-    const isCorrect = session.game_payload.is_correct;
-    // Older sessions (pre-multi-question) never set these — default to
-    // the 1-question shape so calculateXP below stays correct for
-    // every existing game_type without a special case.
-    const correctCount = session.game_payload.correct_count ?? (isCorrect ? 1 : 0);
-    const totalCount = session.game_payload.total_count ?? 1;
+        const content = await GameContent.findById(session.content_id).session(dbSession);
+        const isCorrect = session.game_payload.is_correct;
+        // Older sessions (pre-multi-question) never set these — default to
+        // the 1-question shape so calculateXP below stays correct for
+        // every existing game_type without a special case.
+        const correctCount = session.game_payload.correct_count ?? (isCorrect ? 1 : 0);
+        const totalCount = session.game_payload.total_count ?? 1;
 
-    let mastery = await UserConceptMastery.findOne({
-      user_id: userId,
-      concept_id: content.concept_id,
-    }).session(dbSession);
+        let mastery = await UserConceptMastery.findOne({
+          user_id: userId,
+          concept_id: content.concept_id,
+        }).session(dbSession);
 
-    if (!mastery) {
-      mastery = new UserConceptMastery({
-        user_id: userId,
-        concept_id: content.concept_id,
-        state: "weak",
-        correct_streak: 0,
-      });
-    }
+        if (!mastery) {
+          mastery = new UserConceptMastery({
+            user_id: userId,
+            concept_id: content.concept_id,
+            state: "weak",
+            correct_streak: 0,
+          });
+        }
 
-    // Phase 6B (P1-3): captured before applyMasteryTransition overwrites
-    // mastery.state below, purely so the response can tell the truth
-    // about whether this attempt actually changed anything — the
-    // transition algorithm itself (thresholds, weak/learning/strong
-    // logic) is untouched.
-    const previousMasteryState = mastery.state;
-    const result = applyMasteryTransition(mastery.state, isCorrect, mastery.correct_streak);
-    mastery.state = result.state;
-    mastery.correct_streak = result.correct_streak;
-    mastery.last_attempted_at = new Date();
-    await mastery.save({ session: dbSession });
+        // Phase 6B (P1-3): captured before applyMasteryTransition overwrites
+        // mastery.state below, purely so the response can tell the truth
+        // about whether this attempt actually changed anything — the
+        // transition algorithm itself (thresholds, weak/learning/strong
+        // logic) is untouched.
+        const previousMasteryState = mastery.state;
+        const result = applyMasteryTransition(mastery.state, isCorrect, mastery.correct_streak);
+        mastery.state = result.state;
+        mastery.correct_streak = result.correct_streak;
+        mastery.last_attempted_at = new Date();
+        await mastery.save({ session: dbSession });
 
-    const user = await User.findById(userId).session(dbSession);
+        const user = await User.findById(userId).session(dbSession);
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let streakCounted = false;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        let streakCounted = false;
 
-    if (!user.last_active_date) {
-      user.streak_count = 1;
-      streakCounted = true;
-    } else {
-      const lastActive = new Date(user.last_active_date);
-      lastActive.setHours(0, 0, 0, 0);
-      const diffDays = Math.round((today - lastActive) / (1000 * 60 * 60 * 24));
+        if (!user.last_active_date) {
+          user.streak_count = 1;
+          streakCounted = true;
+        } else {
+          const lastActive = new Date(user.last_active_date);
+          lastActive.setHours(0, 0, 0, 0);
+          const diffDays = Math.round((today - lastActive) / (1000 * 60 * 60 * 24));
 
-      if (diffDays === 1) {
-        user.streak_count += 1;
-        streakCounted = true;
-      } else if (diffDays > 1) {
-        user.streak_count = 1;
-        streakCounted = true;
+          if (diffDays === 1) {
+            user.streak_count += 1;
+            streakCounted = true;
+          } else if (diffDays > 1) {
+            user.streak_count = 1;
+            streakCounted = true;
+          }
+        }
+
+        // For single-check game_types this is still effectively a
+        // 1-question "quiz" (correctCount/totalCount default to 1/1
+        // above). For multi-question game_types (Speed Challenge), this
+        // now scales XP with how many of the round's questions were
+        // right — same formula, just real counts instead of 0-or-1.
+        const { finalXP: rawXP, isPerfect, multiplier } = calculateXP(
+          correctCount,
+          totalCount,
+          user.streak_count,
+        );
+
+        // Daily XP cap — same rationale as the case-investigation cap in
+        // quizControllers.js: unlimited replay for practice is fine,
+        // unlimited XP from replaying the same challenge is not.
+        let xpCapped = false;
+        let finalXP = rawXP;
+        const completionsToday = await countCompletionsToday(
+          userId,
+          "content_id",
+          session.content_id,
+          dbSession,
+        );
+        if (completionsToday >= DAILY_XP_CAP_PER_CONTENT) {
+          finalXP = 0;
+          xpCapped = true;
+        }
+
+        user.last_active_date = today;
+        user.xp_total += finalXP;
+        await user.save({ session: dbSession });
+
+        // completed_at was already set atomically by the claim above —
+        // not reassigned here, so the timestamp reflects the moment this
+        // request won the race, not whenever this later save happens to run.
+        session.xp_awarded = finalXP;
+        session.streak_counted = streakCounted;
+        await session.save({ session: dbSession });
+
+        // Teacher assignments (Section 26): a correct completion of ANY
+        // playable content for the assigned concept satisfies the
+        // assignment — not just the specific GameContent doc the teacher
+        // happened to see when assigning — since assignments are
+        // concept-level, not content-level (see Assignment.js). Only
+        // flips pending -> completed on a genuinely correct attempt, same
+        // bar as earning mastery credit/XP for it; a wrong attempt still
+        // leaves the assignment open so the student can try again.
+        if (isCorrect) {
+          await Assignment.updateMany(
+            {
+              concept_id: content.concept_id,
+              students: { $elemMatch: { student_id: userId, status: "pending" } },
+            },
+            {
+              $set: {
+                "students.$[elem].status": "completed",
+                "students.$[elem].completed_at": new Date(),
+              },
+            },
+            {
+              arrayFilters: [{ "elem.student_id": new mongoose.Types.ObjectId(userId), "elem.status": "pending" }],
+              session: dbSession,
+            },
+          );
+        }
+
+        await dbSession.commitTransaction();
+        // Recorded so the catch block below can never treat an error that
+        // happens AFTER the commit (e.g. while sending the response) as a
+        // retryable transaction conflict — retrying after a successful
+        // commit would try to complete an already-completed session and,
+        // worse, could re-run the post-commit Excel sync.
+        committed = true;
+
+        // Automatic performance -> Excel sync (Section 31-36). Runs after
+        // the transaction has already committed, so a sync failure here
+        // can never roll back or block the student's actual result —
+        // syncSessionToExcel catches its own errors and just marks the
+        // session sync_status: "failed" for an admin to retry.
+        const syncResult = await syncSessionToExcel(session._id);
+
+        // Explicit return: this function now retries on a transient
+        // transaction error (see the catch block below), so falling
+        // through without returning here would let the retry loop
+        // re-execute the whole transaction after a completion that
+        // already succeeded and was already sent to the client.
+        return res.status(200).json({
+          isCorrect,
+          xpAwarded: finalXP,
+          xpCapped,
+          isPerfectQuiz: isPerfect,
+          streakMultiplier: multiplier,
+          newStreak: user.streak_count,
+          // previous_state/changed are additive (Phase 6B, P1-3) — concept_id
+          // and new_state are unchanged from before, so any existing caller
+          // reading only those two fields keeps working exactly as it did.
+          masteryUpdate: {
+            concept_id: content.concept_id,
+            new_state: mastery.state,
+            previous_state: previousMasteryState,
+            changed: previousMasteryState !== mastery.state,
+          },
+          performanceSync: syncResult.status,
+        });
+      } catch (err) {
+        // BUGFIX (Task 1C - concurrent completion, same defect Task 1A fixed in
+        // completeQuiz): two genuinely overlapping completion requests for the
+        // same session both try to write the same QuizSession document inside
+        // their own transactions. MongoDB (WiredTiger) takes a per-document
+        // write lock, so the second transaction gets an immediate WriteConflict
+        // (code 112, labelled TransientTransactionError) instead of waiting and
+        // then cleanly seeing modifiedCount: 0. The driver only auto-retries
+        // that for session.withTransaction(), which this controller does not
+        // use, so it used to escape to sendError as a raw 500.
+        //
+        // Follow MongoDB's documented pattern: abort, and if the error carries
+        // the TransientTransactionError label, re-run the whole transaction from
+        // scratch (bounded). The retry re-reads the session, sees completed_at
+        // set by the winner, and falls into the existing duplicate-replay path.
+        // Every write before the commit lives in the transaction and is rolled
+        // back by the abort, so a retry cannot double-apply XP, streak, mastery
+        // or assignment updates. Non-transient errors are never retried.
+        if (dbSession.inTransaction()) {
+          // Guard: the server may already have ended the transaction after the
+          // conflict; a second abort would throw and mask the real error.
+          await dbSession.abortTransaction().catch(() => {});
+        }
+
+        const isTransientConflict =
+          !committed &&
+          typeof err.hasErrorLabel === "function" &&
+          err.hasErrorLabel("TransientTransactionError");
+
+        if (isTransientConflict && attempt < MAX_COMPLETE_GAME_ATTEMPTS) {
+          continue;
+        }
+
+        return sendError(res, err);
       }
     }
-
-    // For single-check game_types this is still effectively a
-    // 1-question "quiz" (correctCount/totalCount default to 1/1
-    // above). For multi-question game_types (Speed Challenge), this
-    // now scales XP with how many of the round's questions were
-    // right — same formula, just real counts instead of 0-or-1.
-    const { finalXP: rawXP, isPerfect, multiplier } = calculateXP(
-      correctCount,
-      totalCount,
-      user.streak_count,
-    );
-
-    // Daily XP cap — same rationale as the case-investigation cap in
-    // quizControllers.js: unlimited replay for practice is fine,
-    // unlimited XP from replaying the same challenge is not.
-    let xpCapped = false;
-    let finalXP = rawXP;
-    const completionsToday = await countCompletionsToday(
-      userId,
-      "content_id",
-      session.content_id,
-      dbSession,
-    );
-    if (completionsToday >= DAILY_XP_CAP_PER_CONTENT) {
-      finalXP = 0;
-      xpCapped = true;
-    }
-
-    user.last_active_date = today;
-    user.xp_total += finalXP;
-    await user.save({ session: dbSession });
-
-    // completed_at was already set atomically by the claim above —
-    // not reassigned here, so the timestamp reflects the moment this
-    // request won the race, not whenever this later save happens to run.
-    session.xp_awarded = finalXP;
-    session.streak_counted = streakCounted;
-    await session.save({ session: dbSession });
-
-    // Teacher assignments (Section 26): a correct completion of ANY
-    // playable content for the assigned concept satisfies the
-    // assignment — not just the specific GameContent doc the teacher
-    // happened to see when assigning — since assignments are
-    // concept-level, not content-level (see Assignment.js). Only
-    // flips pending -> completed on a genuinely correct attempt, same
-    // bar as earning mastery credit/XP for it; a wrong attempt still
-    // leaves the assignment open so the student can try again.
-    if (isCorrect) {
-      await Assignment.updateMany(
-        {
-          concept_id: content.concept_id,
-          students: { $elemMatch: { student_id: userId, status: "pending" } },
-        },
-        {
-          $set: {
-            "students.$[elem].status": "completed",
-            "students.$[elem].completed_at": new Date(),
-          },
-        },
-        {
-          arrayFilters: [{ "elem.student_id": new mongoose.Types.ObjectId(userId), "elem.status": "pending" }],
-          session: dbSession,
-        },
-      );
-    }
-
-    await dbSession.commitTransaction();
-
-    // Automatic performance -> Excel sync (Section 31-36). Runs after
-    // the transaction has already committed, so a sync failure here
-    // can never roll back or block the student's actual result —
-    // syncSessionToExcel catches its own errors and just marks the
-    // session sync_status: "failed" for an admin to retry.
-    const syncResult = await syncSessionToExcel(session._id);
-
-    res.status(200).json({
-      isCorrect,
-      xpAwarded: finalXP,
-      xpCapped,
-      isPerfectQuiz: isPerfect,
-      streakMultiplier: multiplier,
-      newStreak: user.streak_count,
-      // previous_state/changed are additive (Phase 6B, P1-3) — concept_id
-      // and new_state are unchanged from before, so any existing caller
-      // reading only those two fields keeps working exactly as it did.
-      masteryUpdate: {
-        concept_id: content.concept_id,
-        new_state: mastery.state,
-        previous_state: previousMasteryState,
-        changed: previousMasteryState !== mastery.state,
-      },
-      performanceSync: syncResult.status,
-    });
-  } catch (err) {
-    await dbSession.abortTransaction();
-    sendError(res, err);
   } finally {
     dbSession.endSession();
   }

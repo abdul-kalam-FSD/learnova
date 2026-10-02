@@ -37,6 +37,28 @@ describe("Chapters", () => {
     });
   });
 
+  test("shows a friendly error (not a raw exception) when chapters is missing from the response", async () => {
+    api.get.mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Error: We couldn't understand the response from the server. Please try again in a moment."),
+      ).toBeInTheDocument();
+    });
+    // Must not be mistaken for the legitimate "zero chapters" state.
+    expect(screen.queryByText("No chapters yet")).not.toBeInTheDocument();
+  });
+
+  test("shows the same friendly error when chapters is present but not an array", async () => {
+    api.get.mockResolvedValue({ data: { chapters: { not: "an array" } } });
+    renderPage();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Error: We couldn't understand the response from the server. Please try again in a moment."),
+      ).toBeInTheDocument();
+    });
+  });
+
   test("single-subject grade renders unit headings without a subject heading", async () => {
     api.get.mockResolvedValue({
       data: {

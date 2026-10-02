@@ -3,6 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- PWA: installability metadata (see public/manifest.webmanifest) -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="theme-color" content="#2E7D5B" />
+    <meta name="application-name" content="Learnova" />
+    <meta name="apple-mobile-web-app-title" content="Learnova" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
@@ -10,6 +17,19 @@
       rel="stylesheet"
     />
     <title>Learnova</title>
+    <script>
+      (function () {
+        try {
+          var THEMES = ["light", "dark", "forest", "galaxy"];
+          var saved = localStorage.getItem("leveled_theme");
+          var theme = THEMES.indexOf(saved) !== -1 ? saved : "light";
+          document.documentElement.setAttribute("data-theme", theme);
+        } catch (e) {
+          // localStorage unavailable (privacy mode, etc.) - CSS already
+          // defaults to the light theme via :root, so nothing to do.
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

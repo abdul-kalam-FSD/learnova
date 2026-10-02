@@ -500,6 +500,34 @@ describe("Home (Phase 7C) - Overall Mastery ordering", () => {
       masteryEl.compareDocumentPosition(achievementsHeading) & DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+
+  // Task 2 (defensive guards): a malformed 200 response — chapters
+  // present but not an array, or an entry missing its breakdown —
+  // must not crash the whole Home page. It should just skip the
+  // Overall Mastery snippet, the same way a fetch failure already
+  // does via mockApi's `/progress` rejection path.
+  test("does not crash and hides Overall Mastery when chapters is not an array", async () => {
+    mockApi({ progress: { chapters: "not-an-array" } });
+    renderHome();
+    await screen.findByText("Achievements");
+    expect(screen.queryByText("Overall Mastery")).not.toBeInTheDocument();
+  });
+
+  test("does not crash and still computes mastery when a chapter entry is missing its breakdown", async () => {
+    mockApi({
+      progress: {
+        chapters: [
+          { total_concepts: 10, breakdown: { strong: 4, learning: 2, weak: 4 } },
+          { total_concepts: 5 }, // malformed: no breakdown at all
+        ],
+      },
+    });
+    renderHome();
+    // Only the well-formed chapter contributes: (4+2)/(10+5) = 40%,
+    // not a crash and not silently 0%.
+    await screen.findByText("Overall Mastery");
+    expect(screen.getByText("40%")).toBeInTheDocument();
+  });
 });
 
 describe("Home (Game Selection UI) - catalog", () => {

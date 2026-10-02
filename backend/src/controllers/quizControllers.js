@@ -607,11 +607,121 @@ const getHome = async (req, res) => {
     sendError(res, err);
   }
 };
+// Mistake Review V1 (quiz-type sessions only — weak-concept-targeted
+// and case-investigation, both of which persist structured
+// per-question data via answeredQuestionSchema; see QuizSession.js).
+// Deliberately does NOT cover the 54 game-type mechanics — those
+// store a free-form `game_payload` with no guaranteed per-question
+// structure, so a review screen for them would need a new
+// attempt-persistence design, not this endpoint. That's a future
+// architectural question, not something this task expands into.
+//
+// A completed session's `questions[]` only ever contains what the
+// student actually answered — `eligible_question_ids` (fixed at
+// startQuiz/startCase time) can be a larger set than `questions[]` if
+// the student completed the quiz without answering every eligible
+// question (completeQuiz only requires at least one answer). That's
+// expected, not a bug: there is nothing to review for a question that
+// was never attempted, so this endpoint naturally only ever reports
+// on what's in `questions[]`.
+//
+// Read-only: never mutates QuizSession or Question, never
+// recalculates correctness (uses the persisted `is_correct` as-is).
+const getQuizReview = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const userId = req.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(sessionId)) {
+      return res.status(400).json({ message: "Invalid session id" });
+    }
+
+    const session = await QuizSession.findById(sessionId);
+
+    if (!session) {
+      return res.status(404).json({ message: "Session not found" });
+    }
+
+    if (session.user_id.toString() !== userId) {
+      return res.status(403).json({ message: "Not your session" });
+    }
+
+    // game-session sessions have no structured `questions` data to
+    // review (see the file-level comment above) — a clear, honest
+    // 400 rather than silently returning an empty review.
+    if (session.session_type === "game-session") {
+      return res
+        .status(400)
+        .json({ message: "Mistake review is not available for this session type yet" });
+    }
+
+    // V1 scope: only questions the student got wrong, in the order
+    // they originally answered them.
+    const mistakes = session.questions.filter((q) => !q.is_correct);
+
+    if (mistakes.length === 0) {
+      return res.status(200).json({ mistakes: [] });
+    }
+
+    const questionIds = mistakes.map((q) => q.question_id);
+    const questions = await Question.find({ _id: { $in: questionIds } }).select(
+      "question_text options correct_option_id explanation_text",
+    );
+    const questionById = {};
+    for (const q of questions) {
+      questionById[q._id.toString()] = q;
+    }
+
+    const conceptIds = [...new Set(mistakes.map((q) => q.concept_id.toString()))];
+    const concepts = await Concept.find({ _id: { $in: conceptIds } }).select("title");
+    const conceptById = {};
+    for (const c of concepts) {
+      conceptById[c._id.toString()] = c;
+    }
+
+    const result = mistakes.map((mistake) => {
+      const question = questionById[mistake.question_id.toString()];
+      const concept = conceptById[mistake.concept_id.toString()];
+      const selectedOption = question?.options?.find(
+        (o) => o.id === mistake.selected_option_id,
+      );
+      const correctOption = question?.options?.find(
+        (o) => o.id === question.correct_option_id,
+      );
+
+      return {
+        question_id: mistake.question_id,
+        concept_id: mistake.concept_id,
+        concept_title: concept?.title ?? null,
+        // question may have been deleted/changed since the attempt —
+        // don't let a missing lookup crash the response, just report
+        // what's genuinely available.
+        question_text: question?.question_text ?? null,
+        selected_option: selectedOption
+          ? { id: selectedOption.id, text: selectedOption.text }
+          : { id: mistake.selected_option_id, text: null },
+        correct_option: correctOption
+          ? { id: correctOption.id, text: correctOption.text }
+          : question
+            ? { id: question.correct_option_id, text: null }
+            : null,
+        explanation: question?.explanation_text ?? null,
+        answered_at: mistake.answered_at,
+      };
+    });
+
+    res.status(200).json({ mistakes: result });
+  } catch (err) {
+    sendError(res, err);
+  }
+};
+
 module.exports = {
   startQuiz,
   submitAnswer,
   completeQuiz,
   getHome,
+  getQuizReview,
   calculateXP,
   applyMasteryTransition,
   // Exposed so the Game Lobby (Phase 11) can show a real, honest XP

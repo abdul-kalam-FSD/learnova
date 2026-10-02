@@ -1,0 +1,386 @@
+/* =========================================================
+   Lower-grade (Grade 4-6) presentation layer — SECOND PASS.
+
+   Team Lead review feedback (round 2): the first pass activated
+   correctly for a logged-in Grade 4-6 student, but (a) never
+   activated at all during the public/guest Standard -> Subject ->
+   Chapter -> Game browsing flow (PublicHome.jsx), because that flow
+   has no logged-in user yet, and (b) even where it did activate, the
+   changes (border-radius, shadow, font-weight) were too subtle to
+   visually register as "a different, younger experience."
+
+   This file is scoped under [data-lower-grade="true"], set in TWO
+   places now (both reuse the same isLowerGrade() helper from
+   utils/gradeBand.js — one single definition of "lower grade"):
+
+     1. App.jsx's AppLayout — for every authenticated/guest-token
+        route (Home, Chapters, SubjectWorld, SubjectChapters,
+        Practice, the actual game screens, etc.), keyed off the
+        logged-in user's grade.
+     2. pages/PublicHome.jsx's root element — for the pre-login guest
+        browsing flow, keyed off the Standard the visitor has
+        currently picked (selectedGrade), since no user/token exists
+        yet at that point.
+
+   Because both roots use the same attribute and the same helper,
+   Grades 7-12 (and guests who haven't picked a lower standard, and
+   portal routes) never carry the attribute anywhere, so nothing in
+   this file can ever match for them — verified in the report by
+   comparing Grade 6 vs Grade 7 renders side by side.
+
+   Visual direction this pass: colorful, chunky, "sticker-card" UI —
+   gradient page wash, thick colorful card borders with a per-card
+   accent stripe, gradient buttons/badges/icons, gradient progress
+   fills — built entirely from the app's own existing brand tokens
+   (--primary-color / --accent-color / --xp-color / --success-color,
+   already used together as a gradient pair elsewhere in the app, see
+   --on-primary-accent-gradient in index.css) via color-mix() and
+   linear-gradient(), not a new palette. No new dependency, no new
+   markup beyond the two data-lower-grade attributes above — every
+   selector below targets class names the app already renders.
+   ========================================================= */
+
+[data-lower-grade="true"] {
+  --lg-radius-md: 18px;
+  --lg-radius-lg: 22px;
+  --lg-radius-xl: 30px;
+  --lg-border: 3px;
+  --lg-shadow: 0 8px 20px rgba(31, 51, 41, 0.16);
+  --lg-shadow-sm: 0 4px 12px rgba(31, 51, 41, 0.12);
+  /* The app's own brand pair, reused everywhere below instead of a
+     one-off color. */
+  --lg-gradient: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  --lg-gradient-soft: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--primary-color) 14%, var(--bg-color)),
+    color-mix(in srgb, var(--accent-color) 14%, var(--bg-color))
+  );
+}
+
+/* ---------- Page wash: every lower-grade page gets a soft two-tone
+   gradient backdrop instead of the flat --bg-color every other grade
+   sees. This alone is the single biggest "oh, this looks different"
+   signal, and it's visible the instant the page loads, everywhere. */
+[data-lower-grade="true"] .home,
+[data-lower-grade="true"] .chapters-page,
+[data-lower-grade="true"] .practice-page,
+[data-lower-grade="true"] .practice-panel,
+[data-lower-grade="true"] .public-home {
+  background: var(--lg-gradient-soft);
+  background-attachment: fixed;
+}
+
+/* ---------- Typography: bigger, bolder, and section titles get a
+   colorful little rule under them instead of plain gray-caps text. */
+[data-lower-grade="true"] .home-header__greeting,
+[data-lower-grade="true"] .chapters-page__title,
+[data-lower-grade="true"] .chapters-page__subject-title,
+[data-lower-grade="true"] .world-card__title,
+[data-lower-grade="true"] .game-card__title,
+[data-lower-grade="true"] .chapter-card__title,
+[data-lower-grade="true"] .ph-hero__title {
+  font-weight: 800;
+}
+
+[data-lower-grade="true"] .home-hero__title {
+  font-size: var(--fs-2xl);
+}
+
+[data-lower-grade="true"] .section-header__title,
+[data-lower-grade="true"] .ph-section__title {
+  display: inline-block;
+  font-size: var(--fs-md);
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+  padding-bottom: 4px;
+  border-bottom: 4px solid var(--accent-color);
+  border-radius: 2px;
+}
+
+/* ---------- Buttons: chunky gradient pills on the app's own primary
+   action buttons — hero CTA, game-card play button, generic primary
+   button. Deliberately excludes .btn-pill-inverted (Home.jsx/
+   Practice.jsx's "Play Now"/"Start Practice" pill, which is meant to
+   be a white pill legible ON TOP of the hero's own gradient
+   background) and .ph-standard-card--active (a light "selected"
+   tint, not a CTA) — both already have their own correct, intentional
+   contrast that a gradient fill would break. Text color is set
+   explicitly (not assumed) so contrast holds regardless of what the
+   button's own CSS did or didn't already set. ---------- */
+[data-lower-grade="true"] .btn-primary,
+[data-lower-grade="true"] .btn-pill:not(.btn-pill-inverted),
+[data-lower-grade="true"] .ph-hero__cta,
+[data-lower-grade="true"] .ph-game-card__play {
+  background: var(--lg-gradient);
+  color: var(--on-primary);
+  border: none;
+  box-shadow: var(--lg-shadow-sm);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  transform: scale(1);
+  transition: transform 0.12s ease;
+}
+
+[data-lower-grade="true"] .btn-primary:active,
+[data-lower-grade="true"] .btn-pill:not(.btn-pill-inverted):active,
+[data-lower-grade="true"] .ph-hero__cta:active,
+[data-lower-grade="true"] .ph-game-card__play:active,
+[data-lower-grade="true"] .game-hint__toggle:active {
+  transform: scale(0.95);
+}
+
+/* ---------- Sticker cards: a thick colorful border, a big radius, a
+   drop shadow, and a gradient accent stripe along the top edge via
+   ::before — applied to every card type across dashboard, subjects,
+   chapters and games (both the authenticated app AND the public
+   guest flow's ph-* cards). Each subject's own --world-accent
+   variable (already defined per-subject in Chapters.css) is reused
+   for the stripe where available, so Math/Biology/Physics/etc. keep
+   their existing distinct color instead of one flat accent. */
+[data-lower-grade="true"] .game-card,
+[data-lower-grade="true"] .world-card,
+[data-lower-grade="true"] .chapter-card,
+[data-lower-grade="true"] .ph-standard-card,
+[data-lower-grade="true"] .ph-subject-card,
+[data-lower-grade="true"] .ph-chapter-card,
+[data-lower-grade="true"] .ph-game-card {
+  position: relative;
+  border-width: var(--lg-border);
+  border-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+  border-radius: var(--lg-radius-lg);
+  box-shadow: var(--lg-shadow-sm);
+  overflow: hidden;
+}
+
+[data-lower-grade="true"] .game-card::before,
+[data-lower-grade="true"] .world-card::before,
+[data-lower-grade="true"] .chapter-card::before,
+[data-lower-grade="true"] .ph-standard-card::before,
+[data-lower-grade="true"] .ph-subject-card::before,
+[data-lower-grade="true"] .ph-chapter-card::before,
+[data-lower-grade="true"] .ph-game-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--world-accent, var(--lg-gradient));
+}
+
+[data-lower-grade="true"] .game-card--clickable:active,
+[data-lower-grade="true"] .world-card:active,
+[data-lower-grade="true"] .chapter-card:active,
+[data-lower-grade="true"] .ph-standard-card:active,
+[data-lower-grade="true"] .ph-subject-card:active,
+[data-lower-grade="true"] .ph-chapter-card:active {
+  transform: scale(0.96) rotate(-0.5deg);
+}
+
+[data-lower-grade="true"] .world-card:hover,
+[data-lower-grade="true"] .ph-standard-card:hover,
+[data-lower-grade="true"] .ph-subject-card:hover,
+[data-lower-grade="true"] .ph-chapter-card:hover,
+[data-lower-grade="true"] .ph-game-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--lg-shadow);
+}
+
+/* ---------- Icons: a big gradient "sticker" badge behind every
+   subject/game icon instead of a plain flat tint square, so the
+   emoji reads as a colorful chip rather than floating on white. */
+[data-lower-grade="true"] .game-card__icon,
+[data-lower-grade="true"] .world-card__icon,
+[data-lower-grade="true"] .chapter-card__icon,
+[data-lower-grade="true"] .ph-subject-card__icon,
+[data-lower-grade="true"] .ph-game-card__icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--fs-2xl);
+  border-radius: var(--lg-radius-md);
+  background: var(--world-accent, var(--lg-gradient-soft));
+  box-shadow: var(--lg-shadow-sm);
+}
+
+[data-lower-grade="true"] .ph-standard-card__num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--lg-gradient-soft);
+  font-weight: 900;
+}
+
+/* ---------- Hero card (dashboard + public-home): the app's existing
+   primary->accent gradient, bigger and with a decorative ring shape
+   instead of a flat tinted card. */
+[data-lower-grade="true"] .home-hero {
+  background: var(--lg-gradient);
+  border-radius: var(--lg-radius-xl);
+  box-shadow: var(--lg-shadow);
+}
+
+[data-lower-grade="true"] .home-hero::after {
+  content: "";
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 10px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+[data-lower-grade="true"] .ph-hero {
+  background: var(--lg-gradient-soft);
+  border-radius: 0 0 var(--lg-radius-xl) var(--lg-radius-xl);
+}
+
+[data-lower-grade="true"] .ph-hero__eyebrow {
+  background: var(--lg-gradient);
+  color: var(--on-primary);
+}
+
+/* ---------- Stat chips / XP / streak / progress bars: gradient
+   pills and a thicker gradient progress fill instead of a flat
+   primary-colored line. */
+[data-lower-grade="true"] .stat-chip {
+  padding: 8px 14px;
+  font-size: var(--fs-base);
+  border-radius: var(--lg-radius-md);
+}
+
+[data-lower-grade="true"] .stat-chip--xp,
+[data-lower-grade="true"] .stat-chip--default {
+  background: var(--lg-gradient-soft);
+}
+
+[data-lower-grade="true"] .stat-chip__icon {
+  font-size: var(--fs-lg);
+}
+
+[data-lower-grade="true"] .home-achievements-strip__badge {
+  width: 56px;
+  height: 56px;
+  font-size: var(--fs-2xl);
+  border-radius: 50%;
+  background: var(--lg-gradient-soft);
+  box-shadow: var(--lg-shadow-sm);
+}
+
+[data-lower-grade="true"] .progress-bar__fill--primary,
+[data-lower-grade="true"] .progress-overall__fill {
+  background: var(--lg-gradient);
+}
+
+[data-lower-grade="true"] .progress-bar,
+[data-lower-grade="true"] .game-progress__track {
+  height: 10px;
+}
+
+[data-lower-grade="true"] .game-progress__fill {
+  background: var(--lg-gradient);
+}
+
+/* ---------- Empty states ---------- */
+[data-lower-grade="true"] .empty-state__icon {
+  font-size: 44px;
+}
+
+/* ---------- Bottom nav: gradient active pill (bigger icons were
+   already part of the first pass) instead of a flat tint. ---------- */
+[data-lower-grade="true"] .nav__link span:first-child {
+  font-size: var(--fs-2xl);
+}
+
+[data-lower-grade="true"] .nav__link--active {
+  background: var(--lg-gradient-soft);
+  border-radius: var(--lg-radius-md);
+}
+
+/* ---------- Game screen (GameShell: top bar, objective, hint,
+   feedback). Each of these renders inside the AppLayout route that
+   already carries data-lower-grade, so the actual game screen
+   inherits everything below automatically once the guest/student is
+   in a Grade 4-6 context. ---------- */
+[data-lower-grade="true"] .practice-topbar-wrap {
+  background: var(--lg-gradient-soft);
+  border-bottom: var(--lg-border) solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+}
+
+[data-lower-grade="true"] .practice-pill--xp {
+  background: var(--lg-gradient);
+  color: var(--on-primary-accent-gradient);
+  font-weight: 800;
+}
+
+[data-lower-grade="true"] .game-objective {
+  background: var(--lg-gradient-soft);
+  border: var(--lg-border) solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+  border-radius: var(--lg-radius-md);
+  padding: 14px 16px;
+}
+
+[data-lower-grade="true"] .game-objective__label {
+  font-size: var(--fs-xs);
+}
+
+[data-lower-grade="true"] .game-objective__text {
+  font-size: var(--fs-base);
+}
+
+[data-lower-grade="true"] .game-hint__toggle {
+  background: var(--lg-gradient-soft);
+  border: var(--lg-border) solid color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+  border-radius: var(--lg-radius-md);
+  font-weight: 800;
+}
+
+[data-lower-grade="true"] .game-hint__panel {
+  background: var(--lg-gradient-soft);
+  border-radius: var(--lg-radius-md);
+  border: 2px dashed color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+}
+
+[data-lower-grade="true"] .feedback-card {
+  border-width: var(--lg-border);
+  border-radius: var(--lg-radius-md);
+  box-shadow: var(--lg-shadow-sm);
+}
+
+[data-lower-grade="true"] .feedback-card__verdict {
+  font-size: var(--fs-lg);
+  font-weight: 800;
+}
+
+/* ---------- Responsiveness: nothing above changes widths, only
+   borders/backgrounds/radii inside the app's existing box-sizing:
+   border-box (Tailwind preflight), so grid/flex layouts from
+   PublicHome.css / Chapters.css / Home.css reflow exactly as before
+   at every breakpoint. The one addition, the ::before accent stripe,
+   is absolutely positioned inside each card's own overflow:hidden
+   box, so it never affects card height or grid flow. */
+
+/* ---------- Motion respects the same reduced-motion preference the
+   rest of the app already honors (see index.css). ---------- */
+@media (prefers-reduced-motion: reduce) {
+  [data-lower-grade="true"] .game-card--clickable:active,
+  [data-lower-grade="true"] .world-card:active,
+  [data-lower-grade="true"] .chapter-card:active,
+  [data-lower-grade="true"] .ph-standard-card:active,
+  [data-lower-grade="true"] .ph-subject-card:active,
+  [data-lower-grade="true"] .ph-chapter-card:active,
+  [data-lower-grade="true"] .btn-primary:active,
+  [data-lower-grade="true"] .ph-hero__cta:active,
+  [data-lower-grade="true"] .ph-game-card__play:active,
+  [data-lower-grade="true"] .game-hint__toggle:active {
+    transform: none;
+  }
+}

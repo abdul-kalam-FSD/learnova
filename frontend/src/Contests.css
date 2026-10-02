@@ -1,0 +1,311 @@
+/* Student contests — reuses the app's colour tokens and pill/card feel. */
+.contests__group-title {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 18px 0 8px;
+}
+
+.contest-card {
+  display: block;
+  text-decoration: none;
+  color: var(--text-color);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+
+.contest-card:hover,
+.contest-card:focus-visible {
+  border-color: var(--primary-color);
+}
+
+.contest-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.contest-card__title {
+  font-size: var(--fs-base, 1rem);
+  font-weight: 700;
+  margin: 0 0 2px;
+}
+
+.contest-card__meta {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.contest-pill {
+  flex-shrink: 0;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background-color: var(--bg-color);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.contest-pill--live {
+  background-color: color-mix(in srgb, var(--success-color) 18%, var(--card-bg));
+  color: var(--success-color);
+}
+
+.contest-pill--upcoming {
+  background-color: color-mix(in srgb, var(--primary-color) 16%, var(--card-bg));
+  color: var(--primary-color);
+}
+
+.contest-pill--done {
+  background-color: color-mix(in srgb, var(--success-color) 18%, var(--card-bg));
+  color: var(--success-color);
+}
+
+.contest-pill--wrong {
+  background-color: color-mix(in srgb, var(--danger-color) 16%, var(--card-bg));
+  color: var(--danger-color);
+}
+
+.contest-details__notice {
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  background-color: var(--card-bg);
+  border-left: 3px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 12px 0;
+}
+
+.contest-details__back {
+  display: inline-block;
+  font-size: var(--fs-sm);
+  color: var(--primary-color);
+  text-decoration: none;
+  margin-bottom: 10px;
+}
+
+.contest-challenge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+
+.contest-challenge__title {
+  font-weight: 700;
+  margin: 0;
+}
+
+.contest-challenge__meta {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.contest-challenge__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.contest-challenge__play {
+  min-height: 44px;
+  min-width: 88px;
+}
+
+.contest-challenge__play[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ---------- Contest results / leaderboard ---------- */
+.contest-results__summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.contest-results__stat {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+
+.contest-results__stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-color);
+}
+
+.contest-results__stat-label {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.contest-results__rule {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin: 6px 0 12px;
+}
+
+.contest-results__table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: var(--card-bg);
+}
+
+.contest-results__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  min-width: 640px;
+}
+
+.contest-results__table th {
+  text-align: left;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-secondary);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.contest-results__table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.contest-results__table tr:last-child td {
+  border-bottom: none;
+}
+
+.contest-results__rank {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.contest-results__sub {
+  display: block;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}
+
+.contest-results__pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}
+
+.contest-results__btn {
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.contest-results__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.contest-results__error {
+  color: var(--danger-color);
+}
+
+.contest-results__me {
+  background-color: color-mix(in srgb, var(--primary-color) 10%, var(--card-bg));
+}
+
+.contest-leaderboard__row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-bottom: 6px;
+}
+
+.contest-leaderboard__row--me {
+  border-color: var(--primary-color);
+  background-color: color-mix(in srgb, var(--primary-color) 10%, var(--card-bg));
+}
+
+.contest-leaderboard__rank {
+  font-weight: 800;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.contest-leaderboard__name {
+  font-weight: 700;
+  margin: 0;
+}
+
+.contest-leaderboard__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  margin: 2px 0 0;
+}
+
+.contest-leaderboard__score {
+  font-weight: 800;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ---------- Contest results export ---------- */
+.contest-results__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.contest-results__export {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.contest-results__export-note {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+}

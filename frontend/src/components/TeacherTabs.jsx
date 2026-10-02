@@ -37,6 +37,14 @@ function TeacherTabs() {
       >
         Assignments
       </NavLink>
+      <NavLink
+        to="/teacher/contests"
+        className={({ isActive }) =>
+          `teacher-page__tab${isActive ? " teacher-page__tab--active" : ""}`
+        }
+      >
+        Contests
+      </NavLink>
     </div>
   );
 }

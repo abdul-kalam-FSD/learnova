@@ -24,8 +24,16 @@ export function useGameBackTarget() {
   const navigate = useNavigate();
   const location = useLocation();
   const chapterId = location.state?.chapterId || null;
+  // Launched from a contest (ContestDetails passes { state: { contest } }):
+  // Back returns to that contest, the same way a chapter launch returns to
+  // its chapter. Absent for every non-contest entry, so nothing changes there.
+  const contestId = location.state?.contest?.id || null;
 
   return () => {
+    if (contestId) {
+      navigate(`/contests/${contestId}`);
+      return;
+    }
     navigate(chapterId ? `/mission/${chapterId}` : "/home");
   };
 }

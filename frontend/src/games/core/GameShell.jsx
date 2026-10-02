@@ -644,7 +644,7 @@ export function GameResults({
             )}
             {onBackToChapter && (
               <GamePrimaryButton onClick={onBackToChapter} secondary>
-                Back to Chapter
+                {onBackToChapter.label || "Back to Chapter"}
               </GamePrimaryButton>
             )}
             {onDashboard && (

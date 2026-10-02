@@ -69,6 +69,16 @@ describe("SubjectWorld", () => {
     });
   });
 
+  test("shows a friendly error (not a raw exception) when chapters is missing from the response", async () => {
+    mockApi({ progress: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Error: We couldn't understand the response from the server. Please try again in a moment."),
+      ).toBeInTheDocument();
+    });
+  });
+
   test("renders a world card per subject with mastery and current mission, and navigates on click", async () => {
     mockApi({
       progress: {

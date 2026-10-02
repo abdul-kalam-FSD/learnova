@@ -8,6 +8,7 @@ import {
 } from "../utils/push";
 import { clearGuestSession } from "../utils/guestSession";
 import { useDrawerA11y } from "../utils/useDrawerA11y";
+import InstallAppButton from "./InstallAppButton";
 import "../Shell.css";
 
 /**
@@ -114,6 +115,12 @@ function HamburgerDrawer({ open, onClose, grade, role }) {
           </button>
         )}
         {notifError && <p className="drawer__notif-error">{notifError}</p>}
+
+        <InstallAppButton
+          variant="plain"
+          className="drawer__link drawer__link--install"
+          onResult={() => onClose()}
+        />
 
         <button className="drawer__link drawer__link--danger" onClick={handleLogout}>
           ⎋ Logout

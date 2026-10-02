@@ -336,3 +336,60 @@ button {
     animation: none;
   }
 }
+/* ---------- Theme Switcher ----------
+   Moved here from Profile.css (its only previous host) so the shared
+   ThemeSwitcher component can be rendered anywhere in the app -
+   including the public landing page's own theme toggle (see
+   pages/PublicHome.jsx) - without one page's CSS file depending on
+   another's. Behavior/appearance unchanged, verbatim move. */
+.theme-switcher {
+  padding: 14px;
+}
+
+.theme-switcher__title {
+  font-size: var(--fs-base);
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.theme-switcher__subtitle {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+}
+
+.theme-switcher__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background-color: var(--surface-color);
+  color: var(--text-color);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.theme-option--active {
+  border-color: var(--primary-color);
+  background-color: var(--card-bg);
+  box-shadow: 0 0 0 2px var(--primary-color) inset;
+}
+
+.theme-option__icon {
+  font-size: var(--fs-md);
+}
+
+.theme-option__label {
+  /* inherits sizing/color from .theme-option — kept as its own
+     element for consistency, not because it needs its own styling. */
+}

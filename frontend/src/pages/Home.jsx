@@ -119,11 +119,19 @@ function Home() {
   }, []);
 
   const overallPct = (() => {
-    if (!progress?.chapters) return null;
+    // `!progress?.chapters` only rules out missing/falsy data — a
+    // malformed 200 response (chapters present but not an array, or
+    // an entry missing its breakdown) would otherwise throw here on
+    // every render and crash the whole Home page via the error
+    // boundary, for what's meant to be a small, non-critical snippet.
+    // A genuine fetch failure already goes through the .catch() above
+    // and sets progress to null, which the `!progress?.chapters`
+    // check still correctly handles.
+    if (!Array.isArray(progress?.chapters)) return null;
     const totals = progress.chapters.reduce(
       (acc, ch) => {
-        acc.total += ch.total_concepts;
-        acc.mastered += ch.breakdown.strong + ch.breakdown.learning;
+        acc.total += ch.total_concepts ?? 0;
+        acc.mastered += (ch.breakdown?.strong ?? 0) + (ch.breakdown?.learning ?? 0);
         return acc;
       },
       { total: 0, mastered: 0 },

@@ -8,12 +8,17 @@ export function getAchievements({ user, stats, progress }) {
   const accuracy = stats?.accuracy ?? 0;
   const streak = user?.streak_count ?? 0;
   const xp = user?.xp_total ?? 0;
-  const chapters = progress?.chapters ?? [];
+  const chapters = Array.isArray(progress?.chapters) ? progress.chapters : [];
 
   const hasMasteredChapter = chapters.some(
     (ch) =>
       ch.total_concepts > 0 &&
-      ch.breakdown.strong === ch.total_concepts,
+      // A chapter entry missing its breakdown (malformed/unexpected
+      // API response) should just not count as mastered — not throw
+      // and crash the whole page that's rendering this badge list
+      // (Home.jsx and Profile.jsx both call getAchievements directly
+      // during render, with no try/catch of their own).
+      ch.breakdown?.strong === ch.total_concepts,
   );
 
   return [

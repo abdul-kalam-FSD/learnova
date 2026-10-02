@@ -1,0 +1,25 @@
+/* Install Learnova button. Deliberately layout-free: no positioning, margins
+   or widths - the parent screen decides where it sits. :where() keeps these
+   base rules at zero specificity so a parent's className (e.g. a drawer or
+   header link class) always wins over them. */
+:where(.install-app-btn) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+:where(.install-app-btn__icon) {
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+}
+
+/* Sits in a header next to other pills: same look as the primary pill,
+   just a little smaller (mirrors .ph-header__signin sizing). Doubled class
+   selector so it beats .btn-pill's font-size regardless of CSS load order. */
+.btn-pill.install-app-btn--pill {
+  font-size: var(--fs-sm);
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+}

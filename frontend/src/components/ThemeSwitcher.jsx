@@ -1,6 +1,12 @@
 import { useTheme } from "../context/themeContext";
 
-const THEME_META = {
+// Exported so other entry points to the SAME global theme (e.g. the
+// public landing page's own toggle button, MobileHeader's icon) can
+// show the right icon for the current theme without redefining this
+// map. Same colocation precedent as useTheme() in themeContext.jsx —
+// a new file isn't worth the indirection for a 4-entry constant.
+// eslint-disable-next-line react-refresh/only-export-components
+export const THEME_META = {
   light: { label: "Light", icon: "☀️" },
   dark: { label: "Dark", icon: "🌙" },
   forest: { label: "Forest", icon: "🌲" },

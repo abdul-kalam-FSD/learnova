@@ -6,6 +6,10 @@ import { GAME_TYPES, GAME_TYPE_TO_ROUTE, GAME_TYPE_TO_ICON } from "../games/game
 import { useScrollReveal } from "../utils/useScrollReveal";
 import { useDrawerA11y } from "../utils/useDrawerA11y";
 import ProgressBar from "../components/ProgressBar";
+import InstallAppButton from "../components/InstallAppButton";
+import { isLowerGrade } from "../utils/gradeBand";
+import { useTheme } from "../context/themeContext";
+import { THEME_META } from "../components/ThemeSwitcher";
 import "../PublicHome.css";
 
 const LAST_PLAYED_KEY = "lastPlayed";
@@ -64,6 +68,10 @@ function PublicHome() {
   const drawerRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const closeMenu = () => setMenuOpen(false);
+  // Same global theme every authenticated page already reads from
+  // (see MobileHeader.jsx) - not a separate public/guest theme state.
+  const { theme, cycleTheme, themes } = useTheme();
+  const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length];
 
   useDrawerA11y(drawerRef, menuOpen, closeMenu);
 
@@ -114,16 +122,25 @@ function PublicHome() {
       api
         .get("/progress")
         .then((res) => {
+          // Same malformed-vs-empty distinction used on the other
+          // /progress consumers: `res.data.chapters || []` already
+          // covers a missing/falsy field, but not a truthy non-array
+          // value (still "not iterable"), and an entry missing its
+          // own `breakdown` shouldn't crash this "nice-to-have
+          // overlay" (see the comment on the catch below) — it
+          // should just not show mastery for that one chapter.
+          const rawChapters = Array.isArray(res.data?.chapters) ? res.data.chapters : [];
           const map = {};
-          for (const ch of res.data.chapters || []) {
-            const mastered = ch.breakdown.learning + ch.breakdown.strong;
+          for (const ch of rawChapters) {
+            const breakdown = ch.breakdown ?? { weak: 0, learning: 0, strong: 0 };
+            const mastered = (breakdown.learning ?? 0) + (breakdown.strong ?? 0);
             map[ch.chapter_id] = {
               pct:
                 ch.total_concepts > 0
                   ? Math.round((mastered / ch.total_concepts) * 100)
                   : 0,
               completed: ch.total_concepts > 0 && mastered === ch.total_concepts,
-              breakdown: ch.breakdown,
+              breakdown,
             };
           }
           setProgressByChapterId(map);
@@ -285,8 +302,20 @@ function PublicHome() {
     setChapterPreview(null);
   };
 
+  // Second-pass fix: a guest visitor picks their Standard right here,
+  // before any login/guest-session token exists (ensureGuestSession
+  // only fires once they actually press Play — see handlePlay above).
+  // The original lower-grade implementation keyed off user?.grade,
+  // which is null for this entire browsing flow, so a Grade 4-6 guest
+  // never saw the lower-grade UI until deep into an actual game
+  // screen. selectedGrade is this page's own source of truth for
+  // "what standard is currently being browsed" — reusing the same
+  // isLowerGrade() helper AppLayout uses keeps one single definition
+  // of "lower grade" across the whole app instead of a second one.
+  const lowerGradeUi = isLowerGrade(selectedGrade);
+
   return (
-    <div className="public-home">
+    <div className="public-home" data-lower-grade={lowerGradeUi ? "true" : undefined}>
       {/* ================= HEADER ================= */}
       <header className="ph-header">
         <div className="ph-header__inner">
@@ -313,6 +342,7 @@ function PublicHome() {
             <Link to="/admin" className="ph-header__ghost-link">
               Admin Portal
             </Link>
+            <InstallAppButton className="ph-header__install" />
             {alreadyIn && !isGuest() ? (
               <Link to="/home" className="ph-header__signin">
                 My Dashboard
@@ -327,6 +357,14 @@ function PublicHome() {
               </Link>
             )}
           </div>
+
+          <button
+            className="ph-header__theme-toggle"
+            onClick={cycleTheme}
+            aria-label={`Switch to ${THEME_META[nextTheme].label} theme`}
+          >
+            <span aria-hidden="true">{THEME_META[theme].icon}</span>
+          </button>
 
           <button
             className="ph-header__hamburger"
@@ -390,6 +428,11 @@ function PublicHome() {
             Sign In
           </Link>
         )}
+        <InstallAppButton
+          variant="plain"
+          className="ph-drawer__link ph-drawer__link--install"
+          onResult={closeMenu}
+        />
       </nav>
 
       {/* ================= HERO ================= */}

@@ -43,6 +43,16 @@ function SubjectChapters() {
     api
       .get("/progress")
       .then((res) => {
+        // Same distinction as Chapters.jsx/Progress.jsx: `chapters`
+        // missing or not an array is a malformed response, not a
+        // legitimately-empty one — filtering a non-array here would
+        // throw the same way the bare for..of already did elsewhere.
+        if (!Array.isArray(res.data?.chapters)) {
+          setError(
+            "We couldn't understand the response from the server. Please try again in a moment.",
+          );
+          return;
+        }
         const chaptersInSubject = res.data.chapters.filter(
           (ch) => (ch.subject_name || "General") === decodedSubject,
         );

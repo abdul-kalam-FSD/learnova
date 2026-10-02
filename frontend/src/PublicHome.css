@@ -72,8 +72,43 @@
 .ph-header__signin:hover {
   background: var(--primary-color-hover);
 }
-.ph-header__hamburger {
+.ph-header__theme-toggle {
   margin-left: auto;
+  background: none;
+  border: none;
+  font-size: var(--fs-lg);
+  color: var(--text-color);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+}
+/* Install Learnova (only rendered when the browser offers installation).
+   Same pill shape/size as .ph-header__signin but outlined, so it stays
+   secondary to Sign In / My Dashboard. The border is compensated in the
+   padding so both pills are the same height. */
+.ph-header__actions .ph-header__install {
+  background: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: calc(0.5rem - 1px) calc(1rem - 1px);
+}
+.ph-header__actions .ph-header__install:hover {
+  background: var(--surface-color);
+  filter: none;
+}
+/* 768-899px: the nav + actions row is tight, so drop the pill chrome and
+   let it read like the neighbouring Teacher/Admin links (icon + text). */
+@media (min-width: 768px) and (max-width: 899px) {
+  .ph-header__actions .ph-header__install {
+    border: 0;
+    padding: 0;
+  }
+  .ph-header__actions .ph-header__install:hover {
+    background: transparent;
+    text-decoration: underline;
+  }
+}
+.ph-header__hamburger {
   background: none;
   border: none;
   font-size: var(--fs-xl);
@@ -89,6 +124,9 @@
   }
   .ph-header__hamburger {
     display: none;
+  }
+  .ph-header__theme-toggle {
+    margin-left: 0;
   }
 }
 
@@ -158,6 +196,11 @@
   font-size: var(--fs-base);
   border-bottom: 1px solid var(--border-color);
   cursor: pointer;
+}
+.ph-drawer__link--install {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 @media (min-width: 768px) {

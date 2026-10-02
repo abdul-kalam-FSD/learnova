@@ -1254,6 +1254,11 @@ function CaseInvestigation() {
               </div>
             </div>
             <div className="flex flex-col gap-3">
+              {sessionId && (
+                <PrimaryButton onClick={() => navigate(`/mistake-review/${sessionId}`)} secondary>
+                  Review Answers
+                </PrimaryButton>
+              )}
               <PrimaryButton onClick={restart} secondary>
                 Try Another
               </PrimaryButton>

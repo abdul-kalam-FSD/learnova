@@ -52,6 +52,17 @@ const {
   addStudentToSection,
   removeStudentFromSection,
 } = require("../controllers/sectionControllers");
+const {
+  listContests,
+  getContestDetail,
+  approveContest,
+  rejectContest,
+} = require("../controllers/adminContestControllers");
+const {
+  adminContestResults,
+  adminContestParticipant,
+  adminContestExport,
+} = require("../controllers/contestResultControllers");
 const { protect } = require("../middleware/authMiddleware");
 const { requireAdmin } = require("../middleware/adminMiddleware");
 
@@ -109,5 +120,18 @@ router.patch("/sections/:id", updateSection);
 router.delete("/sections/:id", deleteSection);
 router.post("/sections/:id/students", addStudentToSection);
 router.delete("/sections/:id/students/:studentId", removeStudentFromSection);
+
+// Contest review (teachers create/submit via /api/contests; admins
+// review here). Status/reviewer are decided server-side — see
+// controllers/adminContestControllers.js.
+router.get("/contests", listContests);
+router.get("/contests/:id", getContestDetail);
+router.post("/contests/:id/approve", approveContest);
+router.post("/contests/:id/reject", rejectContest);
+// Results / leaderboard for published contests (read-only).
+router.get("/contests/:id/results", adminContestResults);
+// Registered BEFORE /results/:studentId so "export" is never read as a student id.
+router.get("/contests/:id/results/export", adminContestExport);
+router.get("/contests/:id/results/:studentId", adminContestParticipant);
 
 module.exports = router;

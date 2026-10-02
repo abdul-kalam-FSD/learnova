@@ -431,3 +431,100 @@
 .teacher-table__row:last-child .teacher-table__cell {
   border-bottom: none;
 }
+
+/* ---------- Contests ---------- */
+.teacher-contests__note {
+  font-size: var(--fs-sm);
+  color: var(--text-secondary);
+  background-color: var(--card-bg);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+}
+
+.teacher-contests__pill--draft {
+  color: var(--text-secondary);
+}
+
+.teacher-contests__pill--pending {
+  background-color: rgba(230, 160, 20, 0.15);
+  color: var(--warning-color, #b7791f);
+}
+
+.teacher-contests__pill--rejected {
+  background-color: rgba(220, 60, 60, 0.12);
+  color: var(--danger-color);
+}
+
+.teacher-contests__challenges {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.teacher-contests__challenge {
+  font-size: var(--fs-xs);
+  padding: 3px 8px;
+  border-radius: 999px;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.teacher-contests__picker {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 4px 10px;
+}
+
+.teacher-contests__picker-group {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin: 8px 0 2px;
+}
+
+.teacher-contests__picker-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 0;
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.teacher-contests__picker-meta {
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.teacher-contests__review-note {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  background-color: color-mix(in srgb, var(--danger-color) 10%, var(--card-bg));
+  border-left: 3px solid var(--danger-color);
+  border-radius: var(--radius-md);
+}
+
+.teacher-contests__review-note--info {
+  background-color: var(--card-bg);
+  border-left-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.teacher-contests__review-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: var(--fs-xs);
+  color: var(--text-secondary);
+}

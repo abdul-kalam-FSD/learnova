@@ -43,3 +43,32 @@ export const HINT_LABEL = {
   high: { closed: "💡 Hint", open: "💡 Hide hint" },
   senior: { closed: "💡 Hint", open: "💡 Hide hint" },
 };
+
+// ---------------------------------------------------------------------
+// Lower-grade (4-6) presentation layer.
+//
+// Team Lead review feedback: Grades 4, 5 and 6 should get a more
+// attractive, age-appropriate UI while Grades 7-12 stay exactly as they
+// are. The four bands above deliberately group Grade 6 with 7-8
+// ("middle"), and gradeBandOf() is relied on by the Game Shell, so its
+// behaviour is left untouched. These two helpers are additive:
+//
+//  - isLowerGrade(grade): the single source of truth for "does this
+//    student get the lower-grade UI?" (Grades 4, 5 and 6 only).
+//  - uiBandOf(grade): same as gradeBandOf() except Grade 6 also resolves
+//    to "primary", so Grade 6 picks up the friendly Game Shell copy and
+//    sizing Grades 4-5 already had. Every other grade resolves exactly
+//    as gradeBandOf() does.
+//
+// A missing / unrecognised grade is NOT a lower grade, so anything that
+// can't be identified renders exactly as it did before.
+// ---------------------------------------------------------------------
+export const LOWER_GRADES = [4, 5, 6];
+
+export function isLowerGrade(grade) {
+  return LOWER_GRADES.includes(Number(grade));
+}
+
+export function uiBandOf(grade) {
+  return isLowerGrade(grade) ? "primary" : gradeBandOf(grade);
+}

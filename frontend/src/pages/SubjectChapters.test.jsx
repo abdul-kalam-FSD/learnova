@@ -63,6 +63,16 @@ describe("SubjectChapters", () => {
     });
   });
 
+  test("shows a friendly error (not a raw exception) when chapters is missing from the response", async () => {
+    mockApi({ progress: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(
+        screen.getByText("Error: We couldn't understand the response from the server. Please try again in a moment."),
+      ).toBeInTheDocument();
+    });
+  });
+
   test("filters chapters to only the requested subject and groups by unit", async () => {
     mockApi({
       progress: {

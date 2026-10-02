@@ -89,4 +89,28 @@ describe("getAchievements", () => {
     });
     expect(byId(achievements, "rising-scholar").earned).toBe(true);
   });
+
+  // Task 2 (defensive guards): a malformed chapter entry (missing
+  // breakdown) or a malformed `chapters` field (not an array) must
+  // not throw — getAchievements runs synchronously during Home.jsx's
+  // and Profile.jsx's render, with no try/catch of their own, so an
+  // unhandled exception here would crash the whole page, not just
+  // this one badge.
+  test("does not throw when a chapter entry is missing its breakdown, and does not count it as mastered", () => {
+    const achievements = getAchievements({
+      user: { xp_total: 0, streak_count: 0 },
+      stats: { quizzesPlayed: 0, accuracy: 0 },
+      progress: { chapters: [{ total_concepts: 4 }] },
+    });
+    expect(byId(achievements, "chapter-mastered").earned).toBe(false);
+  });
+
+  test("does not throw when chapters is present but not an array", () => {
+    const achievements = getAchievements({
+      user: { xp_total: 0, streak_count: 0 },
+      stats: { quizzesPlayed: 0, accuracy: 0 },
+      progress: { chapters: "not-an-array" },
+    });
+    expect(byId(achievements, "chapter-mastered").earned).toBe(false);
+  });
 });

@@ -44,6 +44,21 @@ const quizSessionSchema = new mongoose.Schema({
   // Only set when session_type === "game-session". Points at the
   // GameContent document (challenge/level) this session was playing.
   content_id: { type: mongoose.Schema.Types.ObjectId, ref: "GameContent" },
+  // OPTIONAL. Set ONLY by startGame, and only after the server has
+  // validated a teacher-created contest (published, student's grade,
+  // inside its time window, and content_id is one of its challenges).
+  // There is deliberately no other code path that writes it, so a
+  // finished practice session can never be attached to a contest
+  // afterwards. Normal practice sessions leave it unset. This session
+  // IS the student's participation record for that contest challenge:
+  // its game_payload (is_correct/correct_count/total_count), xp_awarded,
+  // started_at and completed_at are the contest result data.
+  contest_id: { type: mongoose.Schema.Types.ObjectId, ref: "Contest" },
+  // Contest sessions only: how many times the student submitted an
+  // answer in this session (the existing hint-and-retry mechanic lets a
+  // session take several submissions). Kept for future tie-breaks; not
+  // used for any scoring today.
+  attempt_count: { type: Number, default: 0 },
   // Free-form result payload for non-MCQ game mechanics (e.g. which
   // pieces the student placed, final built fraction, attempts per
   // step). Existing quiz/case sessions leave this unset and keep using
@@ -85,5 +100,16 @@ const quizSessionSchema = new mongoose.Schema({
 // PERFORMANCE: getHome/getProgress query sessions by user_id +
 // completed_at, and the daily-cap check (Phase 4) will too.
 quizSessionSchema.index({ user_id: 1, completed_at: 1 });
+
+// Contest participation rule, enforced by the database so it holds even
+// under concurrent requests: at most ONE session per student per contest
+// challenge. Partial, so it only applies to contest sessions and never
+// affects normal practice (which may replay the same content freely).
+// Leading with contest_id also serves the future "all sessions in this
+// contest" results query.
+quizSessionSchema.index(
+  { contest_id: 1, user_id: 1, content_id: 1 },
+  { unique: true, partialFilterExpression: { contest_id: { $type: "objectId" } } },
+);
 
 module.exports = mongoose.model("QuizSession", quizSessionSchema);

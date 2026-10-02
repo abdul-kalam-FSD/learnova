@@ -161,6 +161,12 @@
   background-color: var(--surface-color);
 }
 
+.drawer__link--install {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .drawer__link--danger {
   color: var(--danger-color);
   margin-top: auto;

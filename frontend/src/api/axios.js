@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getContestContext } from "./contestContext";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
@@ -7,6 +8,20 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  // Contest play: when the student launched this game from a contest
+  // (see api/contestContext.js), carry the contest id on the two calls the
+  // games already make. Only for the matching game type, and only when the
+  // caller didn't set one itself. The server re-validates everything.
+  const contest = getContestContext();
+  if (contest) {
+    const url = config.url || "";
+    if (config.method === "get" && url === "/games/content" && config.params?.gameType === contest.gameType && config.params.contestId === undefined) {
+      config.params = { ...config.params, contestId: contest.id };
+    } else if (config.method === "post" && url === "/games/start" && config.data?.gameType === contest.gameType && config.data.contestId === undefined) {
+      config.data = { ...config.data, contestId: contest.id };
+    }
   }
   return config;
 });

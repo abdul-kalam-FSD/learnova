@@ -11,6 +11,7 @@ import SubjectWorld from "./pages/SubjectWorld";
 import SubjectChapters from "./pages/SubjectChapters";
 import Practice from "./pages/Practice";
 import CaseInvestigation from "./pages/CaseInvestigation";
+import MistakeReview from "./pages/MistakeReview";
 import ProgressPage from "./pages/Progress";
 import Profile from "./pages/Profile";
 import Leaderboard from "./pages/LeaderBoard";
@@ -29,11 +30,19 @@ import AdminGameContent from "./pages/AdminGameContent";
 import AdminCases from "./pages/AdminCases";
 import AdminCaseEditor from "./pages/AdminCaseEditor";
 import AdminSections from "./pages/AdminSections";
+import AdminContests from "./pages/AdminContests";
+import Contests from "./pages/Contests";
+import ContestResult from "./pages/ContestResult";
+import TeacherContestResults from "./pages/TeacherContestResults";
+import AdminContestResults from "./pages/AdminContestResults";
+import ContestDetails from "./pages/ContestDetails";
+import ContestContextSync from "./components/ContestContextSync";
 import TeacherOverview from "./pages/TeacherOverview";
 import TeacherStudents from "./pages/TeacherStudents";
 import TeacherStudentDetail from "./pages/TeacherStudentDetail";
 import TeacherWeakAreas from "./pages/TeacherWeakAreas";
 import TeacherAssignments from "./pages/TeacherAssignments";
+import TeacherContests from "./pages/TeacherContests";
 import api from "./api/axios";
 import { LazyGameBoundary } from "./games/core/LazyGameBoundary";
 import GuestBanner from "./components/GuestBanner";
@@ -46,7 +55,8 @@ import AuthenticationRequired from "./components/AuthenticationRequired";
 import NotFound from "./components/NotFound";
 import { GradeBandProvider } from "./context/gradeBandContext";
 import { FocusedModeProvider } from "./context/focusedModeContext";
-import { gradeBandOf } from "./utils/gradeBand";
+import { isLowerGrade, uiBandOf } from "./utils/gradeBand";
+import "./LowerGrade.css";
 
 // Section 4 (code splitting): every game module below is fetched on
 // demand via a dynamic import instead of bundled into the initial
@@ -255,8 +265,15 @@ function AppLayout({ children }) {
     location.pathname.startsWith("/admin") || location.pathname.startsWith("/teacher");
   const hideChrome = isPortalRoute || focused;
 
+  // Lower-grade (4-6) presentation hook. LowerGrade.css scopes every rule
+  // under [data-lower-grade="true"], so for Grades 7-12 (and guests /
+  // teachers / admins, who have no lower grade) this attribute is simply
+  // absent and none of those rules can match. Portal routes never get it.
+  const lowerGradeUi = !isPortalRoute && isLowerGrade(user?.grade);
+
   return (
-    <div>
+    <div data-lower-grade={lowerGradeUi ? "true" : undefined}>
+      <ContestContextSync />
       {!focused && (
         <MobileHeader
           onMenuClick={() => setDrawerOpen(true)}
@@ -270,7 +287,7 @@ function AppLayout({ children }) {
         role={user?.role}
       />
       <GuestBanner />
-      <GradeBandProvider value={user?.grade != null ? gradeBandOf(user.grade) : null}>
+      <GradeBandProvider value={user?.grade != null ? uiBandOf(user.grade) : null}>
         <FocusedModeProvider setFocused={setFocused}>
           <div className={hideChrome ? undefined : "md:flex"}>
             {!isPortalRoute && !focused && <BottomNav />}
@@ -368,6 +385,16 @@ function App() {
         }
       />
       <Route
+        path="/mistake-review/:sessionId"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <MistakeReview />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/profile"
         element={
           <ProtectedRoute>
@@ -383,6 +410,36 @@ function App() {
           <ProtectedRoute>
             <AppLayout>
               <ProgressPage />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contests"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <Contests />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contests/:contestId/results"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <ContestResult />
+            </AppLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contests/:contestId"
+        element={
+          <ProtectedRoute>
+            <AppLayout>
+              <ContestDetails />
             </AppLayout>
           </ProtectedRoute>
         }
@@ -1136,6 +1193,26 @@ function App() {
         }
       />
       <Route
+        path="/admin/contests/:contestId/results"
+        element={
+          <AdminRoute>
+            <AppLayout>
+              <AdminContestResults />
+            </AppLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/contests"
+        element={
+          <AdminRoute>
+            <AppLayout>
+              <AdminContests />
+            </AppLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
         path="/admin/game-content"
         element={
           <AdminRoute>
@@ -1221,6 +1298,26 @@ function App() {
           <TeacherRoute>
             <AppLayout>
               <TeacherAssignments />
+            </AppLayout>
+          </TeacherRoute>
+        }
+      />
+      <Route
+        path="/teacher/contests/:contestId/results"
+        element={
+          <TeacherRoute>
+            <AppLayout>
+              <TeacherContestResults />
+            </AppLayout>
+          </TeacherRoute>
+        }
+      />
+      <Route
+        path="/teacher/contests"
+        element={
+          <TeacherRoute>
+            <AppLayout>
+              <TeacherContests />
             </AppLayout>
           </TeacherRoute>
         }

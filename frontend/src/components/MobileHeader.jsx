@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
 import { useTheme } from "../context/themeContext";
+import { THEME_META } from "./ThemeSwitcher";
 import "../Shell.css";
 function MobileHeader({ onMenuClick, streak = 0 }) {
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
+  const { theme, cycleTheme, themes } = useTheme();
+  const nextTheme = themes[(themes.indexOf(theme) + 1) % themes.length];
 
   return (
     <header className="app-header">
@@ -25,10 +26,10 @@ function MobileHeader({ onMenuClick, streak = 0 }) {
       <div className="app-header__right">
         <button
           className="icon-btn"
-          onClick={() => setTheme(isDark ? "light" : "dark")}
-          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          onClick={cycleTheme}
+          aria-label={`Switch to ${THEME_META[nextTheme].label} theme`}
         >
-          <span aria-hidden="true">{isDark ? "🌙" : "☀️"}</span>
+          <span aria-hidden="true">{THEME_META[theme].icon}</span>
         </button>
         <span className="app-header__streak" aria-label={`${streak} day streak`}>
           <span aria-hidden="true">🔥</span> {streak}

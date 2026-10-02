@@ -69,6 +69,14 @@ function AdminTabs() {
       >
         Sections
       </NavLink>
+      <NavLink
+        to="/admin/contests"
+        className={({ isActive }) =>
+          `admin-page__tab${isActive ? " admin-page__tab--active" : ""}`
+        }
+      >
+        Contests
+      </NavLink>
     </div>
   );
 }

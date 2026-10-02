@@ -23,6 +23,17 @@ function Progress() {
     api
       .get("/progress")
       .then((res) => {
+        // Same distinction as Chapters.jsx: `chapters: []` is a real,
+        // valid empty result (already handled by EmptyState below) —
+        // `chapters` missing or not an array means the response
+        // itself is malformed, which is a different situation and
+        // shouldn't be silently treated as "nothing to show yet".
+        if (!Array.isArray(res.data?.chapters)) {
+          setError(
+            "We couldn't understand the response from the server. Please try again in a moment.",
+          );
+          return;
+        }
         const grouped = {};
         for (const ch of res.data.chapters) {
           const unit = ch.unit_name || "General";

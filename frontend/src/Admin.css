@@ -852,3 +852,90 @@
   font-size: var(--fs-sm);
   border-radius: 8px;
 }
+
+/* ---------- Contest review ---------- */
+.role-badge--published {
+  background-color: color-mix(in srgb, var(--success-color) 18%, var(--card-bg));
+  color: var(--success-color);
+}
+
+.role-badge--rejected {
+  background-color: color-mix(in srgb, var(--danger-color) 18%, var(--card-bg));
+  color: var(--danger-color);
+}
+
+.admin-page__danger-btn {
+  background-color: var(--danger-color);
+  color: var(--on-danger);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.admin-page__danger-btn:disabled,
+.admin-page__export-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.admin-contest__meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  margin: 0 0 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+}
+
+.admin-contest__meta dt {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.admin-contest__meta dd {
+  margin: 0;
+}
+
+.admin-contest__description {
+  font-size: var(--fs-sm);
+  color: var(--text-color);
+  background-color: var(--surface-color);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0 0 12px;
+  white-space: pre-wrap;
+}
+
+.admin-contest__games {
+  list-style: none;
+  margin: 4px 0 12px;
+  padding: 0;
+  font-size: var(--fs-sm);
+}
+
+.admin-contest__games li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.admin-contest__games-meta {
+  color: var(--text-secondary);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+.admin-contest__section-title {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin: 8px 0 2px;
+}

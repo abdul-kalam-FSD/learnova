@@ -52,6 +52,8 @@ app.use("/api/admin", require("./routes/adminroutes"));
 app.use("/api/games", require("./routes/gameroutes"));
 app.use("/api/teacher", require("./routes/teacherroutes"));
 app.use("/api/assignments", require("./routes/assignmentroutes"));
+app.use("/api/contests", require("./routes/contestroutes"));
+app.use("/api/student/contests", require("./routes/studentcontestroutes"));
 app.use("/api/maintenance", require("./routes/maintenanceroutes"));
 
 // Must be registered last — after every route above — so they only

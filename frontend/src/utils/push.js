@@ -1,4 +1,5 @@
 import api from "../api/axios";
+import { registerServiceWorker } from "./serviceWorker";
 
 // Public VAPID key is meant to be exposed client-side (that's how the
 // Web Push protocol works — only the private key stays server-side).
@@ -18,16 +19,24 @@ export function isPushSupported() {
 
 export async function getExistingSubscription() {
   if (!isPushSupported()) return null;
-  const reg = await navigator.serviceWorker.register("/sw.js");
+  // Same shared /sw.js registration the app registers at startup.
+  const reg = await registerServiceWorker();
+  if (!reg) return null;
   return reg.pushManager.getSubscription();
 }
 
 export async function subscribeToPush() {
-  const reg = await navigator.serviceWorker.register("/sw.js");
+  // Same shared /sw.js registration the app registers at startup.
+  const reg = await registerServiceWorker();
+  if (!reg) throw new Error("Notifications aren't available in this browser");
+  // Permission is only ever requested here, from a user-initiated action.
   const permission = await Notification.requestPermission();
   if (permission !== "granted") {
     throw new Error("Notification permission denied");
   }
+  // pushManager.subscribe() needs an active worker; with early registration
+  // this is normally already true, but wait for it rather than assume.
+  await navigator.serviceWorker.ready;
 
   const subscription = await reg.pushManager.subscribe({
     userVisibleOnly: true,

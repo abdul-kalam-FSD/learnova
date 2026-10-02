@@ -43,9 +43,15 @@ export function useGameCompletionNav(currentGameType) {
   const chapterId = location.state?.chapterId || null;
   const chapterTitle = location.state?.chapterTitle || null;
   const subjectName = location.state?.subjectName || null;
+  // Set only when ContestDetails launched this game (location.state.contest).
+  // Then "what to do next" is the contest, not the general recommendation.
+  const contestId = location.state?.contest?.id || null;
   const [nextGame, setNextGame] = useState(null);
 
   useEffect(() => {
+    // A contest run doesn't need (or want) a "recommended next game" that
+    // could lead the student out of the contest, so skip the fetch.
+    if (contestId) return undefined;
     let cancelled = false;
     api
       .get("/games/recommended")
@@ -61,7 +67,7 @@ export function useGameCompletionNav(currentGameType) {
     return () => {
       cancelled = true;
     };
-  }, [currentGameType]);
+  }, [currentGameType, contestId]);
 
   // Phase 6C-B: every one of the 54 games forwards this exact function
   // reference, unmodified, all the way down to <GameResults onNextGame=.../>
@@ -103,8 +109,15 @@ export function useGameCompletionNav(currentGameType) {
         )
       : undefined;
 
+  // Rides the same "attach extra copy to the callback" pattern onNextGame
+  // uses above, so GameResults can label the button truthfully without a
+  // new prop threaded through all 54 per-game ResultScreen wrappers.
+  const onBackToContest = contestId
+    ? Object.assign(() => navigate(`/contests/${contestId}`), { label: "Back to Contest" })
+    : undefined;
+
   return {
-    onBackToChapter: chapterId ? () => navigate(`/mission/${chapterId}`) : undefined,
-    onNextGame,
+    onBackToChapter: onBackToContest ?? (chapterId ? () => navigate(`/mission/${chapterId}`) : undefined),
+    onNextGame: contestId ? undefined : onNextGame,
   };
 }
