@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 import "../Auth.css";
+import AuthBrandPanel from "../components/AuthBrandPanel.jsx";
 
 function ResetPassword() {
   const [searchParams] = useSearchParams();
@@ -43,7 +44,8 @@ function ResetPassword() {
 
   if (!token) {
     return (
-      <div className="auth-page min-h-screen flex items-center justify-center p-4">
+      <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+        <AuthBrandPanel />
         <div className="auth-page__card w-full max-w-sm p-6 text-center">
           <h2 className="auth-page__title text-2xl font-bold mb-2">
             This reset link is invalid
@@ -64,7 +66,8 @@ function ResetPassword() {
 
   if (status === "success") {
     return (
-      <div className="auth-page min-h-screen flex items-center justify-center p-4">
+      <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+        <AuthBrandPanel />
         <div className="auth-page__card w-full max-w-sm p-6 text-center">
           <h2 className="auth-page__title text-2xl font-bold mb-2">Password updated</h2>
           <p className="auth-page__success text-sm mb-4 px-3 py-3">
@@ -83,7 +86,8 @@ function ResetPassword() {
   }
 
   return (
-    <div className="auth-page min-h-screen flex items-center justify-center p-4">
+    <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+      <AuthBrandPanel />
       <form onSubmit={handleSubmit} className="auth-page__card w-full max-w-sm p-6">
         <div className="auth-page__brand-row">
           <span className="auth-page__brand-badge" aria-hidden="true">

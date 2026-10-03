@@ -452,9 +452,14 @@ function PublicHome() {
           Educational games for Standards 4–12. Choose your standard and start
           learning through interactive gameplay — no signup needed.
         </p>
-        <button className="ph-hero__cta" onClick={scrollToStandards}>
-          START PLAYING <span aria-hidden="true">→</span>
-        </button>
+        <div className="ph-hero__actions">
+          <button className="ph-hero__cta" onClick={scrollToStandards}>
+            START PLAYING <span aria-hidden="true">→</span>
+          </button>
+          <a href="#how-it-works" className="ph-hero__cta ph-hero__cta--secondary">
+            How it works
+          </a>
+        </div>
         <div className="ph-hero__stats">
           <div className="ph-hero__stat">
             <span className="ph-hero__stat-num">4–12</span>

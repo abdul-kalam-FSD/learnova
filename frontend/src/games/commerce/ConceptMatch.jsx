@@ -15,7 +15,7 @@ import {
   GameResults,
   LeaveMissionDialog,
 } from "../core/GameShell";
-import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
+import { getLevelContext, contextLabel, contextSkills, commonContext } from "../core/curriculumContext";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
 import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
@@ -37,10 +37,10 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
     <GamePage>
       <GameTopBar label="Concept Match" xp={xp} streak={streak} onBack={onBack} />
       <GamePanel>
-        <span className="clue-card__label">COMMERCE · TERMS & DEFINITIONS</span>
-        <h1 className="text-2xl font-bold mt-1 mb-3">Match Each Term to Its Definition</h1>
+        <span className="clue-card__label">{contextLabel(commonContext(levels), "CONCEPT MATCH")}</span>
+        <h1 className="text-2xl font-bold mt-1 mb-3">Match Each Item</h1>
         <p className="hint-text text-sm mb-4">
-          Assign the correct definition to each accounting, business, or economic term —
+          Assign the correct match to each item —
           some options sound plausible but are wrong, so read carefully.
         </p>
         <div className="flex flex-col gap-3">
@@ -70,18 +70,19 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
 // ---------- Matching play screen ----------
 // ---------- Mission briefing (Phase 11) ----------
 function LobbyScreen({ level, levelIndex, totalLevels, xp, streak, xpInfo, onBack, onStart }) {
+  const ctx = getLevelContext(level);
   return (
     <GamePage>
       <GameTopBar label="Concept Match" xp={xp} streak={streak} onBack={onBack} />
       <GameLobby
         title={level.title}
-        subjectLabel="COMMERCE · TERMS & DEFINITIONS"
+        subjectLabel={contextLabel(ctx, "CONCEPT MATCH")}
         objective={level.concept_id?.explanation_text}
         difficulty={level.difficulty}
         levelIndex={levelIndex}
         totalLevels={totalLevels}
         xpInfo={xpInfo}
-        skills={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+        skills={contextSkills(ctx, ["Concept Matching"])}
         onStart={onStart}
         onBack={onBack}
       />
@@ -157,12 +158,12 @@ function MatchScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
         progress={totalLevels ? { current: levelIndex + 1, total: totalLevels } : undefined}
       />
       <GamePanel>
-        <GameObjective>Match each term to its correct definition.</GameObjective>
+        <GameObjective>Pair each item with the option that fits it best.</GameObjective>
 
         <span className="clue-card__label">SCENARIO</span>
         <h2 className="text-lg font-bold mt-1 mb-4">{scenario}</h2>
 
-        <p className="hint-text text-xs mb-2">Terms (pick a definition below, then tap a term):</p>
+        <p className="hint-text text-xs mb-2">Items (pick an option below, then tap an item):</p>
         <div className="flex flex-col gap-2 mb-5">
           {slots.map((slot) => (
             <button
@@ -202,11 +203,11 @@ function MatchScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
         {feedback && (
           <GameFeedback
             isCorrect={feedback.isCorrect}
-            verdict={feedback.isCorrect ? "✓ Every term matched correctly!" : "✕ Not quite — some pairs are wrong."}
+            verdict={feedback.isCorrect ? "✓ Every item matched correctly!" : "✕ Not quite — some pairs are wrong."}
             explanation={!feedback.isCorrect ? feedback.hint || hint : null}
             whatYouLearned={
               feedback.isCorrect
-                ? "Precise terminology matters in accounting, business and economics — each term has a specific meaning that shapes how decisions and records are made."
+                ? "Matching each item correctly shows you understand how these ideas connect."
                 : null
             }
           />
@@ -235,7 +236,7 @@ function ResultScreen({ level, result, xp, streak, onPlayAnother, onHome, onBack
       xpAwarded={result?.xpAwarded ?? 0}
       xpCapped={result?.xpCapped ?? false}
       streak={result?.newStreak ?? streak}
-      skillsPracticed={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+      skillsPracticed={contextSkills(getLevelContext(level), ["Concept Matching"])}
       onPlayAgain={onPlayAnother}
       onBackToChapter={onBackToChapter}
       onNextGame={onNextGame}

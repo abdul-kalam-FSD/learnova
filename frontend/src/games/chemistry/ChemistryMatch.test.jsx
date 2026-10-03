@@ -78,7 +78,7 @@ describe("ChemistryMatch - loading and error", () => {
   test("shows a loading state before content loads", () => {
     api.get.mockImplementation(() => new Promise(() => {}));
     renderGame();
-    expect(screen.getByText("Loading Metals & Non-Metals Match...")).toBeInTheDocument();
+    expect(screen.getByText("Loading Category Match...")).toBeInTheDocument();
   });
 
   test("shows an error state when loading content fails, and Back to Home navigates away", async () => {

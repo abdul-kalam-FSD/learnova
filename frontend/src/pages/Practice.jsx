@@ -115,10 +115,10 @@ function Practice() {
               <SectionHeader title="Practice by Subject" />
               {gameCatalog.map(({ subject, gameTypes }) => (
                 <div key={subject} className="mb-3">
-                  <p className="home-hero__eyebrow mb-2">
+                  <p className="home-section-eyebrow mb-2">
                     {subject.toUpperCase()}
                   </p>
-                  <div className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-2 card-grid">
                     {gameTypes.map(({ game_type, label, count }) => (
                       <GameCard
                         key={game_type}

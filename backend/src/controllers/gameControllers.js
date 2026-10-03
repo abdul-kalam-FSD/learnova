@@ -7,6 +7,7 @@ const UserConceptMastery = require("../models/UserConceptMastery");
 const User = require("../models/User");
 const { calculateXP, applyMasteryTransition, XP_PER_CORRECT, PERFECT_QUIZ_BONUS } = require("./quizControllers");
 const { verifyGradeAccess, getGradeConceptIds } = require("../utils/gradeAccess");
+const { toConceptContext } = require("../utils/conceptContext");
 const { DAILY_XP_CAP_PER_CONTENT, countCompletionsToday } = require("../utils/dailyCap");
 const {
   GAME_TYPES,
@@ -106,7 +107,15 @@ const getGameContentList = async (req, res) => {
     })
       .sort({ order_index: 1 })
       .select("title difficulty payload order_index concept_id")
-      .populate("concept_id", "title explanation_text");
+      .populate({
+        path: "concept_id",
+        select: "title explanation_text chapter_id",
+        populate: {
+          path: "chapter_id",
+          select: "title strand subject_id",
+          populate: { path: "subject_id", select: "name grade" },
+        },
+      });
 
     // SECURITY: this list is fetched before the student ever presses
     // "Start Mission", so it must go through the exact same
@@ -132,7 +141,7 @@ const getGameContentList = async (req, res) => {
       title: item.title,
       difficulty: item.difficulty,
       order_index: item.order_index,
-      concept_id: item.concept_id,
+      concept_id: toConceptContext(item.concept_id),
       payload: sanitizePayloadForClient(gameType, item.payload, bandConfig),
     }));
 

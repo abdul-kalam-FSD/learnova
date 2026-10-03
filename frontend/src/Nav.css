@@ -65,3 +65,31 @@
     font-size: var(--fs-md);
   }
 }
+
+
+/* UI polish pass 2: on tablet/desktop the side nav sticks under the
+   header and keeps its full height while the page scrolls (it used to
+   end partway down long pages), with roomier, pill-shaped links. */
+@media (min-width: 768px) {
+  .nav {
+    position: sticky;
+    top: 56px;
+    align-self: flex-start;
+    gap: 4px;
+    padding: 16px 10px;
+    box-shadow: none;
+  }
+  .nav__link {
+    border-radius: var(--radius-pill);
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .nav__link:hover:not(.nav__link--active) {
+    background-color: var(--surface-color);
+    color: var(--text-color);
+  }
+}
+.nav__link:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}

@@ -15,7 +15,7 @@ import {
   GameResults,
   LeaveMissionDialog,
 } from "../core/GameShell";
-import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
+import { getLevelContext, contextLabel, contextSkills, commonContext } from "../core/curriculumContext";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
 import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
@@ -29,10 +29,10 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
     <GamePage>
       <GameTopBar label="Debugging Lab" xp={xp} streak={streak} onBack={onBack} />
       <GamePanel>
-        <span className="clue-card__label">COMPUTER SCIENCE · ALGORITHMS</span>
+        <span className="clue-card__label">{contextLabel(commonContext(levels), "COMPUTER SCIENCE")}</span>
         <h1 className="text-2xl font-bold mt-1 mb-3">Find the Bug</h1>
         <p className="hint-text text-sm mb-4">
-          Read the pseudocode line by line and tap the one line that's wrong.
+          Read each line carefully and tap the one that's wrong.
         </p>
         <div className="flex flex-col gap-3">
           {levels.map((level) => (
@@ -61,18 +61,19 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
 // ---------- Code-reading play screen ----------
 // ---------- Mission briefing (Phase 11) ----------
 function LobbyScreen({ level, levelIndex, totalLevels, xp, streak, xpInfo, onBack, onStart }) {
+  const ctx = getLevelContext(level);
   return (
     <GamePage>
       <GameTopBar label="Debugging Lab" xp={xp} streak={streak} onBack={onBack} />
       <GameLobby
         title={level.title}
-        subjectLabel="COMPUTER SCIENCE · ALGORITHMS"
+        subjectLabel={contextLabel(ctx, "COMPUTER SCIENCE")}
         objective={level.concept_id?.explanation_text}
         difficulty={level.difficulty}
         levelIndex={levelIndex}
         totalLevels={totalLevels}
         xpInfo={xpInfo}
-        skills={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+        skills={contextSkills(ctx, ["Debugging"])}
         onStart={onStart}
         onBack={onBack}
       />
@@ -120,7 +121,7 @@ function DebugScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
         progress={totalLevels ? { current: levelIndex + 1, total: totalLevels } : undefined}
       />
       <GamePanel>
-        <GameObjective>Read the pseudocode line by line and identify the one line that's wrong.</GameObjective>
+        <GameObjective>Read each line carefully and identify the one that's wrong.</GameObjective>
 
         <span className="clue-card__label">ALGORITHM</span>
         <h2 className="text-lg font-bold mt-1 mb-4">{scenario_label}</h2>
@@ -149,7 +150,7 @@ function DebugScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
             explanation={!feedback.isCorrect ? feedback.hint || hint : null}
             whatYouLearned={
               feedback.isCorrect
-                ? "Debugging means tracing the logic line by line and checking each step against what the algorithm is supposed to do."
+                ? "Debugging means checking each line against what the program is supposed to do."
                 : null
             }
           />
@@ -178,7 +179,7 @@ function ResultScreen({ level, result, xp, streak, onPlayAnother, onHome, onBack
       xpAwarded={result?.xpAwarded ?? 0}
       xpCapped={result?.xpCapped ?? false}
       streak={result?.newStreak ?? streak}
-      skillsPracticed={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+      skillsPracticed={contextSkills(getLevelContext(level), ["Debugging"])}
       onPlayAgain={onPlayAnother}
       onBackToChapter={onBackToChapter}
       onNextGame={onNextGame}

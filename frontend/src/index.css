@@ -162,6 +162,22 @@
   --disabled-accent-bg: color-mix(in srgb, var(--accent-color) 32%, var(--surface-color));
   --disabled-text: color-mix(in srgb, var(--text-color) 55%, transparent);
   --secondary-border: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+
+  /* Polish tokens (UI pass): soft colored glow under primary CTAs, a
+     slightly larger raised-card shadow for floating surfaces (nav bar,
+     auth card, hero panels) and a shared radius for form fields. All
+     derived from existing theme colors, so every theme stays correct. */
+  --shadow-cta: 0 8px 18px -8px color-mix(in srgb, var(--primary-color) 55%, transparent);
+  --shadow-raised: 0 10px 30px -12px color-mix(in srgb, var(--text-color) 28%, transparent);
+  --radius-field: 12px;
+
+  /* Readable text tones for use ON tinted backgrounds. The raw accent /
+     xp / primary colors are tuned as fills and fall below 4.5:1 as text
+     on their own light tints in some themes; blending toward the text
+     color keeps the hue but restores contrast in all four themes. */
+  --xp-text: color-mix(in srgb, var(--xp-color) 40%, var(--text-color));
+  --accent-text: color-mix(in srgb, var(--accent-color) 40%, var(--text-color));
+  --primary-text: color-mix(in srgb, var(--primary-color) 50%, var(--text-color));
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -208,7 +224,17 @@ button {
 .btn-primary {
   background-color: var(--primary-color);
   color: var(--on-primary);
-  transition: filter var(--motion-fast), transform var(--motion-fast);
+  box-shadow: var(--shadow-cta);
+  transition: filter var(--motion-fast), transform var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--tint-primary-soft);
 }
 
 .btn-primary:hover,
@@ -231,6 +257,7 @@ button {
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .btn-primary:disabled:hover,

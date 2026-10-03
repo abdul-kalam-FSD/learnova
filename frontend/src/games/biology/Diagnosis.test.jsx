@@ -123,7 +123,7 @@ describe("Diagnosis - inspect then select flow", () => {
     expect(screen.getAllByText("Tap to inspect")).toHaveLength(3);
     expect(screen.queryByText("Gums bleed with light brushing.")).not.toBeInTheDocument();
 
-    const submitButton = screen.getByRole("button", { name: "Submit Diagnosis" });
+    const submitButton = screen.getByRole("button", { name: "Submit Conclusion" });
     expect(submitButton).toBeDisabled(); // nothing selected yet
 
     // First tap on "Bleeding gums" -> inspects only, doesn't select.
@@ -151,14 +151,14 @@ describe("Diagnosis - inspect then select flow", () => {
     fireEvent.click(screen.getByText("Diet: no fresh produce"));
     fireEvent.click(screen.getByText("Diet: no fresh produce"));
 
-    fireEvent.click(screen.getByRole("button", { name: "Submit Diagnosis" }));
+    fireEvent.click(screen.getByRole("button", { name: "Submit Conclusion" }));
 
     expect(api.post).toHaveBeenCalledWith("/games/sess1/attempt", {
       selectedPieceIds: ["ev1", "ev3"],
     });
 
-    await screen.findByText("✓ Diagnosis confirmed!");
-    expect(screen.getByText("Diagnosis: Scurvy (Vitamin C deficiency)")).toBeInTheDocument();
+    await screen.findByText("✓ Conclusion confirmed!");
+    expect(screen.getByText("Conclusion: Scurvy (Vitamin C deficiency)")).toBeInTheDocument();
     expect(
       screen.getByText("Months without vitamin C weakened his connective tissue."),
     ).toBeInTheDocument();
@@ -195,11 +195,11 @@ describe("Diagnosis - inspect then select flow", () => {
     // Inspect + select the wrong evidence: "Mild fever".
     fireEvent.click(screen.getByText("Mild fever"));
     fireEvent.click(screen.getByText("Mild fever"));
-    fireEvent.click(screen.getByRole("button", { name: "Submit Diagnosis" }));
+    fireEvent.click(screen.getByRole("button", { name: "Submit Conclusion" }));
 
     await screen.findByText("✕ Not quite right.");
     expect(screen.getByText("That fever isn't the cause here.")).toBeInTheDocument();
-    expect(screen.queryByText(/Diagnosis:/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Conclusion:/)).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Claim Reward →" })).not.toBeInTheDocument();
   });
 
@@ -215,9 +215,9 @@ describe("Diagnosis - inspect then select flow", () => {
     const card = screen.getByText("Bleeding gums");
     fireEvent.click(card); // inspect
     fireEvent.click(card); // select
-    expect(screen.getByRole("button", { name: "Submit Diagnosis" })).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: "Submit Conclusion" })).not.toBeDisabled();
 
     fireEvent.click(card); // deselect
-    expect(screen.getByRole("button", { name: "Submit Diagnosis" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Submit Conclusion" })).toBeDisabled();
   });
 });

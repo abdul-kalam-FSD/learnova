@@ -134,7 +134,7 @@ describe("EcosystemBalance - full play flow", () => {
       orderedPieceIds: ["e1", "e2", "e3"],
     });
 
-    await screen.findByText("✓ Ecosystem traced correctly!");
+    await screen.findByText("✓ Sequence traced correctly!");
 
     // ---- Claim reward -> triggers /complete ----
     fireEvent.click(screen.getByRole("button", { name: "Claim Reward →" }));
@@ -194,7 +194,7 @@ describe("EcosystemBalance - full play flow", () => {
     fireEvent.click(screen.getByText("Overgrazed vegetation recovers"));
     fireEvent.click(screen.getByRole("button", { name: "Check Chain" }));
 
-    await screen.findByText("✕ That's not how it unfolds.");
+    await screen.findByText("✕ That's not the right order.");
     expect(screen.getByText("That's out of order — try again.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Check Chain" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Claim Reward →" })).not.toBeInTheDocument();

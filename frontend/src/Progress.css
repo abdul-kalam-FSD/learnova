@@ -116,3 +116,156 @@
     align-items: start;
   }
 }
+
+
+/* =====================================================================
+   UI POLISH PASS 3A - Student Progress screen
+   Presentation only. Every override is scoped under .progress-page (or a
+   class that only this page uses) because .progress-overall__* above is
+   shared with the Home screen, which imports this file.
+   ===================================================================== */
+
+.progress-page {
+  /* Readable text tone for accent-colored text. Uses the shared token when
+     the app defines it, otherwise the same blend computed locally, so this
+     file stays correct on its own. */
+  --pp-accent-text: var(
+    --accent-text,
+    color-mix(in srgb, var(--accent-color) 40%, var(--text-color))
+  );
+}
+
+/* ---------- Width: use the screen instead of a fixed narrow column ---------- */
+@media (min-width: 768px) {
+  .progress-page {
+    max-width: 46rem;
+  }
+  .progress-page__title {
+    font-size: var(--fs-2xl);
+  }
+}
+@media (min-width: 1100px) {
+  .progress-page {
+    max-width: 70rem;
+  }
+}
+.progress-page__title {
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Weak Only filter ---------- */
+.progress-page__filter {
+  min-height: 36px;
+  padding: 6px 14px;
+  font-weight: 700;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+/* The active (on) state keeps its own colors on hover; only the inactive
+   button gets the hover tint. */
+.progress-page__filter:hover:not(.progress-page__filter--active) {
+  background-color: var(--tint-primary-soft);
+  border-color: var(--secondary-border, var(--border-color));
+}
+
+/* ---------- Overall mastery summary card ---------- */
+.progress-summary {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+.progress-page .progress-summary .progress-overall__track {
+  height: 12px;
+  margin-bottom: 0;
+  border-radius: var(--radius-pill);
+}
+.progress-page .progress-summary .progress-overall__fill {
+  border-radius: var(--radius-pill);
+}
+.progress-page .progress-summary .progress-overall__label {
+  margin: 10px 0 0;
+  font-size: var(--fs-md);
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+/* ---------- Chapter cards ---------- */
+.progress-card {
+  margin-bottom: 0;
+  padding: 16px;
+  border-radius: var(--radius-xl);
+}
+/* A chapter that has weak concepts (the only cards that show the practice
+   button) gets a left accent. Purely visual: it reuses the existing
+   presence of that button and reads no new data. The button itself carries
+   the meaning, so this is not color-only. */
+.progress-card:has(.progress-page__practice-link) {
+  border-left: 4px solid var(--danger-color);
+}
+.progress-card__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+.progress-card__chapter-title {
+  font-size: var(--fs-base);
+  line-height: 1.3;
+}
+.progress-page .progress-card .badge {
+  padding: 4px 10px;
+}
+
+/* Single column on phones with an even gap; auto-filling grid from tablet up
+   (replaces the fixed two-column rule above, which only began at 1024px). */
+.progress-card__grid {
+  gap: 12px;
+}
+@media (min-width: 768px) {
+  .progress-card__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 14px 16px;
+    align-items: stretch;
+  }
+}
+
+/* ---------- Practice Weak Concepts: now a real button with readable text ---------- */
+.progress-page__practice-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 16px;
+  margin-top: 4px;
+  border-radius: var(--radius-pill);
+  color: var(--pp-accent-text);
+  background-color: color-mix(in srgb, var(--accent-color) 12%, var(--card-bg));
+  border: 1px solid color-mix(in srgb, var(--accent-color) 35%, var(--border-color));
+  cursor: pointer;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+.progress-page__practice-link:hover {
+  text-decoration: none;
+  background-color: color-mix(in srgb, var(--accent-color) 22%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--accent-color) 55%, var(--border-color));
+}
+
+/* ---------- Error state: same tinted-card language as the dashboards ----------
+   The message text is unchanged; this only styles the existing paragraph. */
+.progress-page__error {
+  max-width: 40rem;
+  margin: 24px 16px;
+  padding: 16px 18px;
+  background-color: var(--error-bg);
+  border: 1px solid color-mix(in srgb, var(--error-color) 30%, transparent);
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  line-height: 1.5;
+}
+@media (min-width: 768px) {
+  .progress-page__error {
+    margin: 32px auto;
+  }
+}

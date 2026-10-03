@@ -1,7 +1,9 @@
 import { describe, test, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { GameTopBar, GamePanel, GamePrimaryButton, GamePage, ShapeIcon, GameResults, LeaveMissionDialog } from "./GameShell";
+import { GameTopBar, GamePanel, GamePrimaryButton, GamePage, ShapeIcon, GameResults, LeaveMissionDialog, GameLobby } from "./GameShell";
 import { MissionProvider } from "../../context/missionContext";
+import { GradeBandProvider } from "../../context/gradeBandContext";
+import { uiBandOf } from "../../utils/gradeBand";
 
 describe("GameTopBar", () => {
   test("renders the label, streak, and XP", () => {
@@ -401,5 +403,37 @@ describe("LeaveMissionDialog", () => {
   test("moves focus into the dialog when opened", () => {
     render(<LeaveMissionDialog open onStay={() => {}} onLeave={() => {}} />);
     expect(document.activeElement).toHaveTextContent("Stay");
+  });
+});
+describe("GameLobby objective by grade (same game, shorter context for Grades 4-6)", () => {
+  const S1 = "Living things pass through stages as they grow.";
+  const S2 = "A seed sprouts into a seedling and then into a plant that can flower.";
+  const REST =
+    " Many animals grow in stages too, such as a chick that hatches from an egg and becomes a hen. Putting the stages in the right order shows how growth happens step by step, not all at once. Each stage looks a little different from the one before it, even though it is the same living thing.";
+  const FULL = `${S1} ${S2}${REST}`;
+
+  const lobby = (grade, onStart = () => {}) => {
+    const view = render(
+      <GradeBandProvider value={grade == null ? null : uiBandOf(grade)} grade={grade}>
+        <GameLobby title="Life Cycles" objective={FULL} xpInfo={{ perCorrect: 10, perfectBonus: 5 }} onStart={onStart} />
+      </GradeBandProvider>,
+    );
+    return view.container.querySelector(".game-objective__text").textContent;
+  };
+
+  test("Grade 4 sees just the first sentence", () => expect(lobby(4)).toBe(S1));
+  test("Grades 5 and 6 see two sentences", () => {
+    expect(lobby(5)).toBe(`${S1} ${S2}`);
+  });
+  test("Grade 6 sees two sentences", () => expect(lobby(6)).toBe(`${S1} ${S2}`));
+  test.each([7, 9, 12])("Grade %s still sees the full, original text", (g) => expect(lobby(g)).toBe(FULL));
+  test("without a grade (no provider value) the full text is shown", () => expect(lobby(null)).toBe(FULL));
+
+  test("the lobby still starts the game and still shows the same XP info for Grade 4", () => {
+    const onStart = vi.fn();
+    lobby(4, onStart);
+    expect(screen.getByText(/\+10 XP for each right answer/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Let's start!" }));
+    expect(onStart).toHaveBeenCalledTimes(1);
   });
 });

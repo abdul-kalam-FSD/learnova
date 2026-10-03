@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import { StudentGradeContext } from "./studentGradeContext";
 
 // Provided once in AppLayout (App.jsx), which already fetches the
 // logged-in user (including grade) for the header/drawer. GameShell's
@@ -10,8 +11,13 @@ import { createContext, useContext } from "react";
 // own screens individually.
 const GradeBandContext = createContext(null);
 
-export function GradeBandProvider({ value, children }) {
-  return <GradeBandContext.Provider value={value}>{children}</GradeBandContext.Provider>;
+// `grade` (optional): the raw numeric grade, see studentGradeContext.js.
+export function GradeBandProvider({ value, grade = null, children }) {
+  return (
+    <GradeBandContext.Provider value={value}>
+      <StudentGradeContext.Provider value={grade}>{children}</StudentGradeContext.Provider>
+    </GradeBandContext.Provider>
+  );
 }
 
 export function useGradeBand() {

@@ -15,7 +15,7 @@ import {
   GameResults,
   LeaveMissionDialog,
 } from "../core/GameShell";
-import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
+import { getLevelContext, contextLabel, contextSkills, commonContext } from "../core/curriculumContext";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
 import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
@@ -29,11 +29,11 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
     <GamePage>
       <GameTopBar label="Ecosystem Balance" xp={xp} streak={streak} onBack={onBack} />
       <GamePanel>
-        <span className="clue-card__label">BIOLOGY · FOOD CHAINS &amp; WEBS</span>
+        <span className="clue-card__label">{contextLabel(commonContext(levels), "SEQUENCE")}</span>
         <h1 className="text-2xl font-bold mt-1 mb-3">Trace the Chain Reaction</h1>
         <p className="hint-text text-sm mb-4">
-          One change ripples through the whole ecosystem — arrange the
-          effects in the order they actually happen.
+          One change sets off a chain of effects —
+          arrange the effects in the order they actually happen.
         </p>
         <div className="flex flex-col gap-3">
           {levels.map((level) => (
@@ -62,18 +62,19 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
 // ---------- Chain-sequencing play screen ----------
 // ---------- Mission briefing (Phase 11) ----------
 function LobbyScreen({ level, levelIndex, totalLevels, xp, streak, xpInfo, onBack, onStart }) {
+  const ctx = getLevelContext(level);
   return (
     <GamePage>
       <GameTopBar label="Ecosystem Balance" xp={xp} streak={streak} onBack={onBack} />
       <GameLobby
         title={level.title}
-        subjectLabel="BIOLOGY · FOOD CHAINS & WEBS"
+        subjectLabel={contextLabel(ctx, "SEQUENCE")}
         objective={level.concept_id?.explanation_text}
         difficulty={level.difficulty}
         levelIndex={levelIndex}
         totalLevels={totalLevels}
         xpInfo={xpInfo}
-        skills={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+        skills={contextSkills(ctx, ["Sequencing"])}
         onStart={onStart}
         onBack={onBack}
       />
@@ -136,7 +137,7 @@ function ChainScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
         progress={totalLevels ? { current: levelIndex + 1, total: totalLevels } : undefined}
       />
       <GamePanel>
-        <GameObjective>Arrange the ecosystem effects in the order they actually ripple through the chain.</GameObjective>
+        <GameObjective>Arrange the steps in the order they actually happen.</GameObjective>
 
         <span className="clue-card__label">TRIGGER</span>
         <h2 className="text-lg font-bold mt-1 mb-4">{trigger}</h2>
@@ -176,11 +177,11 @@ function ChainScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
         {feedback && (
           <GameFeedback
             isCorrect={feedback.isCorrect}
-            verdict={feedback.isCorrect ? "✓ Ecosystem traced correctly!" : "✕ That's not how it unfolds."}
+            verdict={feedback.isCorrect ? "✓ Sequence traced correctly!" : "✕ That's not the right order."}
             explanation={!feedback.isCorrect ? feedback.hint || hint : null}
             whatYouLearned={
               feedback.isCorrect
-                ? "A single change to one population ripples through the food web, affecting predators, prey, and competitors in a predictable sequence."
+                ? "Each step leads to the next, so the order matters."
                 : null
             }
           />
@@ -212,7 +213,7 @@ function ResultScreen({ level, result, xp, streak, onPlayAnother, onHome, onBack
       xpAwarded={result?.xpAwarded ?? 0}
       xpCapped={result?.xpCapped ?? false}
       streak={result?.newStreak ?? streak}
-      skillsPracticed={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+      skillsPracticed={contextSkills(getLevelContext(level), ["Sequencing"])}
       onPlayAgain={onPlayAnother}
       onBackToChapter={onBackToChapter}
       onNextGame={onNextGame}

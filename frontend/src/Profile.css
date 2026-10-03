@@ -248,3 +248,257 @@
 .achievement-badge--locked .achievement-badge__title {
   color: var(--text-secondary);
 }
+
+
+/* =====================================================================
+   UI POLISH PASS 3A - Student Profile screen
+   Presentation only: no markup, handlers or data changed. Level progress,
+   achievements, stream selection and logout behave exactly as before.
+   ===================================================================== */
+
+.profile {
+  /* Readable text tones for colored text on tinted surfaces. They use the
+     shared tokens when the app defines them, otherwise the same blend
+     computed locally, so this file stays correct on its own. */
+  --pf-accent-text: var(
+    --accent-text,
+    color-mix(in srgb, var(--accent-color) 40%, var(--text-color))
+  );
+  --pf-xp-text: var(
+    --xp-text,
+    color-mix(in srgb, var(--xp-color) 40%, var(--text-color))
+  );
+}
+
+/* ---------- Width: use the screen instead of a fixed narrow column ---------- */
+@media (min-width: 768px) {
+  .profile {
+    max-width: 46rem;
+  }
+}
+@media (min-width: 1100px) {
+  .profile {
+    max-width: 64rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 24px;
+    align-items: start;
+  }
+  .profile > * {
+    margin-bottom: 0;
+  }
+  .profile > .profile__header {
+    grid-column: 1 / -1;
+  }
+  /* The achievements card is the tallest block, so it takes the full width
+     (its badges flow into one wide row) and the shorter cards backfill the
+     gap beside Recent Activity instead of leaving empty space. The cards
+     that move are not interactive apart from the theme buttons, so keyboard
+     order is unaffected in practice. */
+  .profile {
+    grid-auto-flow: dense;
+  }
+  .profile > .profile__card:has(.achievements__grid) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- Identity header: now a card ---------- */
+.profile__header {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 16px;
+}
+.profile__avatar {
+  box-shadow: var(
+    --shadow-cta,
+    0 8px 18px -8px color-mix(in srgb, var(--primary-color) 55%, transparent)
+  );
+}
+.profile__name {
+  letter-spacing: -0.01em;
+}
+.profile__tagline {
+  color: var(--pf-accent-text);
+}
+.profile__level-track {
+  height: 10px;
+}
+
+/* Logout: same action, now a clear bordered button with a proper hit area
+   and a text color that meets contrast in every theme. */
+.profile__logout-link {
+  min-height: 40px;
+  margin-top: 14px;
+  padding: 8px 18px;
+  color: var(--error-color);
+  border: 1px solid color-mix(in srgb, var(--error-color) 35%, var(--border-color));
+  border-radius: var(--radius-pill);
+  background: transparent;
+  transition: background-color var(--motion-fast);
+}
+.profile__logout-link:hover {
+  background-color: var(--error-bg);
+}
+
+/* Phone: header stays a centered column. */
+.profile__header {
+  padding: 24px 16px;
+}
+.profile__level-block {
+  align-items: center;
+}
+.profile__level-badge {
+  align-self: center;
+}
+
+/* Tablet and up: avatar, identity and level sit side by side. */
+@media (min-width: 640px) {
+  .profile__header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 24px;
+    row-gap: 2px;
+    align-items: center;
+    justify-items: start;
+    text-align: left;
+    padding: 24px 28px;
+  }
+  .profile__avatar {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: 88px;
+    height: 88px;
+    margin-bottom: 0;
+    font-size: 2.25rem;
+  }
+  .profile__name {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: var(--fs-xl);
+  }
+  .profile__tagline {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .profile__level-block {
+    grid-column: 2;
+    grid-row: 3;
+    align-items: stretch;
+    width: 100%;
+    max-width: 340px;
+    margin-top: 12px;
+  }
+  .profile__level-badge {
+    align-self: flex-start;
+  }
+  .profile__logout-link {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: start;
+    margin-top: 0;
+  }
+}
+
+/* ---------- Cards ---------- */
+.profile__card {
+  border-radius: var(--radius-xl);
+}
+.profile__row {
+  min-height: 52px;
+}
+.profile__section-title {
+  font-family: var(--font-heading);
+  padding: 16px 18px 6px;
+}
+
+/* XP and streak values become small tinted chips with readable text. */
+.profile__xp,
+.profile__streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+}
+.profile__xp {
+  color: var(--pf-xp-text);
+  background-color: color-mix(in srgb, var(--xp-color) 16%, var(--card-bg));
+}
+.profile__streak {
+  color: var(--pf-accent-text);
+  background-color: color-mix(in srgb, var(--accent-color) 14%, var(--card-bg));
+}
+
+/* Existing stream select (grades 11-12): same control, styled to match. */
+.profile__row select {
+  min-height: 40px;
+  padding: 6px 12px;
+  color: var(--text-color);
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-field, 12px);
+}
+
+/* ---------- Stats ---------- */
+.profile__stat-card {
+  padding: 16px 8px;
+  border-radius: var(--radius-xl);
+}
+.profile__stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background-color: var(--tint-primary-soft);
+}
+.profile__stat-value {
+  font-family: var(--font-heading);
+  font-size: var(--fs-xl);
+}
+@media (prefers-reduced-motion: reduce) {
+  .profile__stat-card:hover {
+    transform: none;
+  }
+}
+
+/* ---------- Achievements ---------- */
+.achievements__grid {
+  grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr));
+  gap: 10px;
+}
+.achievement-badge__title {
+  font-size: var(--fs-xs);
+}
+/* Locked badges used to fade the whole tile to 50% opacity, which dropped
+   the badge name below readable contrast. Now only the icon is dimmed and
+   the name keeps full-strength text. */
+.achievement-badge--locked {
+  opacity: 1;
+}
+.achievement-badge--locked .achievement-badge__icon {
+  opacity: 0.45;
+}
+
+/* ---------- Error state: same tinted-card language as the dashboards ---------- */
+.profile__error {
+  max-width: 40rem;
+  margin: 24px 16px;
+  padding: 16px 18px;
+  color: var(--error-color);
+  background-color: var(--error-bg);
+  border: 1px solid color-mix(in srgb, var(--error-color) 30%, transparent);
+  border-radius: var(--radius-xl);
+  font-weight: 600;
+  line-height: 1.5;
+}
+@media (min-width: 768px) {
+  .profile__error {
+    margin: 32px auto;
+  }
+}

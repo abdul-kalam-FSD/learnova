@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api/axios";
 import { isGuest, clearGuestSession } from "../utils/guestSession";
 import "../Auth.css";
+import AuthBrandPanel from "../components/AuthBrandPanel.jsx";
 
 function Signup() {
   // A guest who reaches this page already has a grade (picked on the
@@ -107,7 +108,8 @@ function Signup() {
 
   if (teacherPending) {
     return (
-      <div className="auth-page min-h-screen flex items-center justify-center p-4">
+      <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+        <AuthBrandPanel />
         <div className="auth-page__card w-full max-w-sm p-6 text-center">
           <div className="auth-page__brand-row" style={{ justifyContent: "center" }}>
             <span className="auth-page__brand-badge" aria-hidden="true">
@@ -133,7 +135,8 @@ function Signup() {
   }
 
   return (
-    <div className="auth-page min-h-screen flex items-center justify-center p-4">
+    <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+      <AuthBrandPanel />
       <form onSubmit={handleSubmit} className="auth-page__card w-full max-w-sm p-6">
         <div className="auth-page__brand-row">
           <span className="auth-page__brand-badge" aria-hidden="true">

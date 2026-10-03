@@ -346,7 +346,7 @@ function Home() {
       {assignments.length > 0 && (
         <div className="mb-5">
           <SectionHeader title="Assigned to You" />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 card-grid">
             {assignments.slice(0, 5).map((a) => {
               const isDone = a.status === "completed";
               const route = a.suggestedGame ? GAME_TYPE_TO_ROUTE[a.suggestedGame.gameType] : null;
@@ -422,7 +422,7 @@ function Home() {
       {data.recentQuizzes && data.recentQuizzes.length > 0 && (
         <div className="mb-5 home-tier3-section">
           <SectionHeader title="Recently Played" />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 card-grid">
             {data.recentQuizzes.map((q) => {
               const route = q.gameType ? GAME_TYPE_TO_ROUTE[q.gameType] : null;
               return (
@@ -449,7 +449,7 @@ function Home() {
       {newGames.length > 0 && (
         <div className="mb-5 home-tier3-section">
           <SectionHeader title="New Games" />
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 card-grid">
             {newGames.map((g) => (
               <GameCard
                 key={g.game_type}
@@ -474,8 +474,8 @@ function Home() {
           <SectionHeader title="All Games" />
           {gameCatalog.map(({ subject, gameTypes }) => (
             <div key={subject} className="mb-3">
-              <p className="home-hero__eyebrow mb-2">{subject.toUpperCase()}</p>
-              <div className="flex flex-col gap-2">
+              <p className="home-section-eyebrow mb-2">{subject.toUpperCase()}</p>
+              <div className="flex flex-col gap-2 card-grid">
                 {gameTypes.map(({ game_type, label, count }) => (
                   <GameCard
                     key={game_type}
@@ -555,4 +555,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Home;

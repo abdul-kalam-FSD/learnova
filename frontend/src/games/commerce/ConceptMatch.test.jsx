@@ -135,7 +135,7 @@ describe("ConceptMatch - full play flow", () => {
       mapping: { s1: "c1" },
     });
 
-    await screen.findByText("✓ Every term matched correctly!");
+    await screen.findByText("✓ Every item matched correctly!");
 
     // ---- Claim reward -> triggers /complete ----
     fireEvent.click(screen.getByRole("button", { name: "Claim Reward →" }));

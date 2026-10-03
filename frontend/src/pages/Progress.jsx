@@ -92,20 +92,22 @@ function Progress() {
         </button>
       </div>
 
-      <div
-        className="progress-overall__track mb-1"
-        role="progressbar"
-        aria-valuenow={overallPct}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label="Overall mastery"
-      >
+      <div className="progress-summary">
         <div
-          className="progress-overall__fill"
-          style={{ width: `${overallPct}%` }}
-        />
+          className="progress-overall__track mb-1"
+          role="progressbar"
+          aria-valuenow={overallPct}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Overall mastery"
+        >
+          <div
+            className="progress-overall__fill"
+            style={{ width: `${overallPct}%` }}
+          />
+        </div>
+        <p className="progress-overall__label mb-4">{overallPct}% overall mastery</p>
       </div>
-      <p className="progress-overall__label mb-4">{overallPct}% overall mastery</p>
 
       {visibleGroups.length === 0 ? (
         unitGroups.length === 0 ? (

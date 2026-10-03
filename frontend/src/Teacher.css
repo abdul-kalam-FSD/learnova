@@ -528,3 +528,297 @@
   font-size: var(--fs-xs);
   color: var(--text-secondary);
 }
+
+/* =====================================================================
+   UI POLISH PASS 3B - Teacher screens
+   Presentation only. Every rule is scoped under .teacher-page, so it can
+   never reach Admin screens (they use .admin-page). The assignment modals
+   render inside .teacher-page, which lets the shared .admin-modal rules be
+   adjusted for Teacher only, without touching Admin.css.
+   ===================================================================== */
+
+.teacher-page {
+  /* Readable text tones for colored text on tinted surfaces. They use the
+     shared tokens when the app defines them, otherwise the same blend
+     computed locally, so this block stays correct on its own. */
+  --tp-xp-text: var(
+    --xp-text,
+    color-mix(in srgb, var(--xp-color) 40%, var(--text-color))
+  );
+  --tp-accent-text: var(
+    --accent-text,
+    color-mix(in srgb, var(--accent-color) 40%, var(--text-color))
+  );
+  --tp-primary-text: var(
+    --primary-text,
+    color-mix(in srgb, var(--primary-color) 50%, var(--text-color))
+  );
+}
+
+/* ---------- Contrast ---------- */
+
+/* Learning / developing badge: same tinted background, darker text. */
+.teacher-page .mastery-badge--learning,
+.teacher-page .mastery-badge--developing {
+  color: var(--tp-xp-text);
+}
+
+/* Placeholders (search box and the assignment modal fields). */
+.teacher-page input::placeholder,
+.teacher-page textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 1;
+}
+
+/* ---------- Pill buttons (same shape language as .btn-pill) ---------- */
+
+/* "+ New Assignment": the only .btn-primary that directly follows a heading.
+   (The dashboard Retry button is not matched.) */
+.teacher-page h1 + .btn-primary,
+.teacher-page .admin-modal__actions .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 22px;
+  border: none;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* Keep the assignments header on one row when it fits, wrap when it does not. */
+.teacher-page > div:has(> h1.teacher-page__title) {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+/* Pagination and the modal Cancel button. */
+.teacher-page .teacher-page__page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 20px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+.teacher-page .teacher-page__page-btn:hover:not(:disabled) {
+  background-color: var(--tint-primary-soft);
+  border-color: var(--primary-color);
+}
+.teacher-page .teacher-page__page-btn:disabled {
+  cursor: not-allowed;
+}
+.teacher-page .admin-modal__actions {
+  gap: 10px;
+}
+.teacher-page .admin-modal__actions .teacher-page__page-btn {
+  font-size: var(--fs-sm);
+}
+
+/* ---------- Hit areas and readable text on small controls ---------- */
+
+/* Assign / View roster. */
+.teacher-page .teacher-detail__assign-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  color: var(--tp-accent-text);
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+.teacher-page .teacher-detail__assign-btn:hover {
+  background-color: var(--accent-color);
+  color: var(--on-accent);
+}
+.teacher-page .teacher-detail__concept-row {
+  padding: 4px 0;
+}
+
+/* Cancel assignment: a larger target with the same visible text. */
+.teacher-page .teacher-assignments__cancel {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  margin-top: 0;
+  padding: 0 14px;
+  color: var(--error-color);
+  border-radius: var(--radius-pill);
+  transition: background-color var(--motion-fast);
+}
+.teacher-page .teacher-assignments__cancel:hover:not(:disabled) {
+  background-color: var(--error-bg);
+}
+.teacher-page .teacher-assignments__cancel:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Text links get a taller hit area through padding; negative margins cancel
+   the extra height so the surrounding layout does not move. */
+.teacher-page .dash-link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 10px;
+  margin: -8px -10px -8px 0;
+  color: var(--tp-primary-text);
+  border-radius: var(--radius-pill);
+  transition: background-color var(--motion-fast);
+}
+.teacher-page .dash-link-btn:hover {
+  background-color: var(--tint-primary-soft);
+  text-decoration: none;
+}
+.teacher-page .teacher-detail__back {
+  min-height: 40px;
+  padding: 0 14px 0 10px;
+  margin-left: -10px;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+.teacher-page .teacher-detail__back:hover {
+  background-color: var(--tint-primary-soft);
+  color: var(--tp-primary-text);
+}
+
+/* Filters and the modal close button. */
+.teacher-page .teacher-page__search,
+.teacher-page .teacher-page__select {
+  min-height: 40px;
+}
+.teacher-page .admin-modal__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: -6px -8px -6px 0;
+  border-radius: 50%;
+  transition: background-color var(--motion-fast);
+}
+.teacher-page .admin-modal__close:hover {
+  background-color: var(--surface-color);
+}
+
+/* The global focus-visible rule rounds every focused control to a small
+   radius, which would flatten these pills while focused. Keep their shape.
+   The ring itself (outline) is untouched. */
+.teacher-page h1 + .btn-primary:focus-visible,
+.teacher-page .admin-modal__actions .btn-primary:focus-visible,
+.teacher-page .teacher-page__page-btn:focus-visible,
+.teacher-page .teacher-detail__assign-btn:focus-visible,
+.teacher-page .teacher-assignments__cancel:focus-visible,
+.teacher-page .dash-link-btn:focus-visible,
+.teacher-page .teacher-detail__back:focus-visible {
+  border-radius: var(--radius-pill);
+}
+.teacher-page .admin-modal__close:focus-visible {
+  border-radius: 50%;
+}
+
+/* ---------- Tabs: fit when possible, scroll with a visible cue when not ----------
+   Works for any number of tabs (4 now, 5 with the Contests tab). The cue is
+   pure CSS: soft edge shadows that only show on a side that still has hidden
+   tabs, because the matching "local" cover hides them at the scroll limits. */
+.teacher-page .teacher-page__tabs {
+  background:
+    linear-gradient(to right, var(--surface-color) 40%, transparent) left center / 28px 100% no-repeat local,
+    linear-gradient(to left, var(--surface-color) 40%, transparent) right center / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--text-color) 35%, transparent), transparent) left center / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--text-color) 35%, transparent), transparent) right center / 14px 100% no-repeat scroll;
+  background-color: var(--surface-color);
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 12px;
+}
+.teacher-page .teacher-page__tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 14px;
+  white-space: nowrap;
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
+@media (max-width: 480px) {
+  .teacher-page .teacher-page__tab {
+    padding: 0 8px;
+  }
+}
+.teacher-page .teacher-page__tab:not(.teacher-page__tab--active):hover {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+/* Progressive enhancement: where supported, a scrolled tab bar starts with the
+   active tab in view. Ignored by browsers that do not support it. */
+.teacher-page .teacher-page__tab--active {
+  scroll-initial-target: nearest;
+}
+
+/* ---------- Tables: keep every column, scroll sideways with a visible cue ---------- */
+.teacher-page .teacher-table__wrapper {
+  background:
+    linear-gradient(to right, var(--card-bg) 40%, transparent) left center / 28px 100% no-repeat local,
+    linear-gradient(to left, var(--card-bg) 40%, transparent) right center / 28px 100% no-repeat local,
+    radial-gradient(farthest-side at 0 50%, color-mix(in srgb, var(--text-color) 35%, transparent), transparent) left center / 14px 100% no-repeat scroll,
+    radial-gradient(farthest-side at 100% 50%, color-mix(in srgb, var(--text-color) 35%, transparent), transparent) right center / 14px 100% no-repeat scroll;
+  background-color: var(--card-bg);
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+/* The first column stays in view while the rest scrolls underneath it. */
+.teacher-page .teacher-table__head-cell:first-child,
+.teacher-page .teacher-table__cell:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  box-shadow: 1px 0 0 var(--border-color);
+}
+.teacher-page .teacher-table__cell:first-child {
+  background-color: var(--card-bg);
+}
+.teacher-page .teacher-table__row:hover .teacher-table__cell {
+  background-color: var(--surface-color);
+}
+/* Very narrow phones: tighter cell padding so the widest column (the date in
+   Recent Activity) still fits fully beside the pinned first column. */
+@media (max-width: 400px) {
+  .teacher-page .teacher-table__head-cell,
+  .teacher-page .teacher-table__cell {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+/* ---------- Error state: tinted card (text and handling unchanged) ---------- */
+.teacher-page .teacher-page__error {
+  max-width: 40rem;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  color: var(--error-color);
+  background-color: var(--error-bg);
+  border: 1px solid color-mix(in srgb, var(--error-color) 30%, transparent);
+  border-radius: var(--radius-xl, 16px);
+  font-weight: 600;
+  line-height: 1.5;
+}
+/* The Overview error already sits inside its own card. */
+.teacher-page .dash-error .teacher-page__error {
+  max-width: none;
+  margin: 0 0 8px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  font-weight: inherit;
+}
+.teacher-page .teacher-assignments__card .teacher-page__error {
+  margin: 8px 0 0;
+}

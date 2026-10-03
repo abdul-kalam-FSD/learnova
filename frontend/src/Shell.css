@@ -38,7 +38,7 @@
   align-items: center;
   gap: 3px;
   background-color: var(--surface-color);
-  color: var(--accent-color);
+  color: var(--accent-text);
   font-weight: 700;
   font-size: var(--fs-sm);
   border-radius: var(--radius-pill);
@@ -212,4 +212,4 @@
   font-size: var(--fs-sm);
   line-height: 1;
   padding: 4px;
-}
+}

@@ -287,7 +287,10 @@ function AppLayout({ children }) {
         role={user?.role}
       />
       <GuestBanner />
-      <GradeBandProvider value={user?.grade != null ? uiBandOf(user.grade) : null}>
+      <GradeBandProvider
+        value={user?.grade != null ? uiBandOf(user.grade) : null}
+        grade={user?.grade ?? null}
+      >
         <FocusedModeProvider setFocused={setFocused}>
           <div className={hideChrome ? undefined : "md:flex"}>
             {!isPortalRoute && !focused && <BottomNav />}

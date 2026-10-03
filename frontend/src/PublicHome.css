@@ -10,16 +10,28 @@
   position: sticky;
   top: 0;
   z-index: 30;
-  background: var(--card-bg);
-  border-bottom: 1px solid var(--border-color);
+  /* Floating bar: the sticky wrapper is transparent and the inner row
+     is the rounded, shadowed surface (UI polish pass). */
+  padding: 0.5rem 0.75rem 0;
+  pointer-events: none;
 }
 .ph-header__inner {
+  pointer-events: auto;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 0.9rem 0.6rem 1.25rem;
   display: flex;
   align-items: center;
   gap: 1rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  box-shadow: var(--shadow-raised);
+}
+@media (min-width: 768px) {
+  .ph-header__inner {
+    border-radius: var(--radius-pill);
+  }
 }
 .ph-header__brand {
   font-weight: 800;
@@ -40,8 +52,14 @@
   font-weight: 600;
   font-size: var(--fs-base);
 }
+.ph-header__link {
+  padding: 0.35rem 0.7rem;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--motion-fast), color var(--motion-fast);
+}
 .ph-header__link:hover {
   color: var(--primary-color);
+  background: var(--tint-primary-soft);
 }
 .ph-header__actions {
   display: none;
@@ -69,8 +87,13 @@
   text-decoration: none;
   white-space: nowrap;
 }
+.ph-header__signin {
+  box-shadow: var(--shadow-cta);
+  transition: background-color var(--motion-fast), transform var(--motion-fast);
+}
 .ph-header__signin:hover {
   background: var(--primary-color-hover);
+  transform: translateY(-1px);
 }
 .ph-header__theme-toggle {
   margin-left: auto;
@@ -294,20 +317,45 @@
   font-size: var(--fs-md);
   margin-bottom: 1.5rem;
 }
+.ph-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
 .ph-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
   background: var(--primary-color);
   color: var(--on-primary);
-  border: none;
+  border: 1.5px solid transparent;
   font-weight: 800;
   font-size: var(--fs-base);
   letter-spacing: 0.03em;
   padding: 0.9rem 1.75rem;
   border-radius: 999px;
   cursor: pointer;
-  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  box-shadow: var(--shadow-cta);
+  transition: background-color var(--motion-fast), transform var(--motion-fast),
+    box-shadow var(--motion-fast);
 }
 .ph-hero__cta:hover {
   background: var(--primary-color-hover);
+  transform: translateY(-2px);
+}
+/* Secondary CTA: outlined, no glow - keeps START PLAYING dominant. */
+.ph-hero__cta--secondary {
+  background: var(--card-bg);
+  color: var(--primary-color);
+  border-color: var(--secondary-border);
+  box-shadow: none;
+}
+.ph-hero__cta--secondary:hover {
+  background: var(--tint-primary-soft);
 }
 
 /* ---------- CONTINUE PLAYING ---------- */

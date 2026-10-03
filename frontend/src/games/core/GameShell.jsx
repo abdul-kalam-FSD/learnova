@@ -3,6 +3,8 @@ import "../../Practice.css";
 import "./gameIdentity.css";
 import { FEEDBACK_COPY, HINT_LABEL } from "../../utils/gradeBand";
 import { useGradeBand } from "../../context/gradeBandContext";
+import { useStudentGrade } from "../../context/studentGradeContext";
+import { getGradeContext, simplifyObjective } from "../../utils/gradeContext";
 import { useMissionContext } from "../../context/missionContext";
 
 // Shared shell for all subject-specific games (Section 16: modular
@@ -330,7 +332,15 @@ export function GameLobby({
   skills,
   onStart,
   onBack,
+  gradeBand: gradeBandProp,
 }) {
+  // Grade-aware wording only (utils/gradeContext.js). Same band source
+  // as GameHint/GameFeedback; no band -> "middle" = the original copy.
+  const contextBand = useGradeBand();
+  const copy = getGradeContext(gradeBandProp ?? contextBand);
+  // Grades 4-6 see a shorter objective (first whole sentence(s) of the same
+  // text). Any other grade / no grade -> the original text, unchanged.
+  const shownObjective = simplifyObjective(objective, useStudentGrade());
   return (
     <GamePanel>
       {/* Below lg: single column, same order as before. At lg+ (once
@@ -346,20 +356,20 @@ export function GameLobby({
           <h1 className="text-2xl font-bold mt-1 mb-1">{title}</h1>
           {typeof levelIndex === "number" && typeof totalLevels === "number" && (
             <p className="hint-text text-xs mb-3">
-              Level {levelIndex + 1} of {totalLevels}
+              {copy.levelLabel(levelIndex + 1, totalLevels)}
             </p>
           )}
 
           {objective && (
             <div className="game-objective mb-4">
-              <span className="game-objective__label">Mission objective</span>
-              <p className="game-objective__text">{objective}</p>
+              <span className="game-objective__label">{copy.objectiveLabel}</span>
+              <p className="game-objective__text">{shownObjective}</p>
             </div>
           )}
 
-          {skills && skills.length > 0 && (
+          {copy.showSkills && skills && skills.length > 0 && (
             <div className="mb-5">
-              <span className="game-objective__label">Skills</span>
+              <span className="game-objective__label">{copy.skillsLabel}</span>
               <div className="flex flex-wrap gap-2 mt-2">
                 {skills.map((skill) => (
                   <span key={skill} className="badge badge-new text-xs font-semibold px-2 py-1">
@@ -380,25 +390,25 @@ export function GameLobby({
             )}
             {typeof timeEstimateMinutes === "number" && (
               <span className="practice-pill px-3 py-1 rounded text-[11px]">
-                ~{timeEstimateMinutes} min
+                {copy.timeLabel(timeEstimateMinutes)}
               </span>
             )}
             {xpInfo && (
               <span className="practice-pill practice-pill--xp px-3 py-1 rounded text-[11px]">
-                +{xpInfo.perCorrect} XP per correct{xpInfo.perfectBonus ? ` · +${xpInfo.perfectBonus} perfect bonus` : ""}
+                {copy.xpPerCorrectLabel(xpInfo.perCorrect)}{xpInfo.perfectBonus ? copy.perfectBonusLabel(xpInfo.perfectBonus) : ""}
               </span>
             )}
             {typeof maxXpEstimate === "number" && (
               <span className="practice-pill practice-pill--xp px-3 py-1 rounded text-[11px]">
-                Up to {maxXpEstimate} XP this round
+                {copy.maxXpLabel(maxXpEstimate)}
               </span>
             )}
           </div>
 
-          <GamePrimaryButton onClick={onStart}>Start Mission</GamePrimaryButton>
+          <GamePrimaryButton onClick={onStart}>{copy.startLabel}</GamePrimaryButton>
           {onBack && (
             <button onClick={onBack} className="hint-text text-xs mt-3 underline block">
-              ← Choose a different level
+              {copy.backLabel}
             </button>
           )}
         </div>
@@ -555,7 +565,7 @@ export function GameResults({
           <div className="case-closed__badge inline-block px-3 py-1 rounded text-[11px] font-bold tracking-widest mb-3">
             {badgeText || completeLabel.toUpperCase()}
           </div>
-          {title && <h1 className="text-2xl font-bold mb-4">{title}</h1>}
+          {title && <h1 className="game-results__title text-2xl font-bold mb-4">{title}</h1>}
 
           {achievementUnlocked && (
             <div className="clue-card rounded-lg p-4 mb-4 text-left">
@@ -592,14 +602,14 @@ export function GameResults({
             </div>
           )}
 
-          <div className="flex flex-wrap justify-center gap-3 mb-6">
+          <div className="game-results__stats mb-6">
             {typeof xpAwarded === "number" && (
-              <div className="case-closed__stat px-3 py-1 rounded text-sm font-semibold">
+              <div className="case-closed__stat case-closed__stat--xp px-3 py-1 rounded text-sm font-semibold">
                 +{xpAwarded} XP
               </div>
             )}
             {typeof streak === "number" && (
-              <div className="case-closed__stat px-3 py-1 rounded text-sm font-semibold">
+              <div className="case-closed__stat case-closed__stat--streak px-3 py-1 rounded text-sm font-semibold">
                 🔥 Streak {streak}
               </div>
             )}

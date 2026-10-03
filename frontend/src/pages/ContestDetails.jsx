@@ -5,7 +5,8 @@ import EmptyState from "../components/EmptyState";
 import PageLoading from "../components/PageLoading";
 import ProgressBar from "../components/ProgressBar";
 import { GAME_TYPE_TO_ROUTE } from "../games/gameRegistry";
-import { PHASE_LABELS, formatContestTime, contestPlace } from "../utils/contestDisplay";
+import { PHASE_LABELS, formatContestTime, contestPlace, contestPhaseNotice, contestPlayHint } from "../utils/contestDisplay";
+import { useStudentGrade } from "../context/studentGradeContext";
 import "../Home.css";
 import "../Contests.css";
 
@@ -27,6 +28,7 @@ function challengeStatus(c) {
 function ContestDetails() {
   const { contestId } = useParams();
   const navigate = useNavigate();
+  const studentGrade = useStudentGrade();
   const [contest, setContest] = useState(null);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
@@ -65,11 +67,7 @@ function ContestDetails() {
     });
   };
 
-  const phaseNotice = {
-    UPCOMING: `This contest starts ${formatContestTime(contest.startAt)}. You can look around now — the games unlock when it begins.`,
-    ACTIVE: `Live now — ends ${formatContestTime(contest.endAt)}. Each game counts once, so give it your best try.`,
-    ENDED: `This contest ended ${formatContestTime(contest.endAt)}. You can no longer start games for it.`,
-  }[contest.phase];
+  const phaseNotice = contestPhaseNotice(contest.phase, studentGrade, contest.startAt, contest.endAt);
 
   const disabledReason = (c) => {
     if (c.status === "COMPLETED") return "Done";
@@ -145,8 +143,7 @@ function ContestDetails() {
 
       {contest.phase === "ACTIVE" && (
         <p className="contest-card__meta mt-3">
-          Tapping Play opens the game and shows only this contest&apos;s levels. XP, mastery and streaks work
-          exactly like normal practice.
+          {contestPlayHint(studentGrade)}
         </p>
       )}
     </div>

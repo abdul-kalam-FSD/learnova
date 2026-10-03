@@ -70,6 +70,7 @@ function TeacherStudents() {
         />
         <select
           className="teacher-page__select"
+          aria-label="Filter by grade"
           value={grade}
           onChange={(e) => {
             setGrade(e.target.value);

@@ -15,7 +15,7 @@ import {
   GameResults,
   LeaveMissionDialog,
 } from "../core/GameShell";
-import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
+import { getLevelContext, contextLabel, contextSkills, commonContext } from "../core/curriculumContext";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
 import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
@@ -33,12 +33,12 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
       <GamePanel>
         <span className="clue-card__label game-identity-badge">
           <GameIdentityMark identity={IDENTITY} />
-          BIOLOGY · HUMAN HEALTH
+          {contextLabel(commonContext(levels), "EVIDENCE FILE")}
         </span>
-        <h1 className="text-2xl font-bold mt-1 mb-3">Diagnose the Patient</h1>
+        <h1 className="text-2xl font-bold mt-1 mb-3">Read the Evidence</h1>
         <p className="hint-text text-sm mb-4">
-          Inspect every piece of evidence, then select only the clues that
-          actually support your diagnosis — some symptoms are red herrings.
+          Inspect every piece of evidence, then select only the clues that actually support the correct conclusion —
+          some of the evidence is misleading.
         </p>
         <div className="flex flex-col gap-3">
           {levels.map((level) => (
@@ -74,18 +74,19 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
 // tap-and-submit MCQ.
 // ---------- Mission briefing (Phase 11) ----------
 function LobbyScreen({ level, levelIndex, totalLevels, xp, streak, xpInfo, onBack, onStart }) {
+  const ctx = getLevelContext(level);
   return (
     <GamePage identity={IDENTITY}>
       <GameTopBar label="Diagnosis" xp={xp} streak={streak} onBack={onBack} />
       <GameLobby
         title={level.title}
-        subjectLabel="BIOLOGY · HUMAN HEALTH"
+        subjectLabel={contextLabel(ctx, "EVIDENCE FILE")}
         objective={level.concept_id?.explanation_text}
         difficulty={level.difficulty}
         levelIndex={levelIndex}
         totalLevels={totalLevels}
         xpInfo={xpInfo}
-        skills={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+        skills={contextSkills(ctx, ["Reasoning from Evidence"])}
         onStart={onStart}
         onBack={onBack}
       />
@@ -142,18 +143,18 @@ function DiagnosisScreen({ level, sessionId, xp, streak, onBack, onSolved, level
       />
       <GamePanel>
         <GameObjective>
-          Inspect the evidence, then select only the clues that support the correct diagnosis.
+          Inspect the evidence, then select only the clues that support the correct conclusion.
         </GameObjective>
 
         <span className="clue-card__label game-identity-badge">
           <GameIdentityMark identity={IDENTITY} />
-          CASE FILE
+          EVIDENCE FILE
         </span>
         <h2 className="text-lg font-bold mt-1 mb-4">{scenario}</h2>
 
         <p className="hint-text text-xs mb-2">
           Tap a card to inspect it, then tap again to mark it as supporting
-          evidence for your diagnosis:
+          evidence for your conclusion:
         </p>
         <div className="flex flex-col gap-2 mb-5">
           {evidence.map((card) => (
@@ -178,10 +179,10 @@ function DiagnosisScreen({ level, sessionId, xp, streak, onBack, onSolved, level
         {feedback && (
           <GameFeedback
             isCorrect={feedback.isCorrect}
-            verdict={feedback.isCorrect ? "✓ Diagnosis confirmed!" : "✕ Not quite right."}
+            verdict={feedback.isCorrect ? "✓ Conclusion confirmed!" : "✕ Not quite right."}
             explanation={
               feedback.isCorrect
-                ? feedback.diagnosis && `Diagnosis: ${feedback.diagnosis}`
+                ? feedback.diagnosis && `Conclusion: ${feedback.diagnosis}`
                 : feedback.hint || hint
             }
             whatYouLearned={feedback.isCorrect ? feedback.explanation : null}
@@ -190,7 +191,7 @@ function DiagnosisScreen({ level, sessionId, xp, streak, onBack, onSolved, level
 
         {!feedback?.isCorrect ? (
           <GamePrimaryButton disabled={selected.length === 0 || submitting} onClick={submitDiagnosis}>
-            {submitting ? "Reviewing..." : "Submit Diagnosis"}
+            {submitting ? "Reviewing..." : "Submit Conclusion"}
           </GamePrimaryButton>
         ) : (
           <GamePrimaryButton onClick={onSolved}>Claim Reward →</GamePrimaryButton>
@@ -205,17 +206,17 @@ function ResultScreen({ level, result, xp, streak, onPlayAnother, onHome, onBack
   return (
     <GameResults
       identity={IDENTITY}
-      completeLabel="Case Closed"
+      completeLabel="Round Complete"
       title={level.title}
       masteryUpdate={result?.masteryUpdate}
       xpAwarded={result?.xpAwarded ?? 0}
       xpCapped={result?.xpCapped ?? false}
       streak={result?.newStreak ?? streak}
-      skillsPracticed={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+      skillsPracticed={contextSkills(getLevelContext(level), ["Reasoning from Evidence"])}
       onPlayAgain={onPlayAnother}
       onBackToChapter={onBackToChapter}
       onNextGame={onNextGame}
-      playAgainLabel="Diagnose Another Patient"
+      playAgainLabel="Try Another Case"
       onDashboard={onHome}
       dashboardLabel="Back to Home"
       xp={xp}

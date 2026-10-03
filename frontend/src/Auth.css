@@ -194,3 +194,259 @@
 .auth-page__hint {
   color: var(--text-secondary);
 }
+
+
+/* =====================================================================
+   UI POLISH PASS - split auth layout + refined form controls
+   Presentation only. Selectors/markup hooks used by the existing
+   forms (labels, ids, roles, aria) are untouched.
+   ===================================================================== */
+
+/* ---------- Layout: centered card on small screens ---------- */
+.auth-page--split {
+  display: grid;
+  place-items: center;
+}
+
+.auth-page--split .auth-page__card {
+  max-width: 26rem;
+  padding: 28px 24px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-raised);
+}
+
+.auth-brand-panel {
+  display: none;
+}
+
+/* ---------- Layout: two columns on wide screens ---------- */
+@media (min-width: 960px) {
+  .auth-page--split {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    place-items: stretch;
+    padding: 0;
+  }
+
+  .auth-page--split .auth-page__card {
+    align-self: center;
+    justify-self: center;
+    width: calc(100% - 4rem);
+    max-width: 28rem;
+    margin: 2.5rem 0;
+    padding: 8px;
+    /* On wide screens the whitespace itself is the container. */
+    background-color: transparent;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .auth-brand-panel {
+    display: flex;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2.5rem 3rem;
+    overflow: hidden;
+    color: var(--on-primary);
+    background:
+      radial-gradient(
+        circle at 85% 12%,
+        color-mix(in srgb, var(--on-primary) 16%, transparent) 0,
+        transparent 46%
+      ),
+      radial-gradient(
+        circle at 8% 96%,
+        color-mix(in srgb, var(--on-primary) 12%, transparent) 0,
+        transparent 40%
+      ),
+      linear-gradient(155deg, var(--primary-color), var(--primary-color-hover));
+  }
+}
+
+/* ---------- Brand panel content ---------- */
+.auth-brand-panel__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-brand-panel__logo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  border-radius: 12px;
+  background-color: color-mix(in srgb, var(--on-primary) 18%, transparent);
+}
+
+.auth-brand-panel__name {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: var(--fs-lg);
+  letter-spacing: 0.01em;
+}
+
+.auth-brand-panel__headline {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  line-height: 1.08;
+  margin-bottom: 1rem;
+}
+
+.auth-brand-panel__headline span {
+  opacity: 0.82;
+}
+
+.auth-brand-panel__lead {
+  max-width: 30rem;
+  font-size: var(--fs-md);
+  line-height: 1.55;
+  margin-bottom: 1.75rem;
+}
+
+.auth-brand-panel__list {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 30rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.auth-brand-panel__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-lg);
+  background-color: color-mix(in srgb, var(--on-primary) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--on-primary) 18%, transparent);
+}
+
+.auth-brand-panel__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  font-size: 18px;
+  border-radius: 12px;
+  background-color: color-mix(in srgb, var(--on-primary) 18%, transparent);
+}
+
+.auth-brand-panel__item strong {
+  display: block;
+  font-size: var(--fs-base);
+  font-weight: 700;
+}
+
+.auth-brand-panel__item small {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-sm);
+}
+
+/* Floating "badge" chips (decorative, same idea as the reference's
+   small floating info cards). */
+.auth-brand-panel__chip {
+  position: absolute;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-pill);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  box-shadow: var(--shadow-raised);
+}
+
+.auth-brand-panel__chip--streak {
+  top: 2.5rem;
+  right: 2.5rem;
+}
+
+.auth-brand-panel__chip--achv {
+  top: 5.25rem;
+  right: 4.5rem;
+}
+
+@media (min-width: 960px) and (max-height: 700px) {
+  .auth-brand-panel__chip,
+  .auth-brand-panel__lead {
+    display: none;
+  }
+}
+
+/* ---------- Refined form controls (shared by all four auth pages) ---------- */
+.auth-page__title {
+  letter-spacing: -0.01em;
+}
+
+.auth-page__label {
+  font-size: 0.8125rem;
+}
+
+.auth-page__input {
+  border-radius: var(--radius-field);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9375rem;
+  transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
+}
+
+.auth-page__input::placeholder {
+  color: color-mix(in srgb, var(--text-secondary) 70%, transparent);
+}
+
+.auth-page__input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--tint-primary-ring);
+}
+
+/* Keep a clearly visible keyboard ring even though the soft ring above
+   replaces the default outline on :focus. */
+.auth-page__input:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 1px;
+}
+
+.auth-page__submit {
+  border-radius: var(--radius-pill);
+  padding-top: 0.8rem;
+  padding-bottom: 0.8rem;
+}
+
+.auth-page__guest-link {
+  border-radius: var(--radius-pill);
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+
+.auth-page__guest-link:hover {
+  background-color: var(--tint-primary-soft);
+  border-color: var(--secondary-border);
+}
+
+.auth-page__error,
+.auth-page__success {
+  border-radius: var(--radius-field);
+}
+
+.auth-page__role-option {
+  border-radius: var(--radius-field);
+  padding: 12px;
+  transition: border-color var(--motion-fast), background-color var(--motion-fast);
+}
+
+.auth-page__role-option:hover {
+  border-color: var(--secondary-border);
+}
+
+.auth-page__role-option--active {
+  box-shadow: 0 0 0 1px var(--primary-color) inset;
+}

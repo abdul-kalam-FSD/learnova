@@ -795,3 +795,143 @@
   color: var(--text-color);
   line-height: 1.4;
 }
+
+/* =====================================================================
+   UI POLISH PASS 2 - game shell (top bar, lobby, play, feedback, results)
+   Shared by every game through GameShell.jsx. Class names/markup used
+   by game logic are untouched; this only changes how they look.
+   ===================================================================== */
+
+/* Top bar: floats slightly above the content with a soft shadow, and the
+   stat pills become compact chips with a hairline border. */
+.practice-topbar-wrap {
+  box-shadow: 0 4px 14px -10px color-mix(in srgb, var(--text-color) 40%, transparent);
+}
+.practice-pill {
+  border: 1px solid var(--border-color);
+  letter-spacing: 0.02em;
+}
+.practice-pill--xp {
+  border-color: color-mix(in srgb, var(--xp-color) 35%, var(--border-color));
+}
+
+/* Progress: thicker track so "question 2 of 3" is readable at a glance. */
+.game-progress__track {
+  height: 8px;
+}
+.game-progress__fill {
+  transition: width var(--motion-base, 0.3s ease);
+}
+
+/* Panel breathing room on larger screens. */
+@media (min-width: 640px) {
+  .practice-panel {
+    padding: 28px 32px;
+  }
+}
+
+/* Objective / hint: same card language as the rest of the UI. */
+.game-objective {
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  border-left: 3px solid var(--primary-color);
+}
+.game-hint__toggle {
+  border-radius: var(--radius-lg);
+  padding: 10px 14px;
+  transition: background-color var(--motion-fast), border-color var(--motion-fast);
+}
+.game-hint__toggle:hover {
+  background-color: var(--tint-primary-soft);
+  border-color: var(--secondary-border);
+}
+.game-hint__panel {
+  border-radius: var(--radius-lg);
+}
+.game-hint__toggle:focus-visible,
+.hub-item:focus-visible,
+.option:focus-visible,
+.dragdrop-item:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Level-select rows and answer options: clearer hover affordance. */
+.hub-item {
+  border-radius: var(--radius-lg);
+  transition: border-color var(--motion-fast), transform var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+.option {
+  border-radius: var(--radius-lg);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hub-item:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-raised);
+  }
+}
+
+/* Feedback: larger, calmer card; verdict is the first thing read. */
+.feedback-card {
+  border-radius: var(--radius-xl);
+  padding: 14px 16px;
+}
+.feedback-card__verdict {
+  font-size: var(--fs-md);
+}
+.feedback-card__explanation {
+  line-height: 1.5;
+}
+.game-feedback__xp {
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, var(--success-color) 16%, var(--card-bg));
+}
+
+/* ---------- Results screen ---------- */
+.case-closed__badge {
+  border-radius: var(--radius-pill);
+  padding: 5px 14px;
+}
+.game-results__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-2xl);
+  letter-spacing: -0.01em;
+}
+
+/* Stats become tiles (what did I earn?) rather than small grey pills. */
+.game-results__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+  gap: 10px;
+  max-width: 34rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.case-closed__stat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 14px 12px;
+  border-radius: var(--radius-lg);
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
+  font-size: var(--fs-md);
+  font-weight: 800;
+}
+.case-closed__stat--xp {
+  color: var(--xp-text);
+  background-color: color-mix(in srgb, var(--xp-color) 12%, var(--card-bg));
+  border-color: color-mix(in srgb, var(--xp-color) 35%, var(--border-color));
+}
+.case-closed__stat--streak {
+  color: var(--accent-text);
+}
+
+/* Contrast: XP pill text (top bar, lobby) on its own tint. */
+.practice-pill--xp {
+  color: var(--xp-text);
+}

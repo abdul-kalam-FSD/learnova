@@ -48,8 +48,8 @@ function RoundSelectScreen({ levels, xp, streak, onBack, onPick }) {
         <span className="clue-card__label">MATHEMATICS · SIMPLE EQUATIONS</span>
         <h1 className="text-2xl font-bold mt-1 mb-3">Quick-Fire Solving</h1>
         <p className="hint-text text-sm mb-4">
-          Type the answer and submit before time runs out — same undo-the-
-          operation thinking as the Number Machine, just faster.
+          Type the answer and submit before time runs out —
+          same undo-the-operation thinking as the Number Machine, just faster.
         </p>
         <div className="flex flex-col gap-3">
           {levels.map((level) => (

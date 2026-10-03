@@ -111,7 +111,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--accent-color);
+  color: var(--accent-text);
 }
 
 .game-card__title {
@@ -169,15 +169,25 @@
 /* ---------- Empty state ---------- */
 .empty-state {
   text-align: center;
-  padding: 28px 16px;
+  padding: 32px 20px;
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
+/* Icon sits in a soft tinted disc (same icon-container language as the
+   rest of the UI pass) instead of floating bare on the card. */
 .empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: var(--tint-primary-soft);
   font-size: var(--fs-2xl);
-  margin-bottom: 6px;
+  margin-bottom: 10px;
 }
 
 .empty-state__title {
@@ -194,4 +204,88 @@
 
 .empty-state__action {
   margin-top: 12px;
+}
+
+
+/* =====================================================================
+   UI POLISH PASS 2 - student experience (shared building blocks)
+   Presentation only; tokens come from index.css. Hover motion is
+   gated on prefers-reduced-motion at the bottom of this block.
+   ===================================================================== */
+
+/* Section headings: a little more presence than the old tiny caps. */
+.section-header {
+  margin-bottom: 10px;
+}
+.section-header__title {
+  font-family: var(--font-heading);
+  font-size: var(--fs-sm);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--text-color);
+}
+
+/* Subject label above a group of game cards (Home "All Games",
+   Practice "Practice by Subject"). These previously reused the hero's
+   white-on-gradient eyebrow class and were effectively invisible on the
+   page background in every theme. */
+.home-section-eyebrow {
+  display: inline-block;
+  font-size: var(--fs-2xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--primary-text);
+  background-color: var(--tint-primary-soft);
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+}
+
+/* Responsive list of cards: one column on phones, auto-fills wider
+   screens. Used where a flex column of GameCards used to stretch. */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 10px 14px;
+}
+
+.stat-chip {
+  border: 1px solid var(--border-color);
+}
+
+.game-card {
+  border-radius: var(--radius-xl);
+  transition: border-color var(--motion-fast), transform var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+.game-card__icon {
+  background-color: var(--tint-primary-soft);
+  border-radius: var(--radius-lg);
+}
+.game-card__arrow {
+  transition: transform var(--motion-fast);
+}
+.game-card--clickable:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .game-card--clickable:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-raised);
+  }
+  .game-card--clickable:hover .game-card__arrow {
+    transform: translateX(3px);
+  }
+  .game-card--clickable:active {
+    transform: scale(0.99);
+  }
+}
+
+/* Contrast: XP / streak values were raw fill colors on light surfaces. */
+.stat-chip--xp .stat-chip__value {
+  color: var(--xp-text);
+}
+.stat-chip--streak .stat-chip__value {
+  color: var(--accent-text);
 }

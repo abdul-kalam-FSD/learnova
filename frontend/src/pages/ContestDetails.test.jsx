@@ -3,6 +3,7 @@ import { render, screen, fireEvent, within } from "@testing-library/react";
 import { MemoryRouter, Routes, Route, useLocation } from "react-router-dom";
 import api from "../api/axios";
 import ContestDetails from "./ContestDetails";
+import { GradeBandProvider } from "../context/gradeBandContext";
 
 vi.mock("../api/axios", () => ({
   default: { get: vi.fn(), post: vi.fn() },
@@ -186,5 +187,48 @@ describe("results link", () => {
     renderPage();
     await screen.findByText(/This contest starts/);
     expect(screen.queryByRole("link", { name: /View results/ })).not.toBeInTheDocument();
+  });
+});
+
+describe("grade-aware wording (Grades 4-6 simpler, everything else unchanged)", () => {
+  const renderForGrade = (grade) =>
+    render(
+      <MemoryRouter initialEntries={["/contests/c1"]}>
+        <GradeBandProvider value={grade == null ? null : "primary"} grade={grade}>
+          <Routes>
+            <Route path="/contests/:contestId" element={<ContestDetails />} />
+            <Route path="/games/*" element={<GameProbe />} />
+          </Routes>
+        </GradeBandProvider>
+      </MemoryRouter>,
+    );
+
+  test("Grade 4 sees short wording; teacher description, progress and Play are unchanged", async () => {
+    api.get.mockResolvedValue({ data: DETAIL() });
+    renderForGrade(4);
+    expect(await screen.findByText(/It's on now!/)).toBeInTheDocument();
+    expect(screen.getByText("Tap Play to start a game.")).toBeInTheDocument();
+    expect(screen.queryByText(/mastery and streaks work/)).not.toBeInTheDocument();
+    expect(screen.getByText("Play them all")).toBeInTheDocument();
+    expect(screen.getByText("2 of 4 games completed")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Play Build 3/4" }));
+    expect(await screen.findByTestId("game-path")).toHaveTextContent("/games/fraction-builder");
+    expect(JSON.parse(screen.getByTestId("game-state").textContent)).toEqual({
+      contest: { id: "c1", title: "Weekly Fractions Blitz", gameType: "MATH_FRACTION_BUILDER" },
+    });
+  });
+
+  test("Grade 6 sees the moderately simplified wording", async () => {
+    api.get.mockResolvedValue({ data: DETAIL() });
+    renderForGrade(6);
+    expect(await screen.findByText(/so do your best/)).toBeInTheDocument();
+    expect(screen.getByText(/XP and streaks work just like normal practice/)).toBeInTheDocument();
+  });
+
+  test.each([7, 12, null])("grade %s keeps the original wording", async (grade) => {
+    api.get.mockResolvedValue({ data: DETAIL() });
+    renderForGrade(grade);
+    expect(await screen.findByText(/give it your best try/)).toBeInTheDocument();
+    expect(screen.getByText(/XP, mastery and streaks work\s+exactly like normal practice|XP, mastery and streaks work exactly like normal practice/)).toBeInTheDocument();
   });
 });

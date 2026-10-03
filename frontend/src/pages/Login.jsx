@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import api from "../api/axios";
 import { clearGuestSession } from "../utils/guestSession";
 import "../Auth.css";
+import AuthBrandPanel from "../components/AuthBrandPanel.jsx";
 import "../Portal.css";
 
 const CONTEXT_COPY = {
@@ -69,7 +70,8 @@ function Login() {
   };
 
   return (
-    <div className="auth-page min-h-screen flex items-center justify-center p-4">
+    <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+      <AuthBrandPanel />
       <form onSubmit={handleSubmit} className="auth-page__card w-full max-w-sm p-6">
         <div className="auth-page__brand-row">
           <span className="auth-page__brand-badge" aria-hidden="true">

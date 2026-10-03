@@ -15,7 +15,7 @@ import {
   GameResults,
   LeaveMissionDialog,
 } from "../core/GameShell";
-import { GAME_TYPE_TO_SKILLS } from "../gameRegistry";
+import { getLevelContext, contextLabel, contextSkills, commonContext } from "../core/curriculumContext";
 import { useGameCompletionNav } from "../core/useGameCompletionNav";
 import { useGameBackTarget } from "../core/useGameBackTarget";
 import { useLeaveConfirmation } from "../core/useLeaveConfirmation";
@@ -27,13 +27,13 @@ const GAME_TYPE = "CHEMISTRY_MATCH";
 function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
   return (
     <GamePage>
-      <GameTopBar label="Metals & Non-Metals Match" xp={xp} streak={streak} onBack={onBack} />
+      <GameTopBar label="Category Match" xp={xp} streak={streak} onBack={onBack} />
       <GamePanel>
-        <span className="clue-card__label">CHEMISTRY · MATERIALS</span>
-        <h1 className="text-2xl font-bold mt-1 mb-3">Match Metal or Non-Metal</h1>
+        <span className="clue-card__label">{contextLabel(commonContext(levels), "CATEGORY MATCH")}</span>
+        <h1 className="text-2xl font-bold mt-1 mb-3">Match Each Card to Its Category</h1>
         <p className="hint-text text-sm mb-4">
-          Match each material or property to Metal or Non-Metal — extra cards in
-          the tray are decoys, so double-check before you assign.
+          Match each card to the category it belongs to —
+          extra cards in the tray are decoys, so double-check before you assign.
         </p>
         <div className="flex flex-col gap-3">
           {levels.map((level) => (
@@ -62,18 +62,19 @@ function LevelSelectScreen({ levels, xp, streak, onBack, onPick }) {
 // ---------- Fraction-matching play screen ----------
 // ---------- Mission briefing (Phase 11) ----------
 function LobbyScreen({ level, levelIndex, totalLevels, xp, streak, xpInfo, onBack, onStart }) {
+  const ctx = getLevelContext(level);
   return (
     <GamePage>
-      <GameTopBar label="Metals & Non-Metals Match" xp={xp} streak={streak} onBack={onBack} />
+      <GameTopBar label="Category Match" xp={xp} streak={streak} onBack={onBack} />
       <GameLobby
         title={level.title}
-        subjectLabel="CHEMISTRY · MATERIALS"
+        subjectLabel={contextLabel(ctx, "CATEGORY MATCH")}
         objective={level.concept_id?.explanation_text}
         difficulty={level.difficulty}
         levelIndex={levelIndex}
         totalLevels={totalLevels}
         xpInfo={xpInfo}
-        skills={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+        skills={contextSkills(ctx, ["Category Matching"])}
         onStart={onStart}
         onBack={onBack}
       />
@@ -149,13 +150,13 @@ function MatchScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
         progress={totalLevels ? { current: levelIndex + 1, total: totalLevels } : undefined}
       />
       <GamePanel>
-        <GameObjective>Match each material or property to Metal or Non-Metal.</GameObjective>
+        <GameObjective>Match each card to the category it belongs to.</GameObjective>
 
         <span className="clue-card__label">CHALLENGE</span>
         <h2 className="text-lg font-bold mt-1 mb-4">{scenario}</h2>
 
         <p className="hint-text text-xs mb-2">
-          Materials & properties (pick a category below, then tap a card):
+          Cards (pick a category below, then tap a card):
         </p>
         <div className="flex flex-col gap-2 mb-5">
           {slots.map((slot) => (
@@ -200,7 +201,7 @@ function MatchScreen({ level, sessionId, xp, streak, onBack, onSolved, levelInde
             explanation={!feedback.isCorrect ? feedback.hint || hint : null}
             whatYouLearned={
               feedback.isCorrect
-                ? "Metals are typically shiny, malleable, and good conductors, while non-metals are usually dull, brittle, and poor conductors."
+                ? "Matching each card correctly shows how the ideas in this topic are grouped."
                 : null
             }
           />
@@ -228,11 +229,11 @@ function ResultScreen({ level, result, xp, streak, onPlayAnother, onHome, onBack
       xpAwarded={result?.xpAwarded ?? 0}
       xpCapped={result?.xpCapped ?? false}
       streak={result?.newStreak ?? streak}
-      skillsPracticed={GAME_TYPE_TO_SKILLS[GAME_TYPE]}
+      skillsPracticed={contextSkills(getLevelContext(level), ["Category Matching"])}
       onPlayAgain={onPlayAnother}
       onBackToChapter={onBackToChapter}
       onNextGame={onNextGame}
-      playAgainLabel="Match More Materials"
+      playAgainLabel="Match Another Round"
       onDashboard={onHome}
       dashboardLabel="Back to Home"
       xp={xp}
@@ -317,7 +318,7 @@ function ChemistryMatchGame() {
       });
   };
 
-  if (stage === "loading") return <GameLoadingState label="Loading Metals & Non-Metals Match..." />;
+  if (stage === "loading") return <GameLoadingState label="Loading Category Match..." />;
   if (stage === "error")
     return (
       <GameErrorState message={error} onRetry={loadLevels} onBack={goBack} />

@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { formatDuration, formatPercent, contestPlace } from "./contestDisplay";
+import { formatDuration, formatPercent, contestPlace, contestPhaseNotice, contestPlayHint, formatContestTime } from "./contestDisplay";
 
 describe("formatDuration", () => {
   test.each([
@@ -23,5 +23,42 @@ describe("formatPercent / contestPlace", () => {
   test("place falls back to 'All chapters'", () => {
     expect(contestPlace({ subject: "Maths", chapterTitle: null })).toBe("Maths · All chapters");
     expect(contestPlace({ subject: "Maths", chapterTitle: "Fractions" })).toBe("Maths · Fractions");
+  });
+});
+
+describe("grade-aware contest wording", () => {
+  const start = "2030-01-01T10:00:00.000Z";
+  const end = "2030-01-02T10:00:00.000Z";
+  const ORIGINAL = {
+    UPCOMING: `This contest starts ${formatContestTime(start)}. You can look around now — the games unlock when it begins.`,
+    ACTIVE: `Live now — ends ${formatContestTime(end)}. Each game counts once, so give it your best try.`,
+    ENDED: `This contest ended ${formatContestTime(end)}. You can no longer start games for it.`,
+  };
+  const ORIGINAL_HINT =
+    "Tapping Play opens the game and shows only this contest's levels. XP, mastery and streaks work exactly like normal practice.";
+
+  test("Grades 7-12, missing and unknown grades keep the original sentences exactly", () => {
+    for (const g of [7, 8, 9, 10, 11, 12, null, undefined, 2]) {
+      for (const phase of ["UPCOMING", "ACTIVE", "ENDED"]) expect(contestPhaseNotice(phase, g, start, end)).toBe(ORIGINAL[phase]);
+      expect(contestPlayHint(g)).toBe(ORIGINAL_HINT);
+    }
+  });
+
+  test("Grade 4 gets the shortest wording and still carries the end time", () => {
+    for (const phase of ["UPCOMING", "ACTIVE", "ENDED"]) {
+      expect(contestPhaseNotice(phase, 4, start, end).length).toBeLessThan(ORIGINAL[phase].length);
+    }
+    expect(contestPhaseNotice("ACTIVE", 4, start, end)).toContain(formatContestTime(end));
+    expect(contestPhaseNotice("UPCOMING", 4, start, end)).toContain(formatContestTime(start));
+    expect(contestPlayHint(4).length).toBeLessThan(contestPlayHint(5).length);
+  });
+
+  test("Grades 5 and 6 are simplified, but less than Grade 4", () => {
+    for (const g of [5, 6]) {
+      expect(contestPhaseNotice("ACTIVE", g, start, end)).toBe(contestPhaseNotice("ACTIVE", 5, start, end));
+      expect(contestPhaseNotice("ACTIVE", g, start, end).length).toBeLessThan(ORIGINAL.ACTIVE.length);
+      expect(contestPhaseNotice("ACTIVE", g, start, end).length).toBeGreaterThan(contestPhaseNotice("ACTIVE", 4, start, end).length);
+      expect(contestPlayHint(g).length).toBeLessThan(ORIGINAL_HINT.length);
+    }
   });
 });

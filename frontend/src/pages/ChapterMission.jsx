@@ -348,7 +348,7 @@ function ChapterMission() {
         Chapter Missions
       </p>
       {games && games.length > 0 ? (
-        <div className="flex flex-col gap-2 mb-6">
+        <div className="flex flex-col gap-2 mb-6 card-grid">
           {games.map(({ game_type, label, count }) => (
             <GameCard
               key={game_type}

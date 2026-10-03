@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 import "../Auth.css";
+import AuthBrandPanel from "../components/AuthBrandPanel.jsx";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -41,7 +42,8 @@ function ForgotPassword() {
 
   if (status === "success") {
     return (
-      <div className="auth-page min-h-screen flex items-center justify-center p-4">
+      <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+        <AuthBrandPanel />
         <div className="auth-page__card w-full max-w-sm p-6 text-center">
           <div className="auth-page__brand-row" style={{ justifyContent: "center" }}>
             <span className="auth-page__brand-badge" aria-hidden="true">
@@ -60,7 +62,8 @@ function ForgotPassword() {
   }
 
   return (
-    <div className="auth-page min-h-screen flex items-center justify-center p-4">
+    <div className="auth-page auth-page--split min-h-screen flex items-center justify-center p-4">
+      <AuthBrandPanel />
       <form
         onSubmit={handleSubmit}
         noValidate

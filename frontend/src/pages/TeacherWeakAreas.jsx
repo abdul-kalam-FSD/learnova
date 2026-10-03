@@ -47,6 +47,7 @@ function TeacherWeakAreas() {
       <div className="teacher-page__toolbar mb-4">
         <select
           className="teacher-page__select"
+          aria-label="Filter by grade"
           value={grade}
           onChange={(e) => setGrade(e.target.value)}
         >
