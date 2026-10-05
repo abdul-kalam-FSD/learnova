@@ -7,7 +7,7 @@
 // different one-off class name per page.
 function PageLoading({ label = "Loading..." }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-center min-h-[40vh]">
+    <div className="loading-state flex flex-col items-center justify-center gap-3 py-16 text-center min-h-[40vh]">
       <div
         className="h-10 w-10 rounded-full border-4 border-current border-t-transparent animate-spin"
         style={{ color: "var(--primary-color)" }}

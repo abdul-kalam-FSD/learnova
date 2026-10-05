@@ -251,7 +251,7 @@ export function GameLoadingState({ label = "Preparing your challenge..." }) {
   return (
     <GamePage>
       <GamePanel>
-        <div className="flex flex-col items-center justify-center gap-3 py-16 text-center">
+        <div className="loading-state flex flex-col items-center justify-center gap-3 py-16 text-center">
           <div
             className="h-10 w-10 rounded-full border-4 border-current border-t-transparent animate-spin"
             style={{ color: "var(--primary-color)" }}

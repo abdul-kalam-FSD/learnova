@@ -450,3 +450,15 @@
 .auth-page__role-option--active {
   box-shadow: 0 0 0 1px var(--primary-color) inset;
 }
+
+/* Motion polish: field hover hint and a soft entrance for validation
+   messages so errors read as a response rather than a layout jump. */
+.auth-page__input:hover:not(:focus) {
+  border-color: color-mix(in srgb, var(--primary-color) 40%, var(--border-color));
+}
+.auth-page__error {
+  animation: ui-rise-in 200ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-page__error { animation: none; }
+}

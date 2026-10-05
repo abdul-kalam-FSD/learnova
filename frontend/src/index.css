@@ -150,6 +150,8 @@
   --font-body: "Inter", sans-serif;
   --motion-fast: 0.15s ease;
   --motion-base: 0.25s ease;
+  --motion-slow: 0.35s ease;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --shadow-sm: 0 1px 4px rgba(31, 51, 41, 0.05);
   --shadow-lg: 0 8px 24px rgba(31, 51, 41, 0.12);
 
@@ -419,4 +421,101 @@ button {
 .theme-option__label {
   /* inherits sizing/color from .theme-option — kept as its own
      element for consistency, not because it needs its own styling. */
+}
+
+/* ---------- Motion polish layer ----------
+   Shared keyframes + a few gap-fillers on top of the existing tokens.
+   Entrance animations use fill-mode `backwards` (never `both`/`forwards`)
+   so that once they finish, the element's own hover/active transforms
+   are not pinned by the animation. All of it is covered by the global
+   prefers-reduced-motion rule above, and the keyframed parts are also
+   switched off explicitly at the bottom of this block. */
+@keyframes ui-rise-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes ui-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ui-pop-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Theme switch: soften the page-level colour change only (not every
+   element, which would make hover states lag). */
+body {
+  transition: background-color var(--motion-base), color var(--motion-base);
+}
+
+/* Secondary / investigation buttons had hover + press styles but no
+   transition, so they snapped. Same properties as .btn-primary. */
+.btn-secondary,
+.btn-investigation {
+  transition: filter var(--motion-fast), transform var(--motion-fast),
+    background-color var(--motion-fast), border-color var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+
+/* Press feedback: the CTA glow tightens while pressed. */
+.btn-primary:active:not(:disabled) {
+  box-shadow: 0 3px 8px -6px color-mix(in srgb, var(--primary-color) 55%, transparent);
+}
+
+/* Bug-class fix: .btn-pill:active (declared after .btn-pill:disabled)
+   used to win the cascade, so a disabled pill still shrank on press.
+   Disabled controls must not react at all. */
+.btn-pill:disabled:active,
+.btn-primary:disabled:active,
+.btn-secondary:disabled:active,
+.btn-investigation:disabled:active {
+  transform: none;
+}
+
+/* Form fields: smooth focus/hover. Element selectors keep specificity
+   at zero, so any component class with its own transition still wins. */
+input,
+select,
+textarea {
+  transition: border-color var(--motion-fast), box-shadow var(--motion-fast),
+    background-color var(--motion-fast);
+}
+
+/* Loading states: a short fade so the spinner never pops in, delayed
+   slightly so near-instant loads do not flash it at all. Layout space
+   is reserved (min-height) so nothing jumps either way. */
+.loading-state {
+  animation: ui-fade-in 200ms ease-out 100ms backwards;
+}
+
+/* Lists that fill in after data arrives: a light, capped stagger.
+   Only 5 steps of 25ms, so the last card is never more than ~130ms
+   behind the first. Page-level slide-in above is unchanged. */
+@media (prefers-reduced-motion: no-preference) {
+  .world-card,
+  .chapter-card,
+  .contest-card,
+  .game-card--clickable,
+  .hub-item,
+  .leaderboard__row {
+    animation: ui-rise-in 240ms var(--ease-out) backwards;
+  }
+  :is(.world-card, .chapter-card, .contest-card, .game-card--clickable, .hub-item, .leaderboard__row):nth-child(2) { animation-delay: 25ms; }
+  :is(.world-card, .chapter-card, .contest-card, .game-card--clickable, .hub-item, .leaderboard__row):nth-child(3) { animation-delay: 50ms; }
+  :is(.world-card, .chapter-card, .contest-card, .game-card--clickable, .hub-item, .leaderboard__row):nth-child(4) { animation-delay: 75ms; }
+  :is(.world-card, .chapter-card, .contest-card, .game-card--clickable, .hub-item, .leaderboard__row):nth-child(5) { animation-delay: 100ms; }
+  :is(.world-card, .chapter-card, .contest-card, .game-card--clickable, .hub-item, .leaderboard__row):nth-child(n + 6) { animation-delay: 125ms; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-state,
+  .world-card,
+  .chapter-card,
+  .contest-card,
+  .game-card--clickable,
+  .hub-item,
+  .leaderboard__row {
+    animation: none;
+  }
 }

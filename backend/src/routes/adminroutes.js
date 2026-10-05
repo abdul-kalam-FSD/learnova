@@ -9,6 +9,7 @@ const {
   downloadSyncedWorkbook,
   retrySync,
   setUserRole,
+  getTeacherStudents,
   getDashboardStats,
 } = require("../controllers/adminControllers");
 const {
@@ -77,6 +78,7 @@ router.get("/results/export", exportResultsExcel);
 router.get("/results/synced-file", downloadSyncedWorkbook);
 router.post("/results/:sessionId/retry-sync", retrySync);
 router.patch("/users/:id/role", setUserRole);
+router.get("/teachers/:id/students", getTeacherStudents);
 
 router.get("/subjects", listSubjects);
 router.post("/subjects", createSubject);

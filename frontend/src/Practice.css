@@ -935,3 +935,52 @@
 .practice-pill--xp {
   color: var(--xp-text);
 }
+
+/* ---------- Motion polish: answer + result feedback ----------
+   Quick (<= 260ms) and non-blocking: nothing here delays the next
+   question or disables input, it only makes the state change readable.
+   Wrong answers get a tiny sideways nudge (not a shake-the-screen
+   effect); right answers a small settle. */
+@keyframes option-correct-settle {
+  0% { transform: scale(0.985); }
+  60% { transform: scale(1.012); }
+  100% { transform: scale(1); }
+}
+@keyframes option-incorrect-nudge {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+.option--correct {
+  animation: option-correct-settle 240ms var(--ease-out);
+}
+.option--incorrect {
+  animation: option-incorrect-nudge 220ms ease-in-out;
+}
+
+/* Result screen: badge settles in, title/stats follow in sequence. */
+.case-closed__badge {
+  animation: ui-pop-in 260ms var(--ease-out) backwards;
+}
+.game-results__title {
+  animation: ui-rise-in 260ms var(--ease-out) 60ms backwards;
+}
+.case-closed__badge ~ .clue-card {
+  animation: ui-rise-in 300ms var(--ease-out) 120ms backwards;
+}
+.game-results__stats .case-closed__stat {
+  animation: ui-pop-in 260ms var(--ease-out) 140ms backwards;
+}
+.game-results__stats .case-closed__stat:nth-child(2) { animation-delay: 200ms; }
+.game-results__stats .case-closed__stat:nth-child(3) { animation-delay: 260ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .option--correct,
+  .option--incorrect,
+  .case-closed__badge,
+  .game-results__title,
+  .case-closed__badge ~ .clue-card,
+  .game-results__stats .case-closed__stat {
+    animation: none;
+  }
+}

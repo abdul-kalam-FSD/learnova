@@ -4,7 +4,7 @@
 // teacher page load (Part 14 of the redesign spec: no blank screens).
 function RouteLoading({ label = "Checking access..." }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-24 text-center">
+    <div className="loading-state flex flex-col items-center justify-center gap-3 py-24 text-center">
       <div
         className="h-10 w-10 rounded-full border-4 border-current border-t-transparent animate-spin"
         style={{ color: "var(--primary-color)" }}

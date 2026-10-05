@@ -4,6 +4,7 @@ const ExcelJS = require("exceljs");
 const fs = require("fs");
 const User = require("../models/User");
 const QuizSession = require("../models/QuizzSession");
+const Section = require("../models/Section");
 const { syncSessionToExcel, WORKBOOK_PATH } = require("../utils/performanceSync");
 const { computeUserQuizStats, SESSION_TYPE_LABELS } = require("../utils/quizStats");
 const {
@@ -28,6 +29,93 @@ function parsePagination(query) {
   return { page, limit, skip: (page - 1) * limit };
 }
 
+
+// ---------- Teacher -> student relationship ----------
+// The source of truth for "which students belong to which teacher" is
+// Section (teacher_id + student_ids) — the same relationship the
+// teacher dashboard scopes on (teacherControllers.resolveScopedStudentIds).
+// Counts here only include real enrolled students: a student_ids entry
+// pointing at a deleted user, a guest, or a non-student is not counted,
+// so the number always matches the list returned by getTeacherStudents.
+const REAL_STUDENT_FILTER = { role: "student", is_guest: { $ne: true } };
+
+async function countStudentsByTeacher(teacherIds) {
+  if (!teacherIds.length) return new Map();
+  const rows = await Section.aggregate([
+    { $match: { teacher_id: { $in: teacherIds } } },
+    { $unwind: "$student_ids" },
+    // Distinct (teacher, student) pairs — defensive; the controller
+    // already keeps a student in at most one section.
+    { $group: { _id: { teacher: "$teacher_id", student: "$student_ids" } } },
+    {
+      $lookup: {
+        from: User.collection.name,
+        localField: "_id.student",
+        foreignField: "_id",
+        as: "u",
+      },
+    },
+    { $match: { u: { $elemMatch: REAL_STUDENT_FILTER } } },
+    { $group: { _id: "$_id.teacher", count: { $sum: 1 } } },
+  ]);
+  return new Map(rows.map((r) => [String(r._id), r.count]));
+}
+
+// ---------- A teacher's assigned students (admin view) ----------
+// GET /api/admin/teachers/:id/students — the roster behind the
+// "Students" count on the Manage Staff table. Same Section-based
+// relationship and same real-student filter as countStudentsByTeacher,
+// so list length === count shown in the table.
+const getTeacherStudents = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid teacher id" });
+    }
+
+    const teacher = await User.findOne({ _id: id, role: "teacher" }).select("name email status");
+    if (!teacher) {
+      return res.status(404).json({ message: "Teacher not found" });
+    }
+
+    const sections = await Section.find({ teacher_id: teacher._id })
+      .select("name grade student_ids")
+      .sort({ grade: 1, name: 1 });
+
+    const sectionByStudent = new Map();
+    for (const sec of sections) {
+      for (const sid of sec.student_ids) {
+        if (!sectionByStudent.has(String(sid))) {
+          sectionByStudent.set(String(sid), { id: sec._id, name: sec.name });
+        }
+      }
+    }
+
+    const students = sectionByStudent.size
+      ? await User.find({ _id: { $in: [...sectionByStudent.keys()] }, ...REAL_STUDENT_FILTER })
+          .select("name email grade xp_total streak_count last_active_date")
+          .sort({ grade: 1, name: 1 })
+      : [];
+
+    res.status(200).json({
+      teacher: { id: teacher._id, name: teacher.name, email: teacher.email, status: teacher.status },
+      total: students.length,
+      students: students.map((s) => ({
+        id: s._id,
+        name: s.name,
+        email: s.email,
+        grade: s.grade,
+        xpTotal: s.xp_total,
+        streakCount: s.streak_count,
+        lastActiveAt: s.last_active_date ?? null,
+        section: sectionByStudent.get(String(s._id)) ?? null,
+      })),
+    });
+  } catch (err) {
+    sendError(res, err);
+  }
+};
+
 // ---------- Users (all roles — for Manage Staff) ----------
 // Separate from listStudents on purpose: listStudents is scoped to
 // role:"student" for the Students tab, while this powers a screen
@@ -35,7 +123,7 @@ function parsePagination(query) {
 
 const listUsers = async (req, res) => {
   try {
-    const { search, role } = req.query;
+    const { search, role, status } = req.query;
     const { page, limit, skip } = parsePagination(req.query);
 
     // Guests (anonymous "Guest" accounts from the public play-without-
@@ -44,6 +132,10 @@ const listUsers = async (req, res) => {
     // way listStudents excludes them from the Students tab.
     const filter = { is_guest: { $ne: true } };
     if (role) filter.role = role;
+    // Optional exact-match status filter (used by the Staff summary's
+    // "Pending Teachers" count). Only the two real enum values are
+    // honoured, so a crafted query object can never reach Mongo.
+    if (status === "active" || status === "pending") filter.status = status;
     if (search) {
       filter.$or = [
         { name: { $regex: escapeRegex(search), $options: "i" } },
@@ -60,6 +152,11 @@ const listUsers = async (req, res) => {
       User.countDocuments(filter),
     ]);
 
+    // Assigned-student count for teacher rows only (other roles have
+    // no roster, so the field is omitted rather than sent as 0).
+    const teacherIds = users.filter((u) => u.role === "teacher").map((u) => u._id);
+    const studentCounts = await countStudentsByTeacher(teacherIds);
+
     res.status(200).json({
       users: users.map((u) => ({
         id: u._id,
@@ -69,6 +166,7 @@ const listUsers = async (req, res) => {
         status: u.status,
         grade: u.grade,
         joinedAt: u.createdAt,
+        ...(u.role === "teacher" ? { studentCount: studentCounts.get(String(u._id)) ?? 0 } : {}),
       })),
       page,
       limit,
@@ -566,6 +664,7 @@ module.exports = {
   downloadSyncedWorkbook,
   retrySync,
   setUserRole,
+  getTeacherStudents,
   getDashboardStats,
   // Exported for tests/unit/resultRow.test.js — pure function, no DB
   // access, so it doesn't need the mongodb-memory-server integration

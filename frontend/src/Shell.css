@@ -63,11 +63,18 @@
   font-size: var(--fs-xl);
   color: var(--text-color);
   cursor: pointer;
-  transition: background-color var(--motion-fast);
+  transition: background-color var(--motion-fast), transform var(--motion-fast);
 }
 
 .icon-btn:active {
   background-color: var(--surface-color);
+  transform: scale(0.94);
+}
+
+@media (hover: hover) {
+  .icon-btn:hover {
+    background-color: var(--surface-color);
+  }
 }
 
 /* ---------- Drawer ---------- */
@@ -96,7 +103,8 @@
   background-color: var(--card-bg);
   border-right: 1px solid var(--border-color);
   transform: translateX(-100%);
-  transition: transform var(--motion-base);
+  box-shadow: none;
+  transition: transform var(--motion-slow) var(--ease-out), box-shadow var(--motion-slow);
   z-index: 50;
   display: flex;
   flex-direction: column;
@@ -105,6 +113,7 @@
 
 .drawer--open {
   transform: translateX(0);
+  box-shadow: var(--shadow-raised);
 }
 
 .drawer__header {
@@ -155,10 +164,17 @@
   border: none;
   text-align: left;
   cursor: pointer;
+  transition: background-color var(--motion-fast), padding-left var(--motion-fast);
 }
 
 .drawer__link:active {
   background-color: var(--surface-color);
+}
+
+@media (hover: hover) {
+  .drawer__link:hover {
+    background-color: var(--surface-color);
+  }
 }
 
 .drawer__link--install {

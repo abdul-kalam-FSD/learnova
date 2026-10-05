@@ -939,3 +939,45 @@
   color: var(--text-secondary);
   margin: 8px 0 2px;
 }
+
+/* ---------- Motion polish ----------
+   Admin buttons had hover colours but no transitions (snapped) and no
+   press state. Disabled variants are excluded so they stay inert. */
+.admin-page__page-btn,
+.admin-page__export-btn,
+.admin-page__add-btn,
+.content-row__action-btn,
+.dash-link-btn,
+.admin-detail__back {
+  transition: background-color var(--motion-fast), border-color var(--motion-fast),
+    color var(--motion-fast), filter var(--motion-fast), transform var(--motion-fast);
+}
+.admin-page__export-btn:active:not(:disabled):not(.admin-page__export-btn--disabled),
+.admin-page__add-btn:active:not(:disabled),
+.content-row__action-btn:active:not(:disabled),
+.admin-page__page-btn:active:not(:disabled):not(.admin-page__page-btn--disabled) {
+  transform: scale(0.98);
+}
+
+.admin-modal__input:hover:not(:focus) {
+  border-color: color-mix(in srgb, var(--primary-color) 40%, var(--border-color));
+}
+
+.admin-modal__backdrop {
+  animation: ui-fade-in 180ms ease-out;
+}
+.admin-modal {
+  animation: ui-pop-in 220ms var(--ease-out);
+}
+.admin-modal__error,
+.admin-page__error {
+  animation: ui-rise-in 200ms var(--ease-out);
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-modal__backdrop,
+  .admin-modal,
+  .admin-modal__error,
+  .admin-page__error {
+    animation: none;
+  }
+}

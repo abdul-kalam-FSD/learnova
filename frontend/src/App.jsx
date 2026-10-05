@@ -25,6 +25,7 @@ import AdminStudents from "./pages/AdminStudents";
 import AdminStudentDetail from "./pages/AdminStudentDetail";
 import AdminResults from "./pages/AdminResults";
 import AdminStaff from "./pages/AdminStaff";
+import AdminTeacherStudents from "./pages/AdminTeacherStudents";
 import AdminContent from "./pages/AdminContent";
 import AdminGameContent from "./pages/AdminGameContent";
 import AdminCases from "./pages/AdminCases";
@@ -1171,6 +1172,16 @@ function App() {
           <AdminRoute>
             <AppLayout>
               <AdminStaff />
+            </AppLayout>
+          </AdminRoute>
+        }
+      />
+      <Route
+        path="/admin/teachers/:id/students"
+        element={
+          <AdminRoute>
+            <AppLayout>
+              <AdminTeacherStudents />
             </AppLayout>
           </AdminRoute>
         }

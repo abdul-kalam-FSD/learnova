@@ -822,3 +822,8 @@
 .teacher-page .teacher-assignments__card .teacher-page__error {
   margin: 8px 0 0;
 }
+
+/* Motion polish: table row highlight eases instead of snapping. */
+.teacher-page .teacher-table__cell {
+  transition: background-color var(--motion-fast);
+}

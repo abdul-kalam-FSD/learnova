@@ -1041,3 +1041,14 @@
     transition: none;
   }
 }
+
+/* Hero entrance: eyebrow, title, copy, CTAs and stats rise in a short
+   sequence (all done within ~500ms) so the landing page feels composed
+   on first paint. Page-level orbit icons are unchanged. */
+@media (prefers-reduced-motion: no-preference) {
+  .ph-hero__eyebrow { animation: ui-rise-in 320ms var(--ease-out) backwards; }
+  .ph-hero__title { animation: ui-rise-in 360ms var(--ease-out) 50ms backwards; }
+  .ph-hero__sub { animation: ui-rise-in 360ms var(--ease-out) 110ms backwards; }
+  .ph-hero__actions { animation: ui-rise-in 360ms var(--ease-out) 170ms backwards; }
+  .ph-hero__stats { animation: ui-rise-in 360ms var(--ease-out) 230ms backwards; }
+}
